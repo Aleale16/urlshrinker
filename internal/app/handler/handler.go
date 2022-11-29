@@ -21,15 +21,15 @@ func StatusOKHandler(w http.ResponseWriter, r *http.Request) {
 
 func ReqHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
-        postHandler(w, r)
+        PostHandler(w, r)
     }
 	if r.Method == http.MethodGet {
-        getHandler(w, r)
+        GetHandler(w, r)
     }
 	fmt.Println(r.Method)
 }
 
-func getHandler(w http.ResponseWriter, r *http.Request) {
+func GetHandler(w http.ResponseWriter, r *http.Request) {
 	// этот обработчик принимает только запросы, отправленные методом GET
 	if r.Method != http.MethodGet {
         http.Error(w, "Only Get requests are allowed!", http.StatusBadRequest)
@@ -48,15 +48,10 @@ func getHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusTemporaryRedirect)
 	//w.WriteHeader(http.StatusOK)
 
-	fmt.Println("GET: " + q)
+	fmt.Println("GET: " + q + " Redirect to " + storage.Getrecord(q))
 }
 
-func postHandler(w http.ResponseWriter, r *http.Request) (shortURL string){
-	// этот обработчик принимает только запросы, отправленные методом POST и GET
-	if r.Method != http.MethodPost {
-        http.Error(w, "Only Post requests are allowed!", http.StatusBadRequest)
-        return
-    }
+func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 
 	// читаем Body (Тело POST запроса)
 		b, err := io.ReadAll(r.Body)
@@ -74,9 +69,11 @@ func postHandler(w http.ResponseWriter, r *http.Request) (shortURL string){
 	//отладка что было в POST запросе
 	//w.Write([]byte(b))
 
+//типа return:
 	w.Write([]byte(shortURLpath))
 
 	fmt.Println("POST: " + string(b)+ " return id= "+ shortURLid)	
+		
 
-	return shortURLpath
+	//return shortURLpath
 }

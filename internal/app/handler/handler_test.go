@@ -59,7 +59,9 @@ func TestReqHandlerPost(t *testing.T) {
 
 	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(ReqHandler)
+	handler := http.HandlerFunc(PostHandler)
+	
+
 
 	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
 	// directly and pass in our Request and ResponseRecorder.
@@ -93,7 +95,7 @@ func TestReqHandlerGet1(t *testing.T) {
 
 	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(ReqHandler)
+	handler := http.HandlerFunc(GetHandler)
 
 	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
 	// directly and pass in our Request and ResponseRecorder.
@@ -127,7 +129,7 @@ func TestReqHandlerGet2(t *testing.T) {
 		t.Fatal(err)
 	}	
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(ReqHandler)
+	handler := http.HandlerFunc(GetHandler)
 	handler.ServeHTTP(rr, reqget)
 	status := rr.Code
 	if  status != http.StatusTemporaryRedirect {
@@ -154,7 +156,7 @@ func TestReqHandlerGet3(t *testing.T) {
 		t.Fatal(err)
 	}	
 	rr := httptest.NewRecorder()
-	handler := http.HandlerFunc(ReqHandler)
+	handler := http.HandlerFunc(GetHandler)
 	handler.ServeHTTP(rr, reqget)
 	status := rr.Code
 	if  status != http.StatusBadRequest {
