@@ -16,9 +16,14 @@ func Initdb() {
 }
 
 func Storerecord(fullURL string) string{
+	//Once.Do(Initdb())
 	id := strconv.Itoa(rand.Intn(9999))
-	URL[id] = fullURL
-	return id
+	
+	for (!isnewID(id)){
+		id = strconv.Itoa(rand.Intn(9999))
+	}
+		URL[id] = fullURL
+		return id
 }
 
 func Getrecord(id string) string {
@@ -27,6 +32,13 @@ func Getrecord(id string) string {
 	if (result != ""){
 		return result
 	} else {
-		return "error404"
+		return "http://google.com/404"
 	}
+}
+
+func isnewID(id string) bool{
+	result := URL[id]
+	if (result == ""){
+		return true
+	} else {return false}
 }
