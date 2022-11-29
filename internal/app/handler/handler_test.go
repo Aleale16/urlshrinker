@@ -42,7 +42,7 @@ func TestHealthCheckHandler(t *testing.T) {
 	fmt.Println(req.URL)
 }
 
-func TestReqHandler(t *testing.T) {
+func TestReqHandlerPost(t *testing.T) {
 	storage.Initdb()
 	var body = []byte("https://ya.ru")	
 	//Описание тела запроса в JSON
