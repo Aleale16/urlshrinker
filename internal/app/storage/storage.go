@@ -20,7 +20,6 @@ func Storerecord(fullURL string) string{
 }
 
 func Getrecord(id string) string {
-
 	result := URL[id]
 
 	if (result != ""){
