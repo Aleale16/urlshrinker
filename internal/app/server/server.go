@@ -10,7 +10,7 @@ import (
 
 func Start(){
 	storage.Initdb()
-	fmt.Println("Storage ready!")
+	
 	http.HandleFunc("/health-check", handler.StatusOKHandler)
 
 	http.HandleFunc("/", handler.ReqHandler) //Мне так не нравится, хочется тип запроса обработать уже здесь

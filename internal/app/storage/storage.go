@@ -1,6 +1,7 @@
 package storage
 
 import (
+	"fmt"
 	"math/rand"
 	"strconv"
 )
@@ -11,6 +12,7 @@ var URL URLrecord
 
 func Initdb() {
 	URL = make(URLrecord)
+	fmt.Println("Storage ready!")
 }
 
 func Storerecord(fullURL string) string{
@@ -21,7 +23,7 @@ func Storerecord(fullURL string) string{
 
 func Getrecord(id string) string {
 	result := URL[id]
-	
+
 	if (result != ""){
 		return result
 	} else {
