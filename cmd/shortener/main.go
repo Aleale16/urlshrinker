@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Aleale16/practicumDev/internal/app/server"
+	"github.com/Aleale16/urlshrinker/internal/app/server"
 )
 
 func main() {

@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/Aleale16/practicumDev/internal/app/storage"
+	"github.com/Aleale16/urlshrinker/internal/app/storage"
 )
 
 func StatusOKHandler(w http.ResponseWriter, r *http.Request) {

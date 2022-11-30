@@ -1,4 +1,4 @@
-module github.com/Aleale16/practicumDev
+module github.com/Aleale16/urlshrinker
 
 go 1.19
 

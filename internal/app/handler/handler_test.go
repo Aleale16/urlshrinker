@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Aleale16/practicumDev/internal/app/storage"
+	"github.com/Aleale16/urlshrinker/internal/app/storage"
 )
 
 func TestHealthCheckHandler(t *testing.T) {
