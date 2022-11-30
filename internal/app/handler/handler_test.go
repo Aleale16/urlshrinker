@@ -82,11 +82,9 @@ func TestReqHandlerPost(t *testing.T) {
 func TestReqHandlerGet1(t *testing.T) {
 //Запрос существующего id
 	reqget, err := http.NewRequest("GET", "/?id=7943", nil)
-
 	if err != nil {
 		t.Fatal(err)
 	}	
-
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(GetHandler)
 	handler.ServeHTTP(rr, reqget)
@@ -113,7 +111,7 @@ func TestReqHandlerGet1(t *testing.T) {
 }
 
 func TestReqHandlerGet2(t *testing.T) {
-//несуществующий id
+//запрос несуществующего id
 	reqget, err := http.NewRequest("GET", "/?id=xxxx", nil)
 	if err != nil {
 		t.Fatal(err)
@@ -140,7 +138,7 @@ func TestReqHandlerGet2(t *testing.T) {
 }
 
 func TestReqHandlerGet3(t *testing.T) {
-//несуществующий id
+//id отсутствует
 	reqget, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
 		t.Fatal(err)

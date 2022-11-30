@@ -18,7 +18,7 @@ func StatusOKHandler(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, `{"alive": true}`)
 
 }
-
+/* Наверное, больше не пригодится, если и дальше использовать Chi
 func ReqHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodPost {
         PostHandler(w, r)
@@ -28,14 +28,8 @@ func ReqHandler(w http.ResponseWriter, r *http.Request) {
     }
 	fmt.Println(r.Method)
 }
-
+*/
 func GetHandler(w http.ResponseWriter, r *http.Request) {
-	// этот обработчик принимает только запросы, отправленные методом GET
-	if r.Method != http.MethodGet {
-        http.Error(w, "Only Get requests are allowed!", http.StatusBadRequest)
-        return
-    }
-	
 	q := r.URL.Query().Get("id")
 	//q := r.URL.String()
     if q == "" {
@@ -46,13 +40,11 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Location", storage.Getrecord(q))
 	// устанавливаем статус-код 307
 	w.WriteHeader(http.StatusTemporaryRedirect)
-	//w.WriteHeader(http.StatusOK)
 
 	fmt.Println("GET: " + q + " Redirect to " + storage.Getrecord(q))
 }
 
 func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
-
 	// читаем Body (Тело POST запроса)
 		b, err := io.ReadAll(r.Body)
 		// обрабатываем ошибку

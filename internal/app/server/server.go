@@ -11,7 +11,7 @@ import (
 )
 
 func Start(){
-	//storage.Initdb()
+	//storage.Initdb() //Убрали управление инициализацией хранилища отсюда в storage
 
 	r := chi.NewRouter()
 
@@ -22,8 +22,9 @@ func Start(){
 	r.Use(middleware.Recoverer)
 	
 	r.Get("/", handler.GetHandler)
-	//r.Get("/health-check", handler.StatusOKHandler)
 	r.Post("/", handler.PostHandler)
+	//r.Get("/health-check", handler.StatusOKHandler)
+	
 
 	fmt.Println("Starting server...")
 
@@ -31,7 +32,8 @@ func Start(){
 	
 	/*http.HandleFunc("/health-check", handler.StatusOKHandler)
 
-	http.HandleFunc("/", handler.ReqHandler) //Мне так не нравится, хочется тип запроса обработать уже здесь
+	http.HandleFunc("/", handler.ReqHandler) //Мне так не нравится, хочется тип запроса обработать уже здесь.
+											//Для этого есть методы в роутере chi
 
 	fmt.Println("Starting server...")
 	//запуск сервера с адресом localhost, порт 8080
