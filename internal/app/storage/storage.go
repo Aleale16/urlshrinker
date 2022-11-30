@@ -4,11 +4,13 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
+	"sync"
 )
 
 type URLrecord map[string]string
 
 var URL URLrecord
+var onlyOnce sync.Once
 
 func Initdb() {
 	URL = make(URLrecord)
@@ -16,7 +18,7 @@ func Initdb() {
 }
 
 func Storerecord(fullURL string) string{
-	//Once.Do(Initdb())
+	onlyOnce.Do(Initdb)
 	id := strconv.Itoa(rand.Intn(9999))
 	
 	for (!isnewID(id)){
@@ -27,6 +29,7 @@ func Storerecord(fullURL string) string{
 }
 
 func Getrecord(id string) string {
+	onlyOnce.Do(Initdb)
 	result := URL[id]
 
 	if (result != ""){
