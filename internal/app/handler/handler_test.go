@@ -57,14 +57,8 @@ func TestReqHandlerPost(t *testing.T) {
 	}	
 	//reqpost.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
 
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(PostHandler)
-	
-
-
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, reqpost)
 
 	// Check the status code is what we expect.
@@ -93,12 +87,8 @@ func TestReqHandlerGet1(t *testing.T) {
 		t.Fatal(err)
 	}	
 
-	// We create a ResponseRecorder (which satisfies http.ResponseWriter) to record the response.
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(GetHandler)
-
-	// Our handlers satisfy http.Handler, so we can call their ServeHTTP method
-	// directly and pass in our Request and ResponseRecorder.
 	handler.ServeHTTP(rr, reqget)
 
 	// Check the status code is what we expect.
@@ -108,7 +98,7 @@ func TestReqHandlerGet1(t *testing.T) {
 			status, http.StatusTemporaryRedirect)
 	}
 
-	// Check the response body is what we expect.
+	// Check the response Header Location is what we expect.
 	expected := "http://URL..."
 	header := rr.Header()
 	if header.Get("Location") == "" {
