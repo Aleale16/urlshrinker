@@ -23,6 +23,7 @@ func Start(){
 	
 	r.Get("/", handler.GetHandler)
 	r.Post("/", handler.PostHandler)
+	r.Post("/api/shorten", handler.PostJSONHandler)
 	//r.Get("/health-check", handler.StatusOKHandler)
 	
 

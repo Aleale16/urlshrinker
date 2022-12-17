@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 
 	"github.com/Aleale16/urlshrinker/internal/app/storage"
@@ -65,6 +67,69 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 	w.Write([]byte(shortURLpath))
 
 	fmt.Println("POST: " + string(b)+ " return id= "+ shortURLid)	
+		
+
+	//return shortURLpath
+}
+
+//структура вводимого JSON
+type inputData struct {
+    //ID int `json:"ID"`
+    URL string `json:"url,omitempty"`   
+}
+
+//структура выводимого JSON	 
+type resultData struct {
+    //ID int `json:"ID"`
+    ShortURL string `json:"result"`    
+}
+
+func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
+	// читаем Body (Тело POST запроса)
+		b, err := io.ReadAll(r.Body)
+		// обрабатываем ошибку
+		if err != nil {
+			http.Error(w, err.Error(), 400)
+			return
+		}
+		//отладка всё что было в POST запросе
+		log.Println(string(b))
+		//Добавить?
+		//type Example struct {
+		//	URL   string `valid:"url"`
+		//}
+		var postJSON inputData
+		err = json.Unmarshal(b, &postJSON)
+		if err != nil {
+			panic(err)
+		}
+		//отладка что было в поле url в POST запросе
+		log.Println(postJSON.URL)
+
+	shortURLid := storage.Storerecord(string(postJSON.URL))
+	shortURLpath := "http://localhost:8080/?id="+ shortURLid
+	
+	var shortURLpathJSON resultData
+	shortURLpathJSON.ShortURL = shortURLpath
+
+	w.Header().Set("Content-Type", "application/json")
+	// устанавливаем статус-код 201
+	w.WriteHeader(http.StatusCreated)
+
+	shortURLpathJSONBz, err := json.MarshalIndent(shortURLpathJSON, "", "  ")
+	if err != nil {
+        panic(err)
+    }
+//типа return:
+	w.Write(shortURLpathJSONBz)
+	//или?
+	//w.Write([]byte(shortURLpathJSON))
+	//w.Write([]byte(shortURLpath))
+	//fmt.Println(string(shortURLpathJSONBz))
+	//w.Write([]byte(bJSONBz))
+	
+
+	fmt.Println("POST: " + string(shortURLpathJSONBz)+ " return id= "+ shortURLid + " return shortURLpath= "+ shortURLpath)	
 		
 
 	//return shortURLpath
