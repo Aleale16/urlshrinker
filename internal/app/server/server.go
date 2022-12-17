@@ -45,8 +45,8 @@ func Start(){
 
     log.Println(SrvConfig)
 
-	_, baseURL_exists := os.LookupEnv("BASE_URL")
-	_, srvAddress_exists := os.LookupEnv("SERVER_ADDRESS")
+	_, baseURLexists := os.LookupEnv("BASE_URL")
+	_, srvAddressexists := os.LookupEnv("SERVER_ADDRESS")
 
 	if (SrvConfig.User=="") {
 		UserName = "Noname"
@@ -55,7 +55,7 @@ func Start(){
 		}
 	log.Println("USERNAME: " + UserName)
 
-	if baseURL_exists {
+	if baseURLexists {
 		baseURL = SrvConfig.BaseURL
 		//baseURL = os.Getenv("BASE_URL")
 		} else {
@@ -65,7 +65,7 @@ func Start(){
     	}
 	log.Println("BASE_URL: " + baseURL)
 
-	if srvAddress_exists {
+	if srvAddressexists {
 		log.Print("SERVER_ADDRESS: " + "Loaded env: " + SrvConfig.SrvAddress)
 
 		log.Fatal(http.ListenAndServe(SrvConfig.SrvAddress, r))
