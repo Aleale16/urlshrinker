@@ -125,12 +125,8 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 	//или?
 	//w.Write([]byte(shortURLpathJSON))
 	//w.Write([]byte(shortURLpath))
-	//fmt.Println(string(shortURLpathJSONBz))
-	//w.Write([]byte(bJSONBz))
-	
 
-	fmt.Println("POST: " + string(shortURLpathJSONBz)+ " return id= "+ shortURLid + " return shortURLpath= "+ shortURLpath)	
-		
+	fmt.Println("POST: " + string(b)+ " return id= "+ shortURLid + " return JSON= "+ string(shortURLpathJSONBz))	
 
 	//return shortURLpath
 }
