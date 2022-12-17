@@ -4,16 +4,22 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/Aleale16/urlshrinker/internal/app/handler"
+	"github.com/caarlos0/env/v6"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
-
+type ServerConfig struct {
+	SrvAddress string `env:"SERVER_ADDRESS"`
+	BaseURL    string `env:"BASE_URL"`
+	User       string `env:"USERNAME"`
+}
 func Start(){
 
-	var serverConfig ServerConfig
-	var baseURL string
+	var SrvConfig ServerConfig
+	var baseURL, UserName string
 	//storage.Initdb() //Убрали управление инициализацией хранилища отсюда в storage
 
 	r := chi.NewRouter()
@@ -31,21 +37,48 @@ func Start(){
 	
 
 	fmt.Println("Starting server...")
+	
+    err := env.Parse(&SrvConfig)
+    if err != nil {
+        log.Fatal(err)
+    }
 
-	if (serverConfig.BaseURL=="") {
-		baseURL = "http://127.0.0.1"
+    log.Println(SrvConfig)
+
+	_, baseURL_exists := os.LookupEnv("BASE_URL")
+	_, srvAddress_exists := os.LookupEnv("SERVER_ADDRESS")
+
+	if (SrvConfig.User=="") {
+		UserName = "Noname"
 		} else {
-			baseURL = serverConfig.BaseURL
+			UserName = SrvConfig.User
 		}
+	log.Println("USERNAME: " + UserName)
+
+	if baseURL_exists {
+		baseURL = SrvConfig.BaseURL
+		//baseURL = os.Getenv("BASE_URL")
+		} else {
+			//запишем в переменную значение по умолчанию
+			os.Setenv("BASE_URL", "http://localhost:8080")
+			baseURL = os.Getenv("BASE_URL")
+    	}
 	log.Println("BASE_URL: " + baseURL)
 
-	if (serverConfig.srvAddress == "") {
-		log.Print("SERVER_ADDRESS: "+"Loaded default: " + "localhost:8080")
-		log.Fatal(http.ListenAndServe("localhost:8080", r))
+	if srvAddress_exists {
+		log.Print("SERVER_ADDRESS: " + "Loaded env: " + SrvConfig.SrvAddress)
+
+		log.Fatal(http.ListenAndServe(SrvConfig.SrvAddress, r))
 		} else {
-			log.Print("SERVER_ADDRESS: " + "Loaded env: " + serverConfig.srvAddress)
-			log.Fatal(http.ListenAndServe(serverConfig.srvAddress, r))
-		}
+			os.Setenv("SERVER_ADDRESS", "localhost:8080")
+			log.Print("SERVER_ADDRESS: "+"Loaded default: " + os.Getenv("SERVER_ADDRESS"))
+			log.Fatal(http.ListenAndServe(os.Getenv("SERVER_ADDRESS"), r))
+			//log.Print("SERVER_ADDRESS: " + "Loaded env: " + os.Getenv("SERVER_ADDRESS"))
+			//log.Fatal(http.ListenAndServe(os.Getenv("SERVER_ADDRESS"), r))
+    }
+
+
+
 
 
 	

@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/Aleale16/urlshrinker/internal/app/storage"
 )
@@ -55,7 +56,8 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 			return
 		}
 	shortURLid := storage.Storerecord(string(b))
-	shortURLpath := "http://localhost:8080/?id="+ shortURLid
+	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
+	shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid
 
 	// устанавливаем статус-код 201
 	w.WriteHeader(http.StatusCreated)
@@ -107,7 +109,8 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 		log.Println(postJSON.URL)
 
 	shortURLid := storage.Storerecord(string(postJSON.URL))
-	shortURLpath := "http://localhost:8080/?id="+ shortURLid
+	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
+	shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid
 	
 	var shortURLpathJSON resultData
 	shortURLpathJSON.ShortURL = shortURLpath
