@@ -11,6 +11,9 @@ import (
 )
 
 func Start(){
+
+	var serverConfig ServerConfig
+	var baseURL string
 	//storage.Initdb() //Убрали управление инициализацией хранилища отсюда в storage
 
 	r := chi.NewRouter()
@@ -29,7 +32,22 @@ func Start(){
 
 	fmt.Println("Starting server...")
 
-	log.Fatal(http.ListenAndServe("localhost:8080", r))
+	if (serverConfig.BaseURL=="") {
+		baseURL = "http://127.0.0.1"
+		} else {
+			baseURL = serverConfig.BaseURL
+		}
+	log.Println("BASE_URL: " + baseURL)
+
+	if (serverConfig.srvAddress == "") {
+		log.Print("SERVER_ADDRESS: "+"Loaded default: " + "localhost:8080")
+		log.Fatal(http.ListenAndServe("localhost:8080", r))
+		} else {
+			log.Print("SERVER_ADDRESS: " + "Loaded env: " + serverConfig.srvAddress)
+			log.Fatal(http.ListenAndServe(serverConfig.srvAddress, r))
+		}
+
+
 	
 	/*http.HandleFunc("/health-check", handler.StatusOKHandler)
 
