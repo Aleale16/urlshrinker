@@ -32,10 +32,25 @@ func InitFlags() {
 	}
 
 	if !fileDBpathexists{
-		FileDBpathflag := flag.String("f", "../../internal/app/storage/database.txt", "FILE_STORAGE_PATH")
-		FileDBpath = *FileDBpathflag
-		fmt.Println("Set from flag: FileDBpath:", FileDBpath)
-		//fmt.Print("FILE_STORAGE_PATH: not set") 
+		var flagFound bool
+		//слайс аргументов
+		parameters := os.Args[1:]
+		//среди них ищем передан ли -f
+		flagFound = false
+		fmt.Printf("Parameters: %v\n", parameters)
+		for i, n := range parameters {
+			if n == "-f" {
+				flagFound = true
+			}
+			i++
+		}
+		if flagFound {
+			FileDBpathflag := flag.String("f", "../../internal/app/storage/database.txt", "FILE_STORAGE_PATH")
+			FileDBpath = *FileDBpathflag
+			fmt.Println("Set from flag: FileDBpath:", FileDBpath)
+		} else {
+			fmt.Print("FILE_STORAGE_PATH: not set") 
+		}
 	} else {
 		FileDBpath = fileDBpathENV
 		fmt.Println("Set from ENV: FileDBpath:", FileDBpath)
