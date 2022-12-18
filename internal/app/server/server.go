@@ -7,20 +7,20 @@ import (
 	"os"
 
 	"github.com/Aleale16/urlshrinker/internal/app/handler"
-	"github.com/caarlos0/env/v6"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
-type ServerConfig struct {
+
+/*type ServerConfig struct {
 	SrvAddress string `env:"SERVER_ADDRESS"`
 	BaseURL    string `env:"BASE_URL"`
 	fileDBpath    string `env:"FILE_STORAGE_PATH"`
 	User       string `env:"USERNAME"`
-}
+}*/
 func Start(){
 
-	var SrvConfig ServerConfig
-	var baseURL, UserName, fileDBpath string
+	//var SrvConfig ServerConfig
+	//var UserName string
 	//storage.Initdb() //Убрали управление инициализацией хранилища отсюда в storage
 
 	r := chi.NewRouter()
@@ -38,7 +38,7 @@ func Start(){
 	
 
 	fmt.Println("Starting server...")
-	
+/*	
     err := env.Parse(&SrvConfig)
     if err != nil {
         log.Fatal(err)
@@ -46,69 +46,43 @@ func Start(){
 
     log.Println(SrvConfig)
 
-	_, baseURLexists := os.LookupEnv("BASE_URL")
-	_, srvAddressexists := os.LookupEnv("SERVER_ADDRESS")
-	_, fileDBpathexists := os.LookupEnv("FILE_STORAGE_PATH")
-
 	if (SrvConfig.User=="") {
 		UserName = "Noname"
 		} else {
 			UserName = SrvConfig.User
 		}
 	log.Println("USERNAME: " + UserName)
+*/
+	if BaseURL == ""{
+		//нет ни переменной окружения ни флага
+		BaseURL = "http://localhost:8080"
+		log.Print("BASE_URL: " + "Loaded default: " + BaseURL)
+	}
+	log.Println("BASE_URL: " + BaseURL)
 
-	if baseURLexists {
-		baseURL = SrvConfig.BaseURL
-		//baseURL = os.Getenv("BASE_URL")
-		} else {
-			//запишем в переменную значение по умолчанию
-			//os.Setenv("BASE_URL", "http://localhost:8080")
-			//baseURL = os.Getenv("BASE_URL")
-			//Возьмем значение флага
-			if BaseURL != ""{
-				baseURL = BaseURL
-			} else {//нет ни переменной окружения ни флага
-				baseURL = "http://localhost:8080"
-			}
-    	}
-	log.Println("BASE_URL: " + baseURL)
+	if FileDBpath == ""{
+		//нет ни переменной окружения ни флага
+		log.Print("FILE_STORAGE_PATH: not set")
+	}
 
-	if fileDBpathexists {
-		fileDBpath = SrvConfig.fileDBpath
-		//fileDBpath = os.Getenv("FILE_STORAGE_PATH")
-		log.Print("FILE_STORAGE_PATH: " + "Loaded env: " + fileDBpath)
-		} else {
-			//Возьмем значение флага
-			if FileDBpath != ""{
-				fileDBpath = FileDBpath
-				log.Print("fileDBpath Loaded from flag: " + fileDBpath)
-			} else {//нет ни переменной окружения ни флага
-				log.Print("FILE_STORAGE_PATH: not set")
-			}
-			
-    	}
+	if SrvAddress == ""{
+		//нет ни переменной окружения ни флага
+		SrvAddress ="localhost:8080" 
+		log.Print("SERVER_ADDRESS: " + "Loaded default: " + SrvAddress)
+	}
 
-	if srvAddressexists {
-		log.Print("SERVER_ADDRESS: " + "Loaded env: " + SrvConfig.SrvAddress)
+	os.Setenv("SERVER_ADDRESS", SrvAddress)
+	os.Setenv("BASE_URL", BaseURL)
+	os.Setenv("FILE_STORAGE_PATH", FileDBpath)
 
-		log.Fatal(http.ListenAndServe(SrvConfig.SrvAddress, r))
-		} else {
-			var srvaddr string
-			//Возьмем значение флага
-			if SrvAddress != ""{
-				srvaddr = SrvAddress
-				log.Print("SERVER_ADDRESS: "+"Loaded from flag: " + srvaddr)
-			} else { //нет ни переменной окружения ни флага
-				srvaddr ="localhost:8080" 
-				log.Print("SERVER_ADDRESS: "+"Loaded default: " + srvaddr)
-			}
-			log.Fatal(http.ListenAndServe(srvaddr, r))
+	log.Fatal(http.ListenAndServe(SrvAddress, r))
+
 			//os.Setenv("SERVER_ADDRESS", "localhost:8080")
 			//log.Print("SERVER_ADDRESS: "+"Loaded default: " + os.Getenv("SERVER_ADDRESS"))
 			
 			//log.Print("SERVER_ADDRESS: " + "Loaded env: " + os.Getenv("SERVER_ADDRESS"))
 			//log.Fatal(http.ListenAndServe(os.Getenv("SERVER_ADDRESS"), r))
-    }
+    
 
 
 

@@ -58,6 +58,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 	shortURLid := storage.Storerecord(string(b))
 	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
 	shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid
+	//shortURLpath := BaseURL + "/?id="+ shortURLid Как сюда передать переменную из server.go?
 
 	// устанавливаем статус-код 201
 	w.WriteHeader(http.StatusCreated)
