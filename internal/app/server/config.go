@@ -12,12 +12,12 @@ func InitFlags() {
 	_, fileDBpathexists := os.LookupEnv("FILE_STORAGE_PATH")
 
 	if !srvAddressexists{
-		SrvAddress := flag.String("a", "localhost:8080", "SERVER_ADDRESS")
+		SrvAddress := flag.String("a", "127.0.0.1:8080", "SERVER_ADDRESS")
 		fmt.Println("Set from flag: SrvAddress:", *SrvAddress)
 	}
 
 	if !baseURLexists{
-		BaseURL := flag.String("b", "http://localhost:8080", "BASE_URL")
+		BaseURL := flag.String("b", "http://127.0.0.1:8080", "BASE_URL")
 		fmt.Println("Set from flag: BaseURL:", *BaseURL)
 	}
 
