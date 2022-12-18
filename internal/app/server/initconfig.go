@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"os"
 )
+var FileDBpath, BaseURL, SrvAddress string
 
 func InitFlags() {
+
 	_, baseURLexists := os.LookupEnv("BASE_URL")
 	_, srvAddressexists := os.LookupEnv("SERVER_ADDRESS")
 	_, fileDBpathexists := os.LookupEnv("FILE_STORAGE_PATH")
@@ -22,8 +24,8 @@ func InitFlags() {
 	}
 
 	if !fileDBpathexists{
-		fileDBpath := flag.String("f", "../../internal/app/storage/database.txt", "FILE_STORAGE_PATH")
-		fmt.Println("Set from flag: fileDBpath:", *fileDBpath)
+		FileDBpath := flag.String("f", "../../internal/app/storage/database.txt", "FILE_STORAGE_PATH")
+		fmt.Println("Set from flag: FileDBpath:", *FileDBpath)
 	}
 
 }

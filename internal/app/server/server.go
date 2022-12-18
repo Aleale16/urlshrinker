@@ -62,8 +62,14 @@ func Start(){
 		//baseURL = os.Getenv("BASE_URL")
 		} else {
 			//запишем в переменную значение по умолчанию
-			os.Setenv("BASE_URL", "http://localhost:8080")
-			baseURL = os.Getenv("BASE_URL")
+			//os.Setenv("BASE_URL", "http://localhost:8080")
+			//baseURL = os.Getenv("BASE_URL")
+			//Возьмем значение флага
+			if BaseURL != ""{
+				baseURL = BaseURL
+			} else {//нет не переменной окружения ни флага
+				baseURL = "http://localhost:8080"
+			}
     	}
 	log.Println("BASE_URL: " + baseURL)
 
@@ -72,7 +78,13 @@ func Start(){
 		//fileDBpath = os.Getenv("FILE_STORAGE_PATH")
 		log.Print("FILE_STORAGE_PATH: " + "Loaded env: " + fileDBpath)
 		} else {
-			log.Print("FILE_STORAGE_PATH: not set")
+			//Возьмем значение флага
+			if FileDBpath != ""{
+				fileDBpath = FileDBpath
+			} else {//нет не переменной окружения ни флага
+				log.Print("FILE_STORAGE_PATH: not set")
+			}
+			
     	}
 
 	if srvAddressexists {
@@ -80,9 +92,19 @@ func Start(){
 
 		log.Fatal(http.ListenAndServe(SrvConfig.SrvAddress, r))
 		} else {
-			os.Setenv("SERVER_ADDRESS", "localhost:8080")
-			log.Print("SERVER_ADDRESS: "+"Loaded default: " + os.Getenv("SERVER_ADDRESS"))
-			log.Fatal(http.ListenAndServe(os.Getenv("SERVER_ADDRESS"), r))
+			var srvaddr string
+			//Возьмем значение флага
+			if SrvAddress != ""{
+				srvaddr = SrvAddress
+				log.Print("SERVER_ADDRESS: "+"Loaded from flag: " + srvaddr)
+			} else { //нет не переменной окружения ни флага
+				srvaddr ="localhost:8080" 
+				log.Print("SERVER_ADDRESS: "+"Loaded default: " + srvaddr)
+			}
+			log.Fatal(http.ListenAndServe(srvaddr, r))
+			//os.Setenv("SERVER_ADDRESS", "localhost:8080")
+			//log.Print("SERVER_ADDRESS: "+"Loaded default: " + os.Getenv("SERVER_ADDRESS"))
+			
 			//log.Print("SERVER_ADDRESS: " + "Loaded env: " + os.Getenv("SERVER_ADDRESS"))
 			//log.Fatal(http.ListenAndServe(os.Getenv("SERVER_ADDRESS"), r))
     }
