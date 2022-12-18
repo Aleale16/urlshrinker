@@ -86,15 +86,18 @@ func isnewID(id string) bool{
 		return true
 	} else {return false}
 	}else {
+		var idIsnew bool
+		idIsnew = true
 		DBfile, err := os.OpenFile(dbPath, os.O_RDONLY, 0777)
 		if err != nil {
-			panic(err)
+			log.Println(err)
+			idIsnew = false
+			//panic(err)
 		}
 		scanner := bufio.NewScanner(DBfile)
 		line :=0
 		var postJSON URLJSONrecord
-		var idIsnew bool
-		idIsnew = true
+
 		for scanner.Scan() && idIsnew{
 			//log.Println(line)
 			//log.Println("lineStr: " + scanner.Text())
