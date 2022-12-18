@@ -90,9 +90,9 @@ func isnewID(id string) bool{
 		idIsnew = true
 		DBfile, err := os.OpenFile(dbPath, os.O_RDONLY, 0777)
 		if err != nil {
-			log.Println(err)
-			idIsnew = false
-			//panic(err)
+			//log.Println(err)
+			//idIsnew = false
+			panic(err)
 		}
 		scanner := bufio.NewScanner(DBfile)
 		line :=0
