@@ -14,12 +14,13 @@ import (
 type ServerConfig struct {
 	SrvAddress string `env:"SERVER_ADDRESS"`
 	BaseURL    string `env:"BASE_URL"`
+	fileDBpath    string `env:"FILE_STORAGE_PATH"`
 	User       string `env:"USERNAME"`
 }
 func Start(){
 
 	var SrvConfig ServerConfig
-	var baseURL, UserName string
+	var baseURL, UserName, fileDBpath string
 	//storage.Initdb() //Убрали управление инициализацией хранилища отсюда в storage
 
 	r := chi.NewRouter()
@@ -47,6 +48,7 @@ func Start(){
 
 	_, baseURLexists := os.LookupEnv("BASE_URL")
 	_, srvAddressexists := os.LookupEnv("SERVER_ADDRESS")
+	_, fileDBpathexists := os.LookupEnv("FILE_STORAGE_PATH")
 
 	if (SrvConfig.User=="") {
 		UserName = "Noname"
@@ -64,6 +66,14 @@ func Start(){
 			baseURL = os.Getenv("BASE_URL")
     	}
 	log.Println("BASE_URL: " + baseURL)
+
+	if fileDBpathexists {
+		fileDBpath = SrvConfig.fileDBpath
+		//fileDBpath = os.Getenv("FILE_STORAGE_PATH")
+		log.Print("FILE_STORAGE_PATH: " + "Loaded env: " + fileDBpath)
+		} else {
+			log.Print("FILE_STORAGE_PATH: not set")
+    	}
 
 	if srvAddressexists {
 		log.Print("SERVER_ADDRESS: " + "Loaded env: " + SrvConfig.SrvAddress)
