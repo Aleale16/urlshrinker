@@ -67,7 +67,7 @@ func Start(){
 			//Возьмем значение флага
 			if BaseURL != ""{
 				baseURL = BaseURL
-			} else {//нет не переменной окружения ни флага
+			} else {//нет ни переменной окружения ни флага
 				baseURL = "http://localhost:8080"
 			}
     	}
@@ -81,7 +81,8 @@ func Start(){
 			//Возьмем значение флага
 			if FileDBpath != ""{
 				fileDBpath = FileDBpath
-			} else {//нет не переменной окружения ни флага
+				log.Print("fileDBpath Loaded from flag: " + fileDBpath)
+			} else {//нет ни переменной окружения ни флага
 				log.Print("FILE_STORAGE_PATH: not set")
 			}
 			
@@ -97,7 +98,7 @@ func Start(){
 			if SrvAddress != ""{
 				srvaddr = SrvAddress
 				log.Print("SERVER_ADDRESS: "+"Loaded from flag: " + srvaddr)
-			} else { //нет не переменной окружения ни флага
+			} else { //нет ни переменной окружения ни флага
 				srvaddr ="localhost:8080" 
 				log.Print("SERVER_ADDRESS: "+"Loaded default: " + srvaddr)
 			}

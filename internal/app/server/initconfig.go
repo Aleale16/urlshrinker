@@ -26,6 +26,7 @@ func InitFlags() {
 	if !fileDBpathexists{
 		FileDBpath := flag.String("f", "../../internal/app/storage/database.txt", "FILE_STORAGE_PATH")
 		fmt.Println("Set from flag: FileDBpath:", *FileDBpath)
+		os.Setenv("FILE_STORAGE_PATH", *FileDBpath)
 	}
 
 }
