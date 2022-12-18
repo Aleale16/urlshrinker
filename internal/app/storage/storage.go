@@ -57,7 +57,7 @@ func Storerecord(fullURL string) string{
 		JSONdata = append(JSONdata, '\n')
 		log.Println("dbPath: " + dbPath)
 
-		DBfile, _ := os.OpenFile(dbPath, os.O_RDWR|os.O_APPEND , 0777)
+		DBfile, _ := os.OpenFile(dbPath, os.O_RDWR|os.O_CREATE|os.O_APPEND , 0777)
 		_, err = DBfile.Write(JSONdata)	
 		if err != nil {	
 			return err.Error()
