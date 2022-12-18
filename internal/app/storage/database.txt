@@ -1,6 +1,0 @@
-{"id":"9879","fullurl":"yandex.ru"}
-{"id":"7943","fullurl":"yandex.ru"}
-{"id":"9879","fullurl":"yandex.ru"}
-{"id":"4574","fullurl":"yandex.ru"}
-{"id":"8066","fullurl":"yandex.ru"}
-{"id":"3280","fullurl":"yandex.ru"}
