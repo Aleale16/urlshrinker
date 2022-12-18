@@ -26,7 +26,8 @@ func Initdb() {
 	dbPath, dbPathexists = os.LookupEnv("FILE_STORAGE_PATH")
 	if (dbPathexists && dbPath != "") {
 		RAMonly = false
-		fmt.Println("Loading DB file...")
+		log.Println("Loading DB file...")
+		log.Println("dbPath: " + dbPath)
 		} else {
 			RAMonly = true
 			fmt.Println("DB file path is not set in env vars! Loading RAM storage...")
@@ -55,7 +56,7 @@ func Storerecord(fullURL string) string{
 			return err.Error()
 		}
 		JSONdata = append(JSONdata, '\n')
-		log.Println("dbPath: " + dbPath)
+		
 
 		DBfile, _ := os.OpenFile(dbPath, os.O_RDWR|os.O_CREATE|os.O_APPEND , 0777)
 		_, err = DBfile.Write(JSONdata)	
