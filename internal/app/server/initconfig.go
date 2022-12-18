@@ -41,11 +41,12 @@ func InitFlags() {
 		fmt.Printf("Parameters: %v\n", parameters)
 		for i, n := range parameters {
 			//это как-то некрасиво:
-			hp := strings.Split(n, "=")
-			fmt.Printf(hp[0] + " знак равно " + hp[1])
-			if hp[0] == "-f" {
+			argSplitted := strings.Split(n, "=")
+			fmt.Println(argSplitted[0] + " знак равно " + argSplitted[1])
+			if argSplitted[0] == "-f" {
 				flagFound = true
 			}
+			fmt.Println(flagFound)
 			i++
 		}
 		if flagFound {
