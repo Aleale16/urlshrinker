@@ -69,8 +69,48 @@ func Storerecord(fullURL string) string{
 }
 
 func Getrecord(id string) string {
+	var result string
 	onlyOnce.Do(Initdb)
-	result := URL[id]
+
+	result = ""
+	if RAMonly {
+		result = URL[id]
+	} else {
+		DBfile, err := os.OpenFile(dbPath, os.O_RDONLY, 0777)
+		if err != nil {
+			log.Println("File does NOT EXIST")
+			result =""
+			log.Println(err)
+			//idIsnew = false
+			//panic(err)
+		} else {
+			scanner := bufio.NewScanner(DBfile)
+			line :=0
+			var postJSON URLJSONrecord
+			idIsfound := false
+			for scanner.Scan() && !idIsfound{
+				//log.Println(line)
+				//log.Println("lineStr: " + scanner.Text())
+				if scanner.Text() != "" {
+					err = json.Unmarshal([]byte(scanner.Text()), &postJSON)
+					if err != nil {
+						panic(err)
+					}
+				//отладка что было в поле FullURL в строке файла
+					log.Println(postJSON.ID)
+					log.Println(postJSON.FullURL)
+					if postJSON.ID == id {
+						idIsfound = true
+						log.Println("ID exists: " + postJSON.ID + "; FullURL: " + postJSON.FullURL)
+					}
+					line++
+				}
+			}
+			result = postJSON.FullURL
+			DBfile.Close()
+		}
+	}
+	
 
 	if (result != ""){
 		return result
@@ -90,8 +130,9 @@ func isnewID(id string) bool{
 		idIsnew = true
 		DBfile, err := os.OpenFile(dbPath, os.O_RDONLY, 0777)
 		if err != nil {
+			log.Println("File does NOT EXIST")
 			log.Println(err)
-			idIsnew = false
+			//idIsnew = false
 			//panic(err)
 		} else {
 			scanner := bufio.NewScanner(DBfile)
