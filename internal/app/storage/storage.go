@@ -90,33 +90,34 @@ func isnewID(id string) bool{
 		idIsnew = true
 		DBfile, err := os.OpenFile(dbPath, os.O_RDONLY, 0777)
 		if err != nil {
-			//log.Println(err)
-			//idIsnew = false
-			panic(err)
-		}
-		scanner := bufio.NewScanner(DBfile)
-		line :=0
-		var postJSON URLJSONrecord
+			log.Println(err)
+			idIsnew = false
+			//panic(err)
+		} else {
+			scanner := bufio.NewScanner(DBfile)
+			line :=0
+			var postJSON URLJSONrecord
 
-		for scanner.Scan() && idIsnew{
-			//log.Println(line)
-			//log.Println("lineStr: " + scanner.Text())
-			if scanner.Text() != "" {
-				err = json.Unmarshal([]byte(scanner.Text()), &postJSON)
-				if err != nil {
-					panic(err)
+			for scanner.Scan() && idIsnew{
+				//log.Println(line)
+				//log.Println("lineStr: " + scanner.Text())
+				if scanner.Text() != "" {
+					err = json.Unmarshal([]byte(scanner.Text()), &postJSON)
+					if err != nil {
+						panic(err)
+					}
+				//отладка что было в поле FullURL в строке файла
+					log.Println(postJSON.ID)
+					log.Println(postJSON.FullURL)
+					if postJSON.ID == id {
+						idIsnew = false
+						log.Println("ID exists: " + postJSON.ID)
+					}
+					line++
 				}
-			//отладка что было в поле FullURL в строке файла
-				log.Println(postJSON.ID)
-				log.Println(postJSON.FullURL)
-				if postJSON.ID == id {
-					idIsnew = false
-					log.Println("ID exists: " + postJSON.ID)
-				}
-				line++
 			}
+			DBfile.Close()
 		}
-		DBfile.Close()
 		return idIsnew
 	}
 }
