@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"strings"
 )
 var FileDBpath, BaseURL, SrvAddress string
 
@@ -39,7 +40,10 @@ func InitFlags() {
 		flagFound = false
 		fmt.Printf("Parameters: %v\n", parameters)
 		for i, n := range parameters {
-			if n == "-f" {
+			//это как-то некрасиво:
+			hp := strings.Split(n, "=")
+			fmt.Printf(hp[0] + " знак равно " + hp[1])
+			if hp[0] == "-f" {
 				flagFound = true
 			}
 			i++
