@@ -7,14 +7,15 @@ import (
 	"strings"
 )
 var FileDBpath, BaseURL, SrvAddress string
+var SrvAddressflag, BaseURLflag, FileDBpathflag *string
+func InitFlags() {	
+	SrvAddressflag = flag.String("a", "127.0.0.1:8080", "SERVER_ADDRESS flag")
+	BaseURLflag = flag.String("b", "http://127.0.0.1:8080", "BASE_URL flag")
+	FileDBpathflag = flag.String("f", "../../internal/app/storage/database.txt", "FILE_STORAGE_PATH flag")
+}
+	
 
-func InitFlags() {
-
-	SrvAddressflag := flag.String("a", "127.0.0.1:8080", "SERVER_ADDRESS flag")
-	BaseURLflag := flag.String("b", "http://127.0.0.1:8080", "BASE_URL flag")
-	FileDBpathflag := flag.String("f", "../../internal/app/storage/database.txt", "FILE_STORAGE_PATH flag")
-
-	flag.Parse()
+func SetinitVars() {
 
 	baseURLENV, baseURLexists := os.LookupEnv("BASE_URL")
 	srvAddressENV, srvAddressexists := os.LookupEnv("SERVER_ADDRESS")
