@@ -40,8 +40,6 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "The query parameter is missing", http.StatusBadRequest)
         return
     }	
-	//w.Header().Set("Content-Encoding", "gzip, deflate, br")
-	//w.Header().Set("Accept-Encoding", "gzip, deflate, br")
 	// устанавливаем заголовок Location	
 	w.Header().Set("Location", storage.Getrecord(q))
 	// устанавливаем статус-код 307
@@ -59,7 +57,8 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 			http.Error(w, err.Error(), 400)
 			return
 		}
-*/		
+*/	
+	// обработаем ситуацию, если на вход может прийти сжатое содержимое	
 	// переменная reader будет равна r.Body или *gzip.Reader
 	var reader io.Reader
 	if r.Header.Get("Content-Encoding") == "gzip" {
@@ -69,11 +68,11 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
     // и распаковывать его
     gz, err := gzip.NewReader(r.Body)
     if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
+        http.Error(w, err.Error(), 400)
         return
     }
 	reader = gz
-    // не забывайте потом закрыть *gzip.Reader
+    // потом закрыть *gzip.Reader
     defer gz.Close()
     } else {
         reader = r.Body
@@ -85,34 +84,22 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
         return
     }
     log.Println(w, "body: %d", body)
-    log.Println(w, "Length: %d", len(body))
-
-		
-
-		fmt.Println("Accept-Encoding= " + r.Header.Get("Accept-Encoding"))
-		fmt.Println("Content-Encoding= " + r.Header.Get("Content-Encoding"))
 		
 	shortURLid := storage.Storerecord(string(body))
 	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
 	shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid
-	//shortURLpath := BaseURL + "/?id="+ shortURLid Как сюда передать переменную из server.go?
-	
+	//shortURLpath := BaseURL + "/?id="+ shortURLid Как сюда передать переменную из server.go?	
 	
 	//w.Header().Set("Content-Encoding", "gzip, deflate, br")
 	// устанавливаем статус-код 201
 	w.WriteHeader(http.StatusCreated)
-
-
-
-
 	//отладка что было в POST запросе
 	//w.Write([]byte(b))
 
 //типа return:
 	w.Write([]byte(shortURLpath))
 
-	fmt.Println("POST: " + string(body)+ " return id= "+ shortURLid)	
-		
+	fmt.Println("POST: " + string(body)+ " return id= "+ shortURLid)		
 
 	//return shortURLpath
 }
@@ -131,54 +118,27 @@ type resultData struct {
 
 func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 	// читаем Body (Тело POST запроса)
-		b, err := io.ReadAll(r.Body)
-		// обрабатываем ошибку
-		if err != nil {
-			http.Error(w, err.Error(), 400)
-			return
-		}
-		//отладка всё что было в POST запросе
-		log.Println("PostJSONHandler body: " + string(b))
-		//Добавить?
-		//type Example struct {
-		//	URL   string `valid:"url"`
-		//}
-		log.Println("Content-Encoding from req: " + r.Header.Get("Content-Encoding"))
-		/*
-	// переменная reader будет равна r.Body или *gzip.Reader
-	var reader io.Reader
-	if r.Header.Get("Content-Encoding") == "gzip" {
-		w.Header().Set("Accept-Encoding", "gzip")
-		w.Header().Set("Content-Encoding", "gzip, deflate, br")
-    // создаём *gzip.Reader, который будет читать тело запроса
-    // и распаковывать его
-    gz, err := gzip.NewReader(r.Body)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-    // не забывайте потом закрыть *gzip.Reader
-    defer gz.Close()
-    } else {
-        reader = r.Body
-    }
-    // при чтении вернётся распакованный слайс байт
-    body, err := io.ReadAll(reader)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-    log.Println(w, "body: %d", body)
-    log.Println(w, "Length: %d", len(body))
+	b, err := io.ReadAll(r.Body)
+	// обрабатываем ошибку
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	//отладка всё что было в POST запросе
+	log.Println("PostJSONHandler body: " + string(b))
+	//Добавить?
+	//type Example struct {
+	//	URL   string `valid:"url"`
+	//}
+	log.Println("Content-Encoding from req: " + r.Header.Get("Content-Encoding"))
 
-	*/	
-		var postJSON inputData
-		err = json.Unmarshal(b, &postJSON)
-		if err != nil {
-			panic(err)
-		}
-		//отладка что было в поле url в POST запросе
-		log.Println(postJSON.URL)
+	var postJSON inputData
+	err = json.Unmarshal(b, &postJSON)
+	if err != nil {
+		panic(err)
+	}
+	//отладка что было в поле url в POST запросе
+	log.Println(postJSON.URL)
 
 	shortURLid := storage.Storerecord(string(postJSON.URL))
 	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
@@ -208,29 +168,3 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 
 	//return shortURLpath
 }
-
-func LengthHandle(w http.ResponseWriter, r *http.Request) {
-	// переменная reader будет равна r.Body или *gzip.Reader
-	var reader io.Reader
-	if r.Header.Get(`Content-Encoding`) == `gzip` {
-    // создаём *gzip.Reader, который будет читать тело запроса
-    // и распаковывать его
-    gz, err := gzip.NewReader(r.Body)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-    // не забывайте потом закрыть *gzip.Reader
-    defer gz.Close()
-    } else {
-        reader = r.Body
-    }
-    // при чтении вернётся распакованный слайс байт
-    body, err := io.ReadAll(reader)
-    if err != nil {
-        http.Error(w, err.Error(), http.StatusInternalServerError)
-        return
-    }
-    fmt.Fprintf(w, "body: %d", body)
-    fmt.Fprintf(w, "Length: %d", len(body))
-} 
