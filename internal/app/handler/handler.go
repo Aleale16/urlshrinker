@@ -52,18 +52,46 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
-	// читаем Body (Тело POST запроса)
+/*	// читаем Body (Тело POST запроса)
 		b, err := io.ReadAll(r.Body)
 		// обрабатываем ошибку
 		if err != nil {
 			http.Error(w, err.Error(), 400)
 			return
 		}
+*/		
+	// переменная reader будет равна r.Body или *gzip.Reader
+	var reader io.Reader
+	if r.Header.Get("Content-Encoding") == "gzip" {
+		w.Header().Set("Accept-Encoding", "gzip")
+		w.Header().Set("Content-Encoding", "gzip, deflate, br")
+    // создаём *gzip.Reader, который будет читать тело запроса
+    // и распаковывать его
+    gz, err := gzip.NewReader(r.Body)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    // не забывайте потом закрыть *gzip.Reader
+    defer gz.Close()
+    } else {
+        reader = r.Body
+    }
+    // при чтении вернётся распакованный слайс байт
+    body, err := io.ReadAll(reader)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    log.Println(w, "body: %d", body)
+    log.Println(w, "Length: %d", len(body))
+
+		
 
 		fmt.Println("Accept-Encoding= " + r.Header.Get("Accept-Encoding"))
 		fmt.Println("Content-Encoding= " + r.Header.Get("Content-Encoding"))
 		
-	shortURLid := storage.Storerecord(string(b))
+	shortURLid := storage.Storerecord(string(body))
 	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
 	shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid
 	//shortURLpath := BaseURL + "/?id="+ shortURLid Как сюда передать переменную из server.go?
@@ -82,7 +110,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 //типа return:
 	w.Write([]byte(shortURLpath))
 
-	fmt.Println("POST: " + string(b)+ " return id= "+ shortURLid)	
+	fmt.Println("POST: " + string(body)+ " return id= "+ shortURLid)	
 		
 
 	//return shortURLpath
