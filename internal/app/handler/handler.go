@@ -62,6 +62,8 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 
 	// устанавливаем статус-код 201
 	w.WriteHeader(http.StatusCreated)
+	w.Header().Set("Accept-Encoding", "gzip")
+	//w.WriteHeader(http.enc)
 
 	//отладка что было в POST запросе
 	//w.Write([]byte(b))
