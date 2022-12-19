@@ -115,6 +115,7 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 		//	URL   string `valid:"url"`
 		//}
 		log.Println("Content-Encoding from req: " + r.Header.Get("Content-Encoding"))
+		/*
 	// переменная reader будет равна r.Body или *gzip.Reader
 	var reader io.Reader
 	if r.Header.Get("Content-Encoding") == "gzip" {
@@ -141,9 +142,9 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
     log.Println(w, "body: %d", body)
     log.Println(w, "Length: %d", len(body))
 
-		
+	*/	
 		var postJSON inputData
-		err = json.Unmarshal(body, &postJSON)
+		err = json.Unmarshal(b, &postJSON)
 		if err != nil {
 			panic(err)
 		}

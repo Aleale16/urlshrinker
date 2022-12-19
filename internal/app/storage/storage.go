@@ -72,7 +72,6 @@ func Getrecord(id string) string {
 	var result string
 	onlyOnce.Do(Initdb)
 
-	result = ""
 	if RAMonly {
 		result = URL[id]
 	} else {
