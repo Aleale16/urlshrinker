@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"compress/gzip"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -108,11 +109,37 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 			return
 		}
 		//отладка всё что было в POST запросе
-		log.Println(string(b))
+		log.Println("PostJSONHandler body: " + string(b))
 		//Добавить?
 		//type Example struct {
 		//	URL   string `valid:"url"`
 		//}
+		
+	// переменная reader будет равна r.Body или *gzip.Reader
+	var reader io.Reader
+	if r.Header.Get(`Content-Encoding`) == `gzip` {
+    // создаём *gzip.Reader, который будет читать тело запроса
+    // и распаковывать его
+    gz, err := gzip.NewReader(r.Body)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    // не забывайте потом закрыть *gzip.Reader
+    defer gz.Close()
+    } else {
+        reader = r.Body
+    }
+    // при чтении вернётся распакованный слайс байт
+    body, err := io.ReadAll(reader)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    fmt.Fprintf(w, "body: %d", body)
+    fmt.Fprintf(w, "Length: %d", len(body))
+
+		
 		var postJSON inputData
 		err = json.Unmarshal(b, &postJSON)
 		if err != nil {
@@ -150,3 +177,29 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 
 	//return shortURLpath
 }
+
+func LengthHandle(w http.ResponseWriter, r *http.Request) {
+	// переменная reader будет равна r.Body или *gzip.Reader
+	var reader io.Reader
+	if r.Header.Get(`Content-Encoding`) == `gzip` {
+    // создаём *gzip.Reader, который будет читать тело запроса
+    // и распаковывать его
+    gz, err := gzip.NewReader(r.Body)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    // не забывайте потом закрыть *gzip.Reader
+    defer gz.Close()
+    } else {
+        reader = r.Body
+    }
+    // при чтении вернётся распакованный слайс байт
+    body, err := io.ReadAll(reader)
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    fmt.Fprintf(w, "body: %d", body)
+    fmt.Fprintf(w, "Length: %d", len(body))
+} 
