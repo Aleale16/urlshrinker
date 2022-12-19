@@ -72,6 +72,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
+	reader = gz
     // не забывайте потом закрыть *gzip.Reader
     defer gz.Close()
     } else {
