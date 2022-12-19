@@ -10,3 +10,10 @@
 {"id":"7926","fullurl":"yandex.ru"}
 {"id":"1346","fullurl":"yandex.ru"}
 {"id":"3256","fullurl":"yandex.ru"}
+{"id":"4179","fullurl":"{\"url\":\"yandex.ru\"}"}
+{"id":"6842","fullurl":"{\"url\":\"yandex.ru\"}"}
+{"id":"3037","fullurl":"{\"url\":\"yandex.ru\"}"}
+{"id":"3977","fullurl":"{\"url\":\"yandex.ru\"}"}
+{"id":"1998","fullurl":"yandex.ru"}
+{"id":"4394","fullurl":"yandex.ru"}
+{"id":"9083","fullurl":"yandex.ru"}

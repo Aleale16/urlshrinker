@@ -39,8 +39,8 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "The query parameter is missing", http.StatusBadRequest)
         return
     }	
-	w.Header().Set("Content-Encoding", "gzip, deflate, br")
-	w.Header().Set("Accept-Encoding", "gzip, deflate, br")
+	//w.Header().Set("Content-Encoding", "gzip, deflate, br")
+	//w.Header().Set("Accept-Encoding", "gzip, deflate, br")
 	// устанавливаем заголовок Location	
 	w.Header().Set("Location", storage.Getrecord(q))
 	// устанавливаем статус-код 307
@@ -68,7 +68,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 	//shortURLpath := BaseURL + "/?id="+ shortURLid Как сюда передать переменную из server.go?
 	
 	
-	w.Header().Set("Content-Encoding", "gzip, deflate, br")
+	//w.Header().Set("Content-Encoding", "gzip, deflate, br")
 	// устанавливаем статус-код 201
 	w.WriteHeader(http.StatusCreated)
 
