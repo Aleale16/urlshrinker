@@ -118,6 +118,8 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 	// переменная reader будет равна r.Body или *gzip.Reader
 	var reader io.Reader
 	if r.Header.Get("Content-Encoding") == "gzip" {
+		w.Header().Set("Accept-Encoding", "gzip")
+		w.Header().Set("Content-Encoding", "gzip, deflate, br")
     // создаём *gzip.Reader, который будет читать тело запроса
     // и распаковывать его
     gz, err := gzip.NewReader(r.Body)
@@ -155,8 +157,7 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 	var shortURLpathJSON resultData
 	shortURLpathJSON.ShortURL = shortURLpath
 
-	w.Header().Set("Accept-Encoding", "gzip")
-	w.Header().Set("Content-Encoding", "gzip, deflate, br")
+
 	w.Header().Set("Content-Type", "application/json")
 	// устанавливаем статус-код 201
 	w.WriteHeader(http.StatusCreated)
