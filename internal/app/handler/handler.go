@@ -43,6 +43,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Location", storage.Getrecord(q))
 	// устанавливаем статус-код 307
 	w.WriteHeader(http.StatusTemporaryRedirect)
+	w.Header().Set("Accept-Encoding", "gzip")
 
 	fmt.Println("GET: " + q + " Redirect to " + storage.Getrecord(q))
 }
@@ -55,15 +56,19 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 			http.Error(w, err.Error(), 400)
 			return
 		}
+		h :=r.Header.Get("Accept-Encoding")
+		fmt.Println("Accept-Encoding= " + h)
+
 	shortURLid := storage.Storerecord(string(b))
 	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
 	shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid
 	//shortURLpath := BaseURL + "/?id="+ shortURLid Как сюда передать переменную из server.go?
-
+	
 	// устанавливаем статус-код 201
 	w.WriteHeader(http.StatusCreated)
+
 	w.Header().Set("Accept-Encoding", "gzip")
-	//w.WriteHeader(http.enc)
+
 
 	//отладка что было в POST запросе
 	//w.Write([]byte(b))
@@ -121,6 +126,8 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 	w.Header().Set("Content-Type", "application/json")
 	// устанавливаем статус-код 201
 	w.WriteHeader(http.StatusCreated)
+	
+	w.Header().Set("Accept-Encoding", "gzip")
 
 	shortURLpathJSONBz, err := json.MarshalIndent(shortURLpathJSON, "", "  ")
 	if err != nil {

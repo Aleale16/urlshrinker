@@ -1,1 +1,12 @@
 {"id":"7943","fullurl":"yandex.ru"}
+{"id":"9879","fullurl":"{\"url\":\"yandex.ru\"}"}
+{"id":"4574","fullurl":"{\"url\":\"yandex.ru\"}"}
+{"id":"8066","fullurl":"yandex.ru"}
+{"id":"3280","fullurl":"yandex.ru"}
+{"id":"8826","fullurl":"yandex.ru"}
+{"id":"8521","fullurl":"yandex.ru"}
+{"id":"6155","fullurl":"yandex.ru"}
+{"id":"1282","fullurl":"yandex.ru"}
+{"id":"7926","fullurl":"yandex.ru"}
+{"id":"1346","fullurl":"yandex.ru"}
+{"id":"3256","fullurl":"yandex.ru"}
