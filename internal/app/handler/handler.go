@@ -58,8 +58,9 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 			http.Error(w, err.Error(), 400)
 			return
 		}
-		h :=r.Header.Get("Accept-Encoding")
-		fmt.Println("Accept-Encoding= " + h)
+
+		fmt.Println("Accept-Encoding= " + r.Header.Get("Accept-Encoding"))
+		fmt.Println("Content-Encoding= " + r.Header.Get("Content-Encoding"))
 		
 	shortURLid := storage.Storerecord(string(b))
 	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
