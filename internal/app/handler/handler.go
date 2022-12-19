@@ -136,12 +136,12 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
         http.Error(w, err.Error(), http.StatusInternalServerError)
         return
     }
-    fmt.Fprintf(w, "body: %d", body)
-    fmt.Fprintf(w, "Length: %d", len(body))
+    log.Println(w, "body: %d", body)
+    log.Println(w, "Length: %d", len(body))
 
 		
 		var postJSON inputData
-		err = json.Unmarshal(b, &postJSON)
+		err = json.Unmarshal(body, &postJSON)
 		if err != nil {
 			panic(err)
 		}
