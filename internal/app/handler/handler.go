@@ -114,10 +114,10 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 		//type Example struct {
 		//	URL   string `valid:"url"`
 		//}
-		log.Println("Content-Encoding from req: " + r.Header.Get(`Content-Encoding`))
+		log.Println("Content-Encoding from req: " + r.Header.Get("Content-Encoding"))
 	// переменная reader будет равна r.Body или *gzip.Reader
 	var reader io.Reader
-	if r.Header.Get(`Content-Encoding`) == `gzip` {
+	if r.Header.Get("Content-Encoding") == "gzip" {
     // создаём *gzip.Reader, который будет читать тело запроса
     // и распаковывать его
     gz, err := gzip.NewReader(r.Body)
