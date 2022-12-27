@@ -8,6 +8,7 @@ import (
 
 	"github.com/Aleale16/urlshrinker/internal/app/handler"
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )

@@ -7,8 +7,8 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"os"
 
+	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 	"github.com/Aleale16/urlshrinker/internal/app/storage"
 )
 
@@ -87,8 +87,10 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 		
 	shortURLid := storage.Storerecord(string(body))
 	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
-	shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid
+	//shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid	
 	//shortURLpath := BaseURL + "/?id="+ shortURLid Как сюда передать переменную из server.go?	
+	//вот так из пакета initconfig:
+	shortURLpath :=initconfig.BaseURL + "/?id="+ shortURLid
 	
 	//w.Header().Set("Content-Encoding", "gzip, deflate, br")
 	// устанавливаем статус-код 201
@@ -142,8 +144,8 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 
 	shortURLid := storage.Storerecord(string(postJSON.URL))
 	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
-	shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid
-	//shortURLpath := BaseURL + "/?id="+ shortURLid
+	//shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid
+	shortURLpath := initconfig.BaseURL + "/?id="+ shortURLid
 	
 	var shortURLpathJSON resultData
 	shortURLpathJSON.ShortURL = shortURLpath
