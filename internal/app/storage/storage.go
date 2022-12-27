@@ -52,9 +52,9 @@ func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord{
 	} else {
 		scanner := bufio.NewScanner(DBfile)
 		var postJSON URLJSONrecord
-		var lastId int
+		var lastID int
 		line := 0
-		id := initconfig.NextId
+		id := initconfig.NextID
 		for scanner.Scan(){
 			//log.Println(line)
 			//log.Println("lineStr: " + scanner.Text())
@@ -72,11 +72,11 @@ func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord{
 			line++
 		}
 		if postJSON.ID != ""{
-			lastId, _ = strconv.Atoi(postJSON.ID)
-			initconfig.NextId = lastId + initconfig.Step
+			lastID, _ = strconv.Atoi(postJSON.ID)
+			initconfig.NextID = lastID + initconfig.Step
 		}
 		id = id + initconfig.Step
-		initconfig.NextId = id
+		initconfig.NextID = id
 	}	
 	DBfile.Close()	
 	return URLs
@@ -85,7 +85,7 @@ func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord{
 func Storerecord(fullURL string) string{
 	onlyOnce.Do(Initdb)
 	//id := strconv.Itoa(rand.Intn(9999))
-	id := strconv.Itoa(initconfig.NextId)
+	id := strconv.Itoa(initconfig.NextID)
 	
 	/*for (!isnewID(id)){
 		id = strconv.Itoa(rand.Intn(9999))
@@ -114,7 +114,7 @@ func Storerecord(fullURL string) string{
 		DBfile.Close()
 		
 	}
-	initconfig.NextId = initconfig.NextId + initconfig.Step
+	initconfig.NextID = initconfig.NextID + initconfig.Step
 	return id
 }
 

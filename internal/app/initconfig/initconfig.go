@@ -8,7 +8,7 @@ import (
 )
 var FileDBpath, BaseURL, SrvAddress string
 var SrvAddressflag, BaseURLflag, FileDBpathflag *string
-var NextId = 111
+var NextID = 111
 var Step = 111
 
 func InitFlags() {	
