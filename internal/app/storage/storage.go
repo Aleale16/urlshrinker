@@ -5,10 +5,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"math/rand"
 	"os"
 	"strconv"
 	"sync"
+
+	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 )
 
 type URLrecord map[string]string
@@ -28,6 +29,10 @@ func Initdb() {
 		RAMonly = false
 		log.Println("Loading DB file...")
 		log.Println("dbPath: " + dbPath)
+		log.Println("Copying DB file to RAM storage...")
+		URL = make(URLrecord)
+		URL = copyFiletoRAM(dbPath, URL)
+
 		} else {
 			RAMonly = true
 			fmt.Println("DB file path is not set in env vars! Loading RAM storage...")
@@ -36,13 +41,55 @@ func Initdb() {
 	fmt.Println("Storage ready!")
 }
 
+func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord{
+	DBfile, err := os.OpenFile(dbPath, os.O_RDONLY, 0777)
+	if err != nil {
+		log.Println("File does NOT EXIST")
+		//result = ""
+		log.Println(err)
+		//idIsnew = false
+		//panic(err)
+	} else {
+		scanner := bufio.NewScanner(DBfile)
+		var postJSON URLJSONrecord
+		var lastId int
+		line := 0
+		id := initconfig.NextId
+		for scanner.Scan(){
+			//log.Println(line)
+			//log.Println("lineStr: " + scanner.Text())
+			if scanner.Text() != "" {
+				err = json.Unmarshal([]byte(scanner.Text()), &postJSON)
+				if err != nil {
+					panic(err)
+				}
+			//отладка что было в поле FullURL в строке файла
+				log.Println(postJSON.ID)
+				log.Println(postJSON.FullURL)
+				URLs[postJSON.ID] = postJSON.FullURL
+				log.Println("Line " + strconv.Itoa(line) + "is loaded to RAM: " + scanner.Text())				
+			}
+			line++
+		}
+		if postJSON.ID != ""{
+			lastId, _ = strconv.Atoi(postJSON.ID)
+			initconfig.NextId = lastId + initconfig.Step
+		}
+		id = id + initconfig.Step
+		initconfig.NextId = id
+	}	
+	DBfile.Close()	
+	return URLs
+}
+
 func Storerecord(fullURL string) string{
 	onlyOnce.Do(Initdb)
-	id := strconv.Itoa(rand.Intn(9999))
+	//id := strconv.Itoa(rand.Intn(9999))
+	id := strconv.Itoa(initconfig.NextId)
 	
-	for (!isnewID(id)){
+	/*for (!isnewID(id)){
 		id = strconv.Itoa(rand.Intn(9999))
-	}
+	}*/
 
 	if RAMonly {
 		URL[id] = fullURL
@@ -56,7 +103,8 @@ func Storerecord(fullURL string) string{
 			return err.Error()
 		}
 		JSONdata = append(JSONdata, '\n')
-		
+		//URL[id] = string(JSONdata)
+		URL[id] = fullURL
 
 		DBfile, _ := os.OpenFile(dbPath, os.O_RDWR|os.O_CREATE|os.O_APPEND , 0777)
 		_, err = DBfile.Write(JSONdata)	
@@ -64,7 +112,9 @@ func Storerecord(fullURL string) string{
 			return err.Error()
 		}
 		DBfile.Close()
+		
 	}
+	initconfig.NextId = initconfig.NextId + initconfig.Step
 	return id
 }
 
@@ -75,6 +125,8 @@ func Getrecord(id string) string {
 	if RAMonly {
 		result = URL[id]
 	} else {
+		result = URL[id]
+		/*
 		DBfile, err := os.OpenFile(dbPath, os.O_RDONLY, 0777)
 		if err != nil {
 			log.Println("File does NOT EXIST")
@@ -107,7 +159,7 @@ func Getrecord(id string) string {
 			}
 			result = postJSON.FullURL
 			DBfile.Close()
-		}
+		}*/
 	}
 	
 
@@ -117,7 +169,7 @@ func Getrecord(id string) string {
 		return "http://google.com/404"
 	}
 }
-
+/*
 func isnewID(id string) bool{
 	if RAMonly {
 	result := URL[id]
@@ -160,4 +212,4 @@ func isnewID(id string) bool{
 		}
 		return idIsnew
 	}
-}
+}*/

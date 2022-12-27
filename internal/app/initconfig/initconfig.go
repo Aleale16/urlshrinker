@@ -8,6 +8,9 @@ import (
 )
 var FileDBpath, BaseURL, SrvAddress string
 var SrvAddressflag, BaseURLflag, FileDBpathflag *string
+var NextId = 111
+var Step = 111
+
 func InitFlags() {	
 	SrvAddressflag = flag.String("a", "127.0.0.1:8080", "SERVER_ADDRESS flag")
 	BaseURLflag = flag.String("b", "http://127.0.0.1:8080", "BASE_URL flag")
