@@ -3,15 +3,16 @@ package main
 import (
 	"flag"
 
+	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 	"github.com/Aleale16/urlshrinker/internal/app/server"
 )
 
 func main() {
-	server.InitFlags()
+	initconfig.InitFlags()
 
 	flag.Parse()	
 
-	server.SetinitVars()
+	initconfig.SetinitVars()
 	
 	server.Start()
 	

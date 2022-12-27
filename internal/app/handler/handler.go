@@ -143,6 +143,7 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 	shortURLid := storage.Storerecord(string(postJSON.URL))
 	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
 	shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid
+	//shortURLpath := BaseURL + "/?id="+ shortURLid
 	
 	var shortURLpathJSON resultData
 	shortURLpathJSON.ShortURL = shortURLpath

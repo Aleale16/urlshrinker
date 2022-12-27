@@ -7,6 +7,7 @@ import (
 	"os"
 
 	"github.com/Aleale16/urlshrinker/internal/app/handler"
+	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -54,29 +55,29 @@ func Start(){
 		}
 	log.Println("USERNAME: " + UserName)
 */
-	if BaseURL == ""{
+	if initconfig.BaseURL == ""{
 		//нет ни переменной окружения ни флага
-		BaseURL = "http://localhost:8080"
-		log.Print("BASE_URL: " + "Loaded default: " + BaseURL)
+		initconfig.BaseURL = "http://localhost:8080"
+		log.Print("BASE_URL: " + "Loaded default: " + initconfig.BaseURL)
 	}
-	log.Println("BASE_URL: " + BaseURL)
+	log.Println("BASE_URL: " + initconfig.BaseURL)
 
-	if FileDBpath == ""{
+	if initconfig.FileDBpath == ""{
 		//нет ни переменной окружения ни флага
 		log.Print("FILE_STORAGE_PATH: not set")
 	}
 
-	if SrvAddress == ""{
+	if initconfig.SrvAddress == ""{
 		//нет ни переменной окружения ни флага
-		SrvAddress ="localhost:8080" 
-		log.Print("SERVER_ADDRESS: " + "Loaded default: " + SrvAddress)
+		initconfig.SrvAddress ="localhost:8080" 
+		log.Print("SERVER_ADDRESS: " + "Loaded default: " + initconfig.SrvAddress)
 	}
 
-	os.Setenv("SERVER_ADDRESS", SrvAddress)
-	os.Setenv("BASE_URL", BaseURL)
-	os.Setenv("FILE_STORAGE_PATH", FileDBpath)
+	os.Setenv("SERVER_ADDRESS", initconfig.SrvAddress)
+	os.Setenv("BASE_URL", initconfig.BaseURL)
+	os.Setenv("FILE_STORAGE_PATH", initconfig.FileDBpath)
 
-	log.Fatal(http.ListenAndServe(SrvAddress, r))
+	log.Fatal(http.ListenAndServe(initconfig.SrvAddress, r))
 
 			//os.Setenv("SERVER_ADDRESS", "localhost:8080")
 			//log.Print("SERVER_ADDRESS: "+"Loaded default: " + os.Getenv("SERVER_ADDRESS"))
