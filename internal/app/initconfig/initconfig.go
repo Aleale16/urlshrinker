@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"os"
-	"strings"
 )
 var FileDBpath, BaseURL, SrvAddress string
 var SrvAddressflag, BaseURLflag, FileDBpathflag *string
@@ -41,7 +40,12 @@ func SetinitVars() {
 	}
 
 	if !fileDBpathexists{
-		var flagFound bool
+		FileDBpath = *FileDBpathflag
+		fmt.Println("Set from flag: FileDBpath:", FileDBpath)
+		if FileDBpath == "" {
+			fmt.Print("FILE_STORAGE_PATH: not set") 
+		}
+		/*var flagFound bool
 		//слайс аргументов
 		parameters := os.Args[1:]
 		//среди них ищем передан ли -f
@@ -63,7 +67,7 @@ func SetinitVars() {
 			fmt.Println("Set from flag: FileDBpath:", FileDBpath)
 		} else {
 			fmt.Print("FILE_STORAGE_PATH: not set") 
-		}
+		}*/
 	} else {
 		FileDBpath = fileDBpathENV
 		fmt.Println("Set from ENV: FileDBpath:", FileDBpath)
