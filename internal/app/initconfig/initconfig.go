@@ -40,11 +40,7 @@ func SetinitVars() {
 	}
 
 	if !fileDBpathexists{
-		FileDBpath = *FileDBpathflag
-		fmt.Println("Set from flag: FileDBpath:", FileDBpath)
-		if FileDBpath == "" {
-			fmt.Print("FILE_STORAGE_PATH: not set") 
-		}
+
 		/*var flagFound bool
 		//слайс аргументов
 		parameters := os.Args[1:]
@@ -60,18 +56,28 @@ func SetinitVars() {
 			}
 			fmt.Println(flagFound)
 			i++
-		}
-		if flagFound {
+		}*/
+
+		//if flagFound{
+		if isFlagPassed("f") {
 			//FileDBpathflag := flag.String("f", "../../internal/app/storage/database.txt", "FILE_STORAGE_PATH")
 			FileDBpath = *FileDBpathflag
 			fmt.Println("Set from flag: FileDBpath:", FileDBpath)
 		} else {
 			fmt.Print("FILE_STORAGE_PATH: not set") 
-		}*/
+		}
 	} else {
 		FileDBpath = fileDBpathENV
 		fmt.Println("Set from ENV: FileDBpath:", FileDBpath)
 	}
-	
+}
 
+func isFlagPassed(name string) bool {
+    found := false
+    flag.Visit(func(f *flag.Flag) {
+        if f.Name == name {
+            found = true
+        }
+    })
+    return found
 }
