@@ -110,6 +110,8 @@ func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
 	useridcookie, err:= r.Cookie("userid")
 	if err != nil{	
 		fmt.Println(err)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
 	} else {	
 		validSign, id := checkSign(useridcookie.Value)
 		fmt.Println(id)
