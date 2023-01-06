@@ -13,14 +13,14 @@ import (
 )
 
 type URLrecord map[string]string
-type Userrecord map[string]string
+type Userrecord map[string][]string
 type URLJSONrecord struct {
     ID string `json:"id"`
     FullURL string `json:"fullurl"`    
 }
 
 type UsrURLJSONrecord struct {
-    ID string `json:"short_url"`
+    ShortURL string `json:"short_url"`
     FullURL string `json:"original_url"`    
 }
 
@@ -90,35 +90,42 @@ func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord{
 	return URLs
 }
 
-func Storeuser(userid string){
+func AssignShortURLtouser(userid string, shortURLid string){
 	onlyOnce.Do(Initdb)
-	uid := strconv.Itoa(initconfig.NextUID)
-	Usr[uid] = strconv.Itoa(initconfig.NextID)
-	initconfig.NextUID = initconfig.NextUID + initconfig.Step
+		uid := userid
+		Usr[uid] = append(Usr[uid], shortURLid)
+		fmt.Println("AssignShortURLtouser: " + string(uid)+ " shortURLid= " )	
+		fmt.Println(Usr[uid])
 }
 
 func GetuserURLS(userid string) (output string, noURLs bool){
-var JSONdata []byte
-noURLs = true 
-	for k, v := range Usr {
-		if k == userid {
-			log.Println(v)
-			UsrURLJSON := UsrURLJSONrecord{
-				ID:			k,
-				FullURL:	v,
-			}
-			JSONdata, err := json.Marshal(&UsrURLJSON)
-			if err != nil {
-				return err.Error(), noURLs
-			}
-			JSONdata = append(JSONdata, '\n')
-			//URL[id] = string(JSONdata)
-			log.Println(JSONdata)
-			noURLs = false
+	var UsrURLJSON []UsrURLJSONrecord
+	var JSONresult []byte
+	noURLs = true 
+	UsrShortURLs := Usr[userid]
+	if len(UsrShortURLs)>0{
+		for _, v := range UsrShortURLs {	
+				log.Println(v)
+				//Так нормально заполнять JSON перед маршаллингом?
+				UsrURLJSON = append(UsrURLJSON, UsrURLJSONrecord{
+					ShortURL:	initconfig.BaseURL + "/?id=" + v,
+					FullURL:	URL[v],
+				})
+				
 		}
+		JSONdata, err := json.Marshal(&UsrURLJSON)
+		if err != nil {
+			return err.Error(), noURLs
+		}
+		//JSONdata = append(JSONdata, '\n')
+		//URL[id] = string(JSONdata)
+		JSONresult = JSONdata
+		log.Println("JSONresult= ")		
+		log.Println(JSONresult)		
+		log.Println(string(JSONresult))		
+		noURLs = false
 	}
-	log.Println(JSONdata)
-	return string(JSONdata), noURLs
+	return string(JSONresult), noURLs
 }
 
 func Storerecord(fullURL string) string{

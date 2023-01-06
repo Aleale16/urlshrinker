@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"math/rand"
 	"net/http"
 	"strconv"
 
@@ -39,11 +38,15 @@ func ReqHandler(w http.ResponseWriter, r *http.Request) {
 }
 */
 
-func defineCookie(w http.ResponseWriter, r *http.Request){
+func defineCookie(w http.ResponseWriter, r *http.Request)(uid string){
 
 	var key = []byte("secret key")
-	userid := []byte(strconv.Itoa(rand.Intn(9999)))
+	//userid := []byte(strconv.Itoa(rand.Intn(9999)))
 	//userid := []byte("8888")
+	userid := []byte(strconv.Itoa(initconfig.NextUID))
+	fmt.Println("New userid=" + strconv.Itoa(initconfig.NextUID))
+	initconfig.NextUID = initconfig.NextUID + initconfig.Step
+	
       // подписываем алгоритмом HMAC, используя SHA256
 	  h := hmac.New(sha256.New, key)
 	  h.Write(userid)
@@ -59,6 +62,9 @@ func defineCookie(w http.ResponseWriter, r *http.Request){
         Name:   "userid",
         Value:  hex.EncodeToString([]byte(signedcookie)),
         MaxAge: 300,
+		Path:  "/",
+		HttpOnly: true,
+        Secure:   true,
     }
 	http.SetCookie(w, cookie)
 
@@ -67,6 +73,7 @@ func defineCookie(w http.ResponseWriter, r *http.Request){
 		//checkSign(cookie.Value)
 	//}
 	fmt.Println(r.Cookie("userid"))
+	return string(userid)
 }
 
 func checkSign(msg string) (validSign bool, val string){
@@ -100,15 +107,17 @@ func checkSign(msg string) (validSign bool, val string){
 }
 
 func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
-	useridcookie, _:= r.Cookie("userid")
-
-	if useridcookie.Value != "" {
+	useridcookie, err:= r.Cookie("userid")
+	if err != nil{	
+		fmt.Println(err)
+	} else {	
 		validSign, id := checkSign(useridcookie.Value)
 		fmt.Println(id)
 		fmt.Println(validSign)
-		//if validSign {	
+		//if validSign {
 			userURLS, noURLs := storage.GetuserURLS(id)
 		if noURLs{
+			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusNoContent)
 		} else {
 			w.Header().Set("Content-Type", "application/json")
@@ -137,24 +146,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println("GET: " + q + " Redirect to " + record)
 
-	fmt.Println(r.Cookie("userid"))
-	useridcookie, err:= r.Cookie("userid")
-	if err != nil{	
-		fmt.Println(err)
-		defineCookie(w, r)
-	} else {
-		//if useridcookie.Value == "" {
-			validSign, id := checkSign(useridcookie.Value)
-			fmt.Println(id)
-			if !validSign {	
-				defineCookie(w, r)
-			}
-		//} else {
-		//	defineCookie(w, r)
-		//}
-	}
-	
-	//w.Write([]byte(useridcookie.Value))
+
 }
 
 func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
@@ -192,13 +184,36 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
         return
     }
     log.Println(w, "body: %d", body)
-		
+
+	uid := ""
+	fmt.Println(r.Cookie("userid"))
+	useridcookie, err:= r.Cookie("userid")
+	if err != nil{	
+		fmt.Println(err)
+		uid = defineCookie(w, r)
+	} else {
+		//if useridcookie.Value == "" {
+			validSign, id := checkSign(useridcookie.Value)
+			fmt.Println(id)
+			if !validSign {	
+				uid = defineCookie(w, r)
+			} else {
+				uid = id
+			}
+		//} else {
+		//	defineCookie(w, r)
+		//}
+	}
+	
+	//w.Write([]byte(useridcookie.Value))
+	
 	shortURLid := storage.Storerecord(string(body))
 	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
 	//shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid	
 	//shortURLpath := BaseURL + "/?id="+ shortURLid Как сюда передать переменную из server.go?	
 	//вот так из пакета initconfig:
 	shortURLpath :=initconfig.BaseURL + "/?id="+ shortURLid
+	storage.AssignShortURLtouser(uid, shortURLid)
 	
 	//w.Header().Set("Content-Encoding", "gzip, deflate, br")
 	// устанавливаем статус-код 201
