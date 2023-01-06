@@ -111,6 +111,7 @@ func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
 		if noURLs{
 			w.WriteHeader(http.StatusNoContent)
 		} else {
+			w.Header().Set("Content-Type", "application/json")
 			w.Write([]byte(userURLS))
 		}
 		//}
