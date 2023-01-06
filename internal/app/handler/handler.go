@@ -125,14 +125,14 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
         return
     }
 	record := storage.Getrecord(q)	
-	if record != "http://google.com/404" {
+	//if record != "http://google.com/404" {
 		// устанавливаем заголовок Location	
 		w.Header().Set("Location", record)
 		// устанавливаем статус-код 307
 		w.WriteHeader(http.StatusTemporaryRedirect)
-	} else {
-		http.Error(w, "Short URL with id=" + q + " not set", http.StatusBadRequest)
-	}
+	//} else {
+	//	http.Error(w, "Short URL with id=" + q + " not set", http.StatusBadRequest)
+	//}
 
 	fmt.Println("GET: " + q + " Redirect to " + record)
 
