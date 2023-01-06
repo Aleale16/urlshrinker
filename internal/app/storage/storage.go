@@ -13,12 +13,19 @@ import (
 )
 
 type URLrecord map[string]string
+type Userrecord map[string]string
 type URLJSONrecord struct {
     ID string `json:"id"`
     FullURL string `json:"fullurl"`    
 }
 
+type UsrURLJSONrecord struct {
+    ID string `json:"short_url"`
+    FullURL string `json:"original_url"`    
+}
+
 var URL URLrecord
+var Usr Userrecord
 var dbPath string
 var RAMonly, dbPathexists bool
 var onlyOnce sync.Once
@@ -39,6 +46,7 @@ func Initdb() {
 			URL = make(URLrecord)
 	}	
 	fmt.Println("Storage ready!")
+	Usr = make(Userrecord)
 }
 
 func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord{
@@ -80,6 +88,37 @@ func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord{
 	}	
 	DBfile.Close()	
 	return URLs
+}
+
+func Storeuser(userid string){
+	onlyOnce.Do(Initdb)
+	uid := strconv.Itoa(initconfig.NextUID)
+	Usr[uid] = strconv.Itoa(initconfig.NextID)
+	initconfig.NextUID = initconfig.NextUID + initconfig.Step
+}
+
+func GetuserURLS(userid string) (output string, noURLs bool){
+var JSONdata []byte
+noURLs = true 
+	for k, v := range Usr {
+		if k == userid {
+			log.Println(v)
+			UsrURLJSON := UsrURLJSONrecord{
+				ID:			k,
+				FullURL:	v,
+			}
+			JSONdata, err := json.Marshal(&UsrURLJSON)
+			if err != nil {
+				return err.Error(), noURLs
+			}
+			JSONdata = append(JSONdata, '\n')
+			//URL[id] = string(JSONdata)
+			log.Println(JSONdata)
+			noURLs = false
+		}
+	}
+	log.Println(JSONdata)
+	return string(JSONdata), noURLs
 }
 
 func Storerecord(fullURL string) string{
@@ -167,6 +206,7 @@ func Getrecord(id string) string {
 		return result
 	} else {
 		return "http://google.com/404"
+		
 	}
 }
 /*

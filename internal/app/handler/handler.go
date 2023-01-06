@@ -2,11 +2,16 @@ package handler
 
 import (
 	"compress/gzip"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"net/http"
+	"strconv"
 
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 	"github.com/Aleale16/urlshrinker/internal/app/storage"
@@ -33,20 +38,122 @@ func ReqHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.Method)
 }
 */
+
+func defineCookie(w http.ResponseWriter, r *http.Request){
+
+	var key = []byte("secret key")
+	userid := []byte(strconv.Itoa(rand.Intn(9999)))
+	//userid := []byte("8888")
+      // подписываем алгоритмом HMAC, используя SHA256
+	  h := hmac.New(sha256.New, key)
+	  h.Write(userid)
+	  dst := h.Sum(nil)
+
+	 //вот это вообще было не очевидно:! 
+	  signedcookie := string(dst) + string(userid)
+  
+	  fmt.Printf("%x", dst)
+	  fmt.Printf("%v\n", dst)
+
+	cookie := &http.Cookie{
+        Name:   "userid",
+        Value:  hex.EncodeToString([]byte(signedcookie)),
+        MaxAge: 300,
+    }
+	http.SetCookie(w, cookie)
+
+	fmt.Println("cookie was set: " + cookie.Name + "; value= " + cookie.Value)
+	//if cookie.Value != ""{
+		//checkSign(cookie.Value)
+	//}
+	fmt.Println(r.Cookie("userid"))
+}
+
+func checkSign(msg string) (validSign bool, val string){
+	var key = []byte("secret key")
+	var (
+		data []byte // декодированное сообщение с подписью
+		id   string // значение идентификатора
+		err  error
+		sign []byte // HMAC-подпись от идентификатора
+	)
+	validSign = false
+	data, err = hex.DecodeString(msg)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("data=" + string(data))
+	id = string(data[sha256.Size:])
+	val = id
+	//id = binary.BigEndian.Uint32(data[:4])
+	//id = binary.BigEndian.Uint32(data[sha256.Size:])
+	h := hmac.New(sha256.New, key)
+	h.Write(data[sha256.Size:])
+	sign = h.Sum(nil) 
+	if hmac.Equal(sign, data[:sha256.Size]) {
+		fmt.Println("Подпись подлинная. ID:", id)
+		validSign = true
+	} else {
+		fmt.Println("Подпись неверна. Где-то ошибка! ID:", id)
+	}	
+	return validSign, val
+}
+
+func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
+	useridcookie, _:= r.Cookie("userid")
+
+	if useridcookie.Value != "" {
+		validSign, id := checkSign(useridcookie.Value)
+		fmt.Println(id)
+		fmt.Println(validSign)
+		//if validSign {	
+			userURLS, noURLs := storage.GetuserURLS(id)
+		if noURLs{
+			w.WriteHeader(http.StatusNoContent)
+		} else {
+			w.Write([]byte(userURLS))
+		}
+		//}
+	}
+}
+
 func GetHandler(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query().Get("id")
 	//q := r.URL.String()
     if q == "" {
         http.Error(w, "The query parameter is missing", http.StatusBadRequest)
         return
-    }	
-	// устанавливаем заголовок Location	
-	w.Header().Set("Location", storage.Getrecord(q))
-	// устанавливаем статус-код 307
-	w.WriteHeader(http.StatusTemporaryRedirect)
-	
+    }
+	record := storage.Getrecord(q)	
+	if record != "http://google.com/404" {
+		// устанавливаем заголовок Location	
+		w.Header().Set("Location", record)
+		// устанавливаем статус-код 307
+		w.WriteHeader(http.StatusTemporaryRedirect)
+	} else {
+		http.Error(w, "Short URL with id=" + q + " not set", http.StatusBadRequest)
+	}
 
-	fmt.Println("GET: " + q + " Redirect to " + storage.Getrecord(q))
+	fmt.Println("GET: " + q + " Redirect to " + record)
+
+	fmt.Println(r.Cookie("userid"))
+	useridcookie, err:= r.Cookie("userid")
+	if err != nil{	
+		fmt.Println(err)
+		defineCookie(w, r)
+	} else {
+		//if useridcookie.Value == "" {
+			validSign, id := checkSign(useridcookie.Value)
+			fmt.Println(id)
+			if !validSign {	
+				defineCookie(w, r)
+			}
+		//} else {
+		//	defineCookie(w, r)
+		//}
+	}
+	
+	//w.Write([]byte(useridcookie.Value))
 }
 
 func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{

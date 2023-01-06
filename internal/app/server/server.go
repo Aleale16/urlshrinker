@@ -35,6 +35,7 @@ func Start(){
 	r.Use(middleware.Compress(5, "gzip"))
 	
 	r.Get("/", handler.GetHandler)
+	r.Get("/api/user/urls", handler.GetUsrURLsHandler)
 	r.Post("/", handler.PostHandler)
 	r.Post("/api/shorten", handler.PostJSONHandler)
 	//r.Get("/health-check", handler.StatusOKHandler)
