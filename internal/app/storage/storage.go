@@ -57,26 +57,36 @@ func InitPGdb() {
 		} else {
 			_, err := PGdb.Exec(context.Background(), `CREATE TABLE IF NOT EXISTS urls
 				(shortid character varying(10),
-				fullurl character varying(1000)
+				fullurl character varying(1000),
+				id integer NOT NULL,
+				CONSTRAINT urls_pkey PRIMARY KEY (id)
 			)`)
-			if err == nil {
-				log.Println("w.WriteHeader(http.StatusOK)")
-			} else {
-				log.Println("http.Error(w, "+"Internal server error"+", http.StatusInternalServerError)")
-				return
-			}
+			if err != nil {
+				log.Println(err)
+			} 
 			
 			_, err = PGdb.Exec(context.Background(), `CREATE TABLE IF NOT EXISTS users
 			(
 				uid character varying(10),
-				shortid character varying(10)
+				shortid character varying(10),
+				id integer NOT NULL,
+				CONSTRAINT users_pkey PRIMARY KEY (id)
 			)`)
-			if err == nil {
-				log.Println("w.WriteHeader(http.StatusOK)")
-			} else {
-				log.Println("http.Error(w, "+"Internal server error"+", http.StatusInternalServerError)")
-				return
-			}
+			if err != nil {
+				log.Println(err)
+			} 
+
+			err = PGdb.QueryRow(context.Background(), `select urls.shortid from urls order by urls.id desc limit 1`).Scan(&initconfig.NextID)
+			initconfig.NextID =+ initconfig.Step
+			if err != nil {
+				log.Println(err)
+			} 
+
+			err = PGdb.QueryRow(context.Background(), `select users.uid from users order by users.id desc limit 1`).Scan(&initconfig.NextUID)
+			initconfig.NextUID =+ initconfig.Step
+			if err != nil {
+				log.Println(err)
+			} 
 			PGdbOpened = true
 		}
 	} 
