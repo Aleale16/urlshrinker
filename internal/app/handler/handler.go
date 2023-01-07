@@ -168,8 +168,16 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	//}
 
 	fmt.Println("GET: " + q + " Redirect to " + record)
+}
 
-
+func GetPingHandler(w http.ResponseWriter, r *http.Request) {
+// работаем с базой storage.PGdb
+	if storage.CheckPGdbConn(){
+		w.WriteHeader(http.StatusOK)
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	fmt.Println("GetPingHandler: finished")
 }
 
 func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{

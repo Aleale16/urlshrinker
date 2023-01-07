@@ -2,6 +2,7 @@ package storage
 
 import (
 	"bufio"
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -10,6 +11,7 @@ import (
 	"sync"
 
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 type URLrecord map[string]string
@@ -30,6 +32,30 @@ var dbPath string
 var RAMonly, dbPathexists bool
 var onlyOnce sync.Once
 
+var PGdb *pgxpool.Pool
+
+func InitPGdb() {
+	
+//----------------------------//
+//Подключаемся к СУБД postgres
+//----------------------------//
+	//urlExample := "postgres://postgres:1@localhost:5432/gotoschool"
+    //os.Setenv("DATABASE_DSN", urlExample)
+
+    poolConfig, err := pgxpool.ParseConfig(os.Getenv("DATABASE_DSN"))
+	if err != nil {
+		log.Fatalln("Unable to parse DATABASE_DSN:", err)
+	}
+    fmt.Println(poolConfig)
+
+    PGdb, err = pgxpool.NewWithConfig(context.Background(), poolConfig)
+    if err != nil {
+        fmt.Println("ERROR")
+        panic(err)
+    }
+    
+}
+
 func Initdb() {
 	dbPath, dbPathexists = os.LookupEnv("FILE_STORAGE_PATH")
 	if (dbPathexists && dbPath != "") {
@@ -47,6 +73,9 @@ func Initdb() {
 	}	
 	fmt.Println("Storage ready!")
 	Usr = make(Userrecord)
+
+	//Возможно в отдельный пакет инициализацию Postgres надо вынести
+	InitPGdb()
 }
 
 func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord{
@@ -96,6 +125,20 @@ func AssignShortURLtouser(userid string, shortURLid string){
 		Usr[uid] = append(Usr[uid], shortURLid)
 		fmt.Println("AssignShortURLtouser: " + string(uid)+ " shortURLid= " )	
 		fmt.Println(Usr[uid])
+}
+
+func CheckPGdbConn() (connected bool){
+	onlyOnce.Do(Initdb)
+	//defer PGdb.Close()
+    err := PGdb.Ping(context.Background())
+    if err != nil {
+        fmt.Println(err)
+		return false
+    } else {
+        fmt.Println("Ping db is ok")
+		return true
+    }
+	
 }
 
 func GetuserURLS(userid string) (output string, noURLs bool){
