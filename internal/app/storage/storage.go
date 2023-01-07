@@ -29,7 +29,7 @@ type UsrURLJSONrecord struct {
 var URL URLrecord
 var Usr Userrecord
 var dbPath string
-var RAMonly, dbPathexists bool
+var RAMonly, PGdbOpened, dbPathexists bool
 var onlyOnce sync.Once
 
 var PGdb *pgxpool.Pool
@@ -50,9 +50,12 @@ func InitPGdb() {
 
     PGdb, err = pgxpool.NewWithConfig(context.Background(), poolConfig)
     if err != nil {
-        fmt.Println("ERROR")
+		PGdbOpened = false
+        fmt.Println("ERROR! PGdbOpened = false")
         panic(err)
-    }
+    } else {
+		PGdbOpened = true
+	}
     
 }
 
@@ -74,7 +77,7 @@ func Initdb() {
 	fmt.Println("Storage ready!")
 	Usr = make(Userrecord)
 
-	//Возможно в отдельный пакет инициализацию Postgres надо вынести
+//???Возможно в отдельный пакет инициализацию Postgres надо вынести?
 	InitPGdb()
 }
 
@@ -121,10 +124,19 @@ func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord{
 
 func AssignShortURLtouser(userid string, shortURLid string){
 	onlyOnce.Do(Initdb)
-		uid := userid
-		Usr[uid] = append(Usr[uid], shortURLid)
-		fmt.Println("AssignShortURLtouser: " + string(uid)+ " shortURLid= " )	
-		fmt.Println(Usr[uid])
+	uid := userid
+	Usr[uid] = append(Usr[uid], shortURLid)
+	fmt.Println("AssignShortURLtouser: " + string(uid)+ " shortURLid= " )	
+	fmt.Println(Usr[uid])
+
+	if PGdbOpened {
+		_, err := PGdb.Exec(context.Background(), `insert into users(uid, shortid) values ($1, $2)`, uid, shortURLid)
+		if err == nil {
+			log.Println("w.WriteHeader(http.StatusOK)")
+		} else {
+			log.Println("http.Error(w, "+"Internal server error"+", http.StatusInternalServerError)")
+		}
+	}
 }
 
 func CheckPGdbConn() (connected bool){
@@ -137,8 +149,7 @@ func CheckPGdbConn() (connected bool){
     } else {
         fmt.Println("Ping db is ok")
 		return true
-    }
-	
+    }	
 }
 
 func GetuserURLS(userid string) (output string, noURLs bool){
@@ -153,8 +164,7 @@ func GetuserURLS(userid string) (output string, noURLs bool){
 				UsrURLJSON = append(UsrURLJSON, UsrURLJSONrecord{
 					ShortURL:	initconfig.BaseURL + "/?id=" + v,
 					FullURL:	URL[v],
-				})
-				
+				})				
 		}
 		JSONdata, err := json.Marshal(&UsrURLJSON)
 		if err != nil {
@@ -168,6 +178,45 @@ func GetuserURLS(userid string) (output string, noURLs bool){
 		log.Println(string(JSONresult))		
 		noURLs = false
 	}
+	
+
+	if PGdbOpened {
+		var (
+			UID string
+			shortID string
+			FullURL string
+		)
+		rows, err := PGdb.Query(context.Background(), "SELECT usr.uid, usr.shortid, urls.fullurl FROM users as usr LEFT JOIN urls ON urls.shortid = usr.shortid where uid=$1", userid)
+		if err != nil {
+			return err.Error(), noURLs
+		}
+		// обязательно закрываем перед возвратом функции
+		defer rows.Close()
+
+		// пробегаем по всем записям
+		for rows.Next() {
+			err := rows.Scan(&UID, &shortID, &FullURL)
+			if err != nil {
+				log.Fatal(err)
+			}
+			UsrURLJSON = append(UsrURLJSON, UsrURLJSONrecord{
+				ShortURL:	initconfig.BaseURL + "/?id=" + shortID,
+				FullURL:	FullURL,
+			})	
+		}
+		JSONdata, err := json.Marshal(&UsrURLJSON)
+		if err != nil {
+			return err.Error(), noURLs
+		}
+		//JSONdata = append(JSONdata, '\n')
+		//URL[id] = string(JSONdata)
+		JSONresult = JSONdata
+		log.Println("JSONresult= ")		
+		log.Println(JSONresult)		
+		log.Println(string(JSONresult))		
+		noURLs = false
+	}
+
 	return string(JSONresult), noURLs
 }
 
@@ -179,6 +228,8 @@ func Storerecord(fullURL string) string{
 	/*for (!isnewID(id)){
 		id = strconv.Itoa(rand.Intn(9999))
 	}*/
+
+
 
 	if RAMonly {
 		URL[id] = fullURL
@@ -201,8 +252,18 @@ func Storerecord(fullURL string) string{
 			return err.Error()
 		}
 		DBfile.Close()
-		
+
 	}
+	
+	if PGdbOpened {
+		_, err := PGdb.Exec(context.Background(), `insert into urls(shortid, fullurl) values ($1, $2)`, id, fullURL)
+		if err == nil {
+			log.Println("w.WriteHeader(http.StatusOK)")
+		} else {
+			log.Println("http.Error(w, "+"Internal server error"+", http.StatusInternalServerError)")
+		}
+	}
+
 	initconfig.NextID = initconfig.NextID + initconfig.Step
 	return id
 }
@@ -249,6 +310,26 @@ func Getrecord(id string) string {
 			result = postJSON.FullURL
 			DBfile.Close()
 		}*/
+	}
+	if PGdbOpened {
+		var (
+			FullURL string
+		)
+		rows, err := PGdb.Query(context.Background(), "SELECT urls.fullurl FROM urls where shortid=$1", id)
+		if err != nil {
+			return err.Error()
+		}
+		// обязательно закрываем перед возвратом функции
+		defer rows.Close()
+
+		// пробегаем по всем записям
+		for rows.Next() {
+			err := rows.Scan(&FullURL)
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+		result = id
 	}
 	
 
