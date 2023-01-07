@@ -55,6 +55,28 @@ func InitPGdb() {
 			fmt.Println("ERROR! PGdbOpened = false")
 			panic(err)
 		} else {
+			_, err := PGdb.Exec(context.Background(), `CREATE TABLE IF NOT EXISTS urls
+				(shortid character varying(10),
+				fullurl character varying(1000)
+			)`)
+			if err == nil {
+				log.Println("w.WriteHeader(http.StatusOK)")
+			} else {
+				log.Println("http.Error(w, "+"Internal server error"+", http.StatusInternalServerError)")
+				return
+			}
+			
+			_, err = PGdb.Exec(context.Background(), `CREATE TABLE IF NOT EXISTS users
+			(
+				uid character varying(10),
+				shortid character varying(10)
+			)`)
+			if err == nil {
+				log.Println("w.WriteHeader(http.StatusOK)")
+			} else {
+				log.Println("http.Error(w, "+"Internal server error"+", http.StatusInternalServerError)")
+				return
+			}
 			PGdbOpened = true
 		}
 	} 
