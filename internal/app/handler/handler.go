@@ -108,6 +108,7 @@ func checkSign(msg string) (validSign bool, val string){
 }
 
 func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
+	//То, что автотест ожидает, а затем отправляет токен в поле заголовка Authorization можно было узнать только в результате просмотра текста автотеста!
 	authorizationHeader := r.Header.Get("Authorization")
 	fmt.Println("authorizationHeader=" + authorizationHeader)
 	if authorizationHeader == ""{
