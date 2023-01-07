@@ -41,6 +41,7 @@ func InitPGdb() {
 //----------------------------//
 	//urlExample := "postgres://postgres:1@localhost:5432/gotoschool"
     //os.Setenv("DATABASE_DSN", urlExample)
+	PGdbOpened = false
 	if initconfig.PostgresDBURL != "" {
 		poolConfig, err := pgxpool.ParseConfig(initconfig.PostgresDBURL)
 		if err != nil {
