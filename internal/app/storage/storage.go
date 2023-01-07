@@ -338,7 +338,12 @@ func Getrecord(id string) string {
 		var (
 			FullURL string
 		)
-		rows, err := PGdb.Query(context.Background(), "SELECT urls.fullurl FROM urls where shortid=$1", id)
+		err := PGdb.QueryRow(context.Background(), "SELECT urls.fullurl FROM urls where shortid=$1", id).Scan(&FullURL)
+		if err != nil {
+			return err.Error()
+		}
+		result = FullURL
+/*		rows, err := PGdb.Query(context.Background(), "SELECT urls.fullurl FROM urls where shortid=$1", id)
 		if err != nil {
 			return err.Error()
 		}
@@ -352,7 +357,7 @@ func Getrecord(id string) string {
 				log.Fatal(err)
 			}
 		}
-		result = id
+		result = id*/
 	}
 	
 
