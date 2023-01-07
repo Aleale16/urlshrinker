@@ -108,10 +108,10 @@ func checkSign(msg string) (validSign bool, val string){
 }
 
 func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
-	var authorizationHeader string
-	authorizationHeader = r.Header.Get("Authorization")
+	authorizationHeader := r.Header.Get("Authorization")
 	fmt.Println("authorizationHeader=" + authorizationHeader)
 	if authorizationHeader == ""{
+		fmt.Println("Checking useridcookie:")
 		useridcookie, err:= r.Cookie("userid")
 		if err != nil{	
 			fmt.Println(err)
@@ -131,6 +131,20 @@ func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte(userURLS))
 			}
 			//}
+		}
+	} else {
+		fmt.Println("Checking authorizationHeader:")
+		validSign, id := checkSign(authorizationHeader)
+		fmt.Println(id)
+		fmt.Println(validSign)
+		//if validSign {
+			userURLS, noURLs := storage.GetuserURLS(id)
+		if noURLs{
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusNoContent)
+		} else {
+			w.Header().Set("Content-Type", "application/json")
+			w.Write([]byte(userURLS))
 		}
 	}
 }
