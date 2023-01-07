@@ -41,22 +41,22 @@ func InitPGdb() {
 //----------------------------//
 	//urlExample := "postgres://postgres:1@localhost:5432/gotoschool"
     //os.Setenv("DATABASE_DSN", urlExample)
+	if initconfig.PostgresDBURL != "" {
+		poolConfig, err := pgxpool.ParseConfig(initconfig.PostgresDBURL)
+		if err != nil {
+			log.Fatalln("Unable to parse DATABASE_DSN:", err)
+		}
+		//fmt.Println(poolConfig)
 
-    poolConfig, err := pgxpool.ParseConfig(os.Getenv("DATABASE_DSN"))
-	if err != nil {
-		log.Fatalln("Unable to parse DATABASE_DSN:", err)
-	}
-    fmt.Println(poolConfig)
-
-    PGdb, err = pgxpool.NewWithConfig(context.Background(), poolConfig)
-    if err != nil {
-		PGdbOpened = false
-        fmt.Println("ERROR! PGdbOpened = false")
-        panic(err)
-    } else {
-		PGdbOpened = true
-	}
-    
+		PGdb, err = pgxpool.NewWithConfig(context.Background(), poolConfig)
+		if err != nil {
+			PGdbOpened = false
+			fmt.Println("ERROR! PGdbOpened = false")
+			panic(err)
+		} else {
+			PGdbOpened = true
+		}
+	} 
 }
 
 func Initdb() {
@@ -254,7 +254,7 @@ func Storerecord(fullURL string) string{
 		DBfile.Close()
 
 	}
-	
+
 	if PGdbOpened {
 		_, err := PGdb.Exec(context.Background(), `insert into urls(shortid, fullurl) values ($1, $2)`, id, fullURL)
 		if err == nil {

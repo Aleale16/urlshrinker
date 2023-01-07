@@ -43,9 +43,14 @@ func SetinitVars() {
 		fmt.Println("Set from ENV: BaseURL:", BaseURL)
 	}
 
-	if !postgresDBURLexists{		
-		PostgresDBURL = *PostgresDBURLflag
-		fmt.Println("Set from flag: PostgresDBURL:", PostgresDBURL)
+	if !postgresDBURLexists{	
+		if isFlagPassed("d") {
+			PostgresDBURL = *PostgresDBURLflag
+			fmt.Println("Set from flag: PostgresDBURL:", PostgresDBURL)
+		} else {
+			fmt.Print("DATABASE_DSN: not set, no flag, no ENV") 
+		}	
+
 	} else {
 		PostgresDBURL = postgresDBURLENV
 		fmt.Println("Set from ENV: PostgresDBURL:", PostgresDBURL)
@@ -76,7 +81,7 @@ func SetinitVars() {
 			FileDBpath = *FileDBpathflag
 			fmt.Println("Set from flag: FileDBpath:", FileDBpath)
 		} else {
-			fmt.Print("FILE_STORAGE_PATH: not set") 
+			fmt.Print("FILE_STORAGE_PATH: not set, no flag, no ENV") 
 		}
 	} else {
 		FileDBpath = fileDBpathENV
