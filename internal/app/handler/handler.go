@@ -73,6 +73,7 @@ func defineCookie(w http.ResponseWriter, r *http.Request)(uid string){
 		//checkSign(cookie.Value)
 	//}
 	fmt.Println(r.Cookie("userid"))
+	w.Header().Set("Authorization", cookie.Value)
 	return string(userid)
 }
 
@@ -107,25 +108,30 @@ func checkSign(msg string) (validSign bool, val string){
 }
 
 func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
-	useridcookie, err:= r.Cookie("userid")
-	if err != nil{	
-		fmt.Println(err)
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusNoContent)
-	} else {	
-		validSign, id := checkSign(useridcookie.Value)
-		fmt.Println(id)
-		fmt.Println(validSign)
-		//if validSign {
-			userURLS, noURLs := storage.GetuserURLS(id)
-		if noURLs{
+	var authorizationHeader string
+	authorizationHeader = r.Header.Get("Authorization")
+	fmt.Println("authorizationHeader=" + authorizationHeader)
+	if authorizationHeader == ""{
+		useridcookie, err:= r.Cookie("userid")
+		if err != nil{	
+			fmt.Println(err)
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusNoContent)
-		} else {
-			w.Header().Set("Content-Type", "application/json")
-			w.Write([]byte(userURLS))
+		} else {	
+			validSign, id := checkSign(useridcookie.Value)
+			fmt.Println(id)
+			fmt.Println(validSign)
+			//if validSign {
+				userURLS, noURLs := storage.GetuserURLS(id)
+			if noURLs{
+				w.Header().Set("Content-Type", "application/json")
+				w.WriteHeader(http.StatusNoContent)
+			} else {
+				w.Header().Set("Content-Type", "application/json")
+				w.Write([]byte(userURLS))
+			}
+			//}
 		}
-		//}
 	}
 }
 
