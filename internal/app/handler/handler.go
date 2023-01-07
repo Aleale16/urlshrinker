@@ -377,6 +377,9 @@ func PostJSONbatchHandler(w http.ResponseWriter, r *http.Request) /*(shortURL st
 	}
 
 	JSONresult = JSONdata
+	w.Header().Set("Content-Type", "application/json")
+	// устанавливаем статус-код 201
+	w.WriteHeader(http.StatusCreated)
 //типа return:
 	w.Write(JSONresult)
 	fmt.Println("POST: " + string(b) + " return JSON= "+ string(JSONresult))	
