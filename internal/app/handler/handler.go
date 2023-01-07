@@ -325,3 +325,59 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 
 	//return shortURLpath
 }
+
+//! POST /api/shorten/batch
+//структура вводимого JSON
+type inputbatchData struct {
+    ID string `json:"correlation_id"`
+    URL string `json:"original_url"`   
+}
+
+//структура выводимого JSON	 
+type resultbatchData struct {
+    ID string `json:"correlation_id"`
+    ShortURL string `json:"short_url"`    
+}
+
+func PostJSONbatchHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
+	// читаем Body (Тело POST запроса)
+	b, err := io.ReadAll(r.Body)
+	// обрабатываем ошибку
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	//отладка всё что было в POST запросе
+	log.Println("PostJSONHandler body: " + string(b))
+	log.Println("Content-Encoding from req: " + r.Header.Get("Content-Encoding"))
+
+	var inputbatchJSON []inputbatchData
+	var resultbatchJSON []resultbatchData
+	var JSONresult []byte
+	err = json.Unmarshal(b, &inputbatchJSON)
+	if err != nil {
+		panic(err)
+	}
+	//отладка что было в поле url в POST запросе
+	log.Println(inputbatchJSON)
+	// Обработка входного JSON и выдача результирующего
+	if len(inputbatchJSON)>0{
+		for _, v := range inputbatchJSON {	
+				log.Println(v)
+				shortURLid := storage.Storerecord(string(v.URL))
+				resultbatchJSON = append(resultbatchJSON, resultbatchData{
+					ID:	v.ID,
+					ShortURL:	initconfig.BaseURL + "/?id=" + shortURLid,
+				})	
+		}
+	}
+	JSONdata, err := json.Marshal(&resultbatchJSON)
+	if err != nil {
+		log.Println(err.Error())
+	}
+
+	JSONresult = JSONdata
+//типа return:
+	w.Write(JSONresult)
+	fmt.Println("POST: " + string(b) + " return JSON= "+ string(JSONresult))	
+}

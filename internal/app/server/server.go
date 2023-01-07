@@ -40,6 +40,7 @@ func Start(){
 
 	r.Post("/", handler.PostHandler)
 	r.Post("/api/shorten", handler.PostJSONHandler)
+	r.Post("/api/shorten/batch", handler.PostJSONbatchHandler)
 	//r.Get("/health-check", handler.StatusOKHandler)
 	
 	fmt.Println()
