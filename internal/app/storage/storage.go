@@ -41,6 +41,7 @@ func InitPGdb() {
 //----------------------------//
 	//urlExample := "postgres://postgres:1@localhost:5432/gotoschool"
     //os.Setenv("DATABASE_DSN", urlExample)
+	var NextID, NextUID string
 	PGdbOpened = false
 	if initconfig.PostgresDBURL != "" {
 		poolConfig, err := pgxpool.ParseConfig(initconfig.PostgresDBURL)
@@ -96,19 +97,21 @@ func InitPGdb() {
 			if err != nil {
 				log.Println(err)
 			} 
-
-			err = PGdb.QueryRow(context.Background(), `select urls.shortid from urls order by urls.id desc limit 1`).Scan(&initconfig.NextID)
-			log.Println("NextID =")
-			log.Print(initconfig.NextID)
-			initconfig.NextID =+ initconfig.Step
+			log.Println("Calculating NextID & NextUID:")
+			err = PGdb.QueryRow(context.Background(), `select urls.shortid from urls order by urls.id desc limit 1`).Scan(&NextID)
+			log.Println("NextID =" + NextID)
+			LastID, _ := strconv.Atoi(NextID)			
+			initconfig.NextID =LastID + initconfig.Step
+			log.Println(initconfig.NextID)
 			if err != nil {
 				log.Println(err)
 			} 
 
-			err = PGdb.QueryRow(context.Background(), `select users.uid from users order by users.id desc limit 1`).Scan(&initconfig.NextUID)
-			log.Println("NextUID =")
+			err = PGdb.QueryRow(context.Background(), `select users.uid from users order by users.id desc limit 1`).Scan(&NextUID)
+			log.Println("NextUID =" + NextUID)
+			LastUID, _ := strconv.Atoi(NextUID)
 			log.Print(initconfig.NextUID)
-			initconfig.NextUID =+ initconfig.Step
+			initconfig.NextUID = LastUID + initconfig.Step
 			if err != nil {
 				log.Println(err)
 			} 
