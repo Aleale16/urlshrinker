@@ -173,6 +173,7 @@ func AssignShortURLtouser(userid string, shortURLid string){
 			log.Println("w.WriteHeader(http.StatusOK)")
 		} else {
 			log.Println("http.Error(w, "+"Internal server error"+", http.StatusInternalServerError)")
+			log.Println(err)
 		}
 	}
 }
