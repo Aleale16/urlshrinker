@@ -89,8 +89,12 @@ func InitPGdb() {
 			} 
 			*/
 			PGdbOpened = true
+			fmt.Println("PGdbOpened = TRUE") 
 		}
-	} 
+	} else {
+		fmt.Println("PGdbOpened = FALSE")
+	}
+	
 }
 
 func Initdb() {
