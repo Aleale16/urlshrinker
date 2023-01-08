@@ -96,19 +96,23 @@ func InitPGdb() {
 			if err != nil {
 				log.Println(err)
 			} 
-/*
+
 			err = PGdb.QueryRow(context.Background(), `select urls.shortid from urls order by urls.id desc limit 1`).Scan(&initconfig.NextID)
+			log.Println("NextID =")
+			log.Print(initconfig.NextID)
 			initconfig.NextID =+ initconfig.Step
 			if err != nil {
 				log.Println(err)
 			} 
 
 			err = PGdb.QueryRow(context.Background(), `select users.uid from users order by users.id desc limit 1`).Scan(&initconfig.NextUID)
+			log.Println("NextUID =")
+			log.Print(initconfig.NextUID)
 			initconfig.NextUID =+ initconfig.Step
 			if err != nil {
 				log.Println(err)
 			} 
-			*/
+			
 			PGdbOpened = true
 			fmt.Println("PGdbOpened = TRUE") 
 		}
