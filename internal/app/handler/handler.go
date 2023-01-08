@@ -238,8 +238,8 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 	}
 	
 	//w.Write([]byte(useridcookie.Value))
-	Status := ""
-	shortURLid/*, Status*/ := storage.Storerecord(string(body))
+	
+	shortURLid, Status := storage.Storerecord(string(body))
 	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
 	//shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid	
 	//shortURLpath := BaseURL + "/?id="+ shortURLid Как сюда передать переменную из server.go?	
@@ -303,8 +303,7 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 	//отладка что было в поле url в POST запросе
 	log.Println(postJSON.URL)
 
-	Status := ""
-	shortURLid/*, Status*/ := storage.Storerecord(string(postJSON.URL))
+	shortURLid, Status := storage.Storerecord(string(postJSON.URL))
 	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
 	//shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid
 	shortURLpath := initconfig.BaseURL + "/?id="+ shortURLid
@@ -376,7 +375,7 @@ func PostJSONbatchHandler(w http.ResponseWriter, r *http.Request) /*(shortURL st
 	if len(inputbatchJSON)>0{
 		for _, v := range inputbatchJSON {	
 				log.Println(v)
-				shortURLid/*, _*/ := storage.Storerecord(string(v.URL))
+				shortURLid, _ := storage.Storerecord(string(v.URL))
 				resultbatchJSON = append(resultbatchJSON, resultbatchData{
 					ID:	v.ID,
 					ShortURL:	initconfig.BaseURL + "/?id=" + shortURLid,
