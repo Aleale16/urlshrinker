@@ -287,7 +287,7 @@ func GetuserURLS(userid string) (output string, noURLs bool){
 	return string(JSONresult), noURLs
 }
 
-func Storerecord(fullURL string) string{
+func Storerecord(fullURL string) (ShortURLID, Status string){
 	onlyOnce.Do(Initdb)
 	//id := strconv.Itoa(rand.Intn(9999))
 	id := strconv.Itoa(initconfig.NextID)
@@ -295,8 +295,6 @@ func Storerecord(fullURL string) string{
 	/*for (!isnewID(id)){
 		id = strconv.Itoa(rand.Intn(9999))
 	}*/
-
-
 
 	if RAMonly {
 		URL[id] = fullURL
@@ -307,7 +305,7 @@ func Storerecord(fullURL string) string{
 		}
 		JSONdata, err := json.Marshal(&URLJSONline)
 		if err != nil {
-			return err.Error()
+			return err.Error(), ""
 		}
 		JSONdata = append(JSONdata, '\n')
 		//URL[id] = string(JSONdata)
@@ -316,23 +314,33 @@ func Storerecord(fullURL string) string{
 		DBfile, _ := os.OpenFile(dbPath, os.O_RDWR|os.O_CREATE|os.O_APPEND , 0777)
 		_, err = DBfile.Write(JSONdata)	
 		if err != nil {	
-			return err.Error()
+			return err.Error(), ""
 		}
 		DBfile.Close()
 
 	}
 
 	if PGdbOpened {
-		_, err := PGdb.Exec(context.Background(), `insert into urls(shortid, fullurl) values ($1, $2)`, id, fullURL)
+		result, err := PGdb.Exec(context.Background(), `insert into urls(shortid, fullurl) values ($1, $2) on conflict (fullurl) DO NOTHING`, id, fullURL)
 		if err == nil {
-			log.Println("w.WriteHeader(http.StatusOK)")
+			if result.RowsAffected() == 0{
+				var ShortID string
+				err := PGdb.QueryRow(context.Background(), "SELECT urls.shortid FROM urls where fullurl=$1", fullURL).Scan(&ShortID)
+				if err != nil {
+					log.Println(err)
+				}
+				log.Printf("Value %q, already exist in DB, rows affected =%v, ShortURL id = %q", fullURL, result.RowsAffected(), ShortID)	
+				id = ShortID	
+				Status = "StatusConflict"	
+			} else {
+				log.Printf("Values %q, %q inserted successfully, rows affected =%v", id, fullURL, result.RowsAffected())
+				initconfig.NextID = initconfig.NextID + initconfig.Step
+			}
 		} else {
-			log.Println("http.Error(w, "+"Internal server error"+", http.StatusInternalServerError)")
+			log.Println(err)
 		}
-	}
-
-	initconfig.NextID = initconfig.NextID + initconfig.Step
-	return id
+	}	
+	return id, Status
 }
 
 func Getrecord(id string) string {
@@ -387,21 +395,6 @@ func Getrecord(id string) string {
 			return err.Error()
 		}
 		result = FullURL
-/*		rows, err := PGdb.Query(context.Background(), "SELECT urls.fullurl FROM urls where shortid=$1", id)
-		if err != nil {
-			return err.Error()
-		}
-		// обязательно закрываем перед возвратом функции
-		defer rows.Close()
-
-		// пробегаем по всем записям
-		for rows.Next() {
-			err := rows.Scan(&FullURL)
-			if err != nil {
-				log.Fatal(err)
-			}
-		}
-		result = id*/
 	}
 	
 
