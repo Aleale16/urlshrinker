@@ -72,7 +72,8 @@ func InitPGdb() {
 					fullurl character varying(1000) ,
 					id integer NOT NULL DEFAULT nextval('urls_id_seq'::regclass),
 					CONSTRAINT urls_pkey PRIMARY KEY (id)
-				)`)
+				)
+				ALTER TABLE urls ADD UNIQUE (fullurl)`)
 			if err != nil {
 				log.Println(err)
 			} 
