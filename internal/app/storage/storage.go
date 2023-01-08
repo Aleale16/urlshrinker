@@ -287,7 +287,7 @@ func GetuserURLS(userid string) (output string, noURLs bool){
 	return string(JSONresult), noURLs
 }
 
-func Storerecord(fullURL string) (ShortURLID, Status string){
+func Storerecord(fullURL string) (ShortURLID/*, Status*/ string){
 	onlyOnce.Do(Initdb)
 	//id := strconv.Itoa(rand.Intn(9999))
 	id := strconv.Itoa(initconfig.NextID)
@@ -305,7 +305,7 @@ func Storerecord(fullURL string) (ShortURLID, Status string){
 		}
 		JSONdata, err := json.Marshal(&URLJSONline)
 		if err != nil {
-			return err.Error(), ""
+			return err.Error()//, ""
 		}
 		JSONdata = append(JSONdata, '\n')
 		//URL[id] = string(JSONdata)
@@ -314,7 +314,7 @@ func Storerecord(fullURL string) (ShortURLID, Status string){
 		DBfile, _ := os.OpenFile(dbPath, os.O_RDWR|os.O_CREATE|os.O_APPEND , 0777)
 		_, err = DBfile.Write(JSONdata)	
 		if err != nil {	
-			return err.Error(), ""
+			return err.Error()//, ""
 		}
 		DBfile.Close()
 
@@ -331,7 +331,8 @@ func Storerecord(fullURL string) (ShortURLID, Status string){
 				}
 				log.Printf("Value %q, already exist in DB, rows affected =%v, ShortURL id = %q", fullURL, result.RowsAffected(), ShortID)	
 				id = ShortID	
-				Status = "StatusConflict"	
+				Status := "StatusConflict"	
+				log.Printf(Status)
 			} else {
 				log.Printf("Values %q, %q inserted successfully, rows affected =%v", id, fullURL, result.RowsAffected())
 				initconfig.NextID = initconfig.NextID + initconfig.Step
@@ -340,7 +341,7 @@ func Storerecord(fullURL string) (ShortURLID, Status string){
 			log.Println(err)
 		}
 	}	
-	return id, Status
+	return id//, Status
 }
 
 func Getrecord(id string) string {
