@@ -55,23 +55,44 @@ func InitPGdb() {
 			fmt.Println("ERROR! PGdbOpened = false")
 			panic(err)
 		} else {
-			_, err := PGdb.Exec(context.Background(), `CREATE TABLE IF NOT EXISTS urls
-				(shortid character varying(10),
-				fullurl character varying(1000),
-				id integer NOT NULL,
-				CONSTRAINT urls_pkey PRIMARY KEY (id)
-			)`)
+			_, err := PGdb.Exec(context.Background(), `CREATE SEQUENCE IF NOT EXISTS public.urls_id_seq
+				INCREMENT 1
+				START 1
+				MINVALUE 1
+				MAXVALUE 2147483647
+				CACHE 1;
+		
+				ALTER SEQUENCE urls_id_seq
+					OWNER TO postgres;
+		
+				CREATE TABLE IF NOT EXISTS public.urls
+				(
+					shortid character varying(10) ,
+					fullurl character varying(1000) ,
+					id integer NOT NULL DEFAULT nextval('urls_id_seq'::regclass),
+					CONSTRAINT urls_pkey PRIMARY KEY (id)
+				)`)
 			if err != nil {
 				log.Println(err)
 			} 
 			
-			_, err = PGdb.Exec(context.Background(), `CREATE TABLE IF NOT EXISTS users
-			(
-				uid character varying(10),
-				shortid character varying(10),
-				id integer NOT NULL,
-				CONSTRAINT users_pkey PRIMARY KEY (id)
-			)`)
+			_, err = PGdb.Exec(context.Background(), `CREATE SEQUENCE IF NOT EXISTS public.users_id_seq
+				INCREMENT 1
+				START 1
+				MINVALUE 1
+				MAXVALUE 2147483647
+				CACHE 1;
+		
+				ALTER SEQUENCE users_id_seq
+					OWNER TO postgres;
+
+				CREATE TABLE IF NOT EXISTS users
+				(
+					uid character varying(10),
+					shortid character varying(10),
+					id integer NOT NULL DEFAULT nextval('users_id_seq'::regclass),
+					CONSTRAINT users_pkey PRIMARY KEY (id)
+				)`)
 			if err != nil {
 				log.Println(err)
 			} 
