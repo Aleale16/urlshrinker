@@ -97,20 +97,22 @@ func (conn connectRAM) retrieveURL(id string) (FullURL string) {
 }
 func (conn connectFileDB) retrieveURL(id string) (FullURL string) {
 	FullURL = URL[id]
-	if (FullURL != ""){
+	return FullURL
+/*	if (FullURL != ""){
 		return FullURL
 	} else {
 		return "http://google.com/404"		
-	}
+	}*/
 }
 func (conn connectPGDB) retrieveURL(id string) (FullURL string) {
 	err := PGdb.QueryRow(context.Background(), "SELECT urls.fullurl FROM urls where shortid=$1", id).Scan(&FullURL)
 	if err != nil {
 		return err.Error()
 	}
-	if (FullURL != ""){
+	return FullURL
+	/*if (FullURL != ""){
 		return FullURL
 	} else {
 		return "http://google.com/404"		
-	}
+	}*/
 }

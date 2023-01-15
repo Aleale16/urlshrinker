@@ -194,6 +194,7 @@ type storager interface{
     storeURL(fullURL string) (ShortURLID, status string)
 	storeShortURLtouser(userid, shortURLid string)
     retrieveURL(id string) (FullURL string)
+	retrieveUserURLS(userid string) (output string, noURLs bool)
 
     /*append(what, where string) string
     retrieve(from, id string) string*/
@@ -272,8 +273,81 @@ func CheckPGdbConn() (connected bool){
     }	
 }
 
-func GetuserURLS(userid string) (output string, noURLs bool){
+func (conn connectRAM) retrieveUserURLS (userid string) (output string, noURLs bool){
 	var UsrURLJSON []UsrURLJSONrecord
+	var JSONresult []byte
+	noURLs = true 
+	UsrShortURLs := Usr[userid]
+	if len(UsrShortURLs)>0{
+		for _, v := range UsrShortURLs {	
+				log.Println(v)
+				//Так нормально заполнять JSON перед маршаллингом?
+				UsrURLJSON = append(UsrURLJSON, UsrURLJSONrecord{
+					ShortURL:	initconfig.BaseURL + "/?id=" + v,
+					FullURL:	URL[v],
+				})				
+		}
+		JSONdata, err := json.Marshal(&UsrURLJSON)
+		if err != nil {
+			return err.Error(), noURLs
+		}
+		//JSONdata = append(JSONdata, '\n')
+		//URL[id] = string(JSONdata)
+		JSONresult = JSONdata
+		log.Println("JSONresult= ")		
+		log.Println(JSONresult)		
+		log.Println(string(JSONresult))		
+		noURLs = false
+	}
+	return string(JSONresult), noURLs
+}
+
+func (conn connectFileDB) retrieveUserURLS (userid string) (output string, noURLs bool){
+	return "", true
+}
+func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs bool){
+	var (
+		UsrURLJSON []UsrURLJSONrecord
+		JSONresult []byte
+		UID string
+		shortID string
+		FullURL string
+	)
+	noURLs = true
+	rows, err := PGdb.Query(context.Background(), "SELECT usr.uid, usr.shortid, urls.fullurl FROM users as usr LEFT JOIN urls ON urls.shortid = usr.shortid where uid=$1", userid)
+	if err != nil {
+		return err.Error(), noURLs
+	}
+	// обязательно закрываем перед возвратом функции
+	defer rows.Close()
+
+	// пробегаем по всем записям
+	for rows.Next() {
+		err := rows.Scan(&UID, &shortID, &FullURL)
+		if err != nil {
+			log.Fatal(err)
+		}
+		UsrURLJSON = append(UsrURLJSON, UsrURLJSONrecord{
+			ShortURL:	initconfig.BaseURL + "/?id=" + shortID,
+			FullURL:	FullURL,
+		})	
+	}
+	JSONdata, err := json.Marshal(&UsrURLJSON)
+	if err != nil {
+		return err.Error(), noURLs
+	}
+	//JSONdata = append(JSONdata, '\n')
+	//URL[id] = string(JSONdata)
+	JSONresult = JSONdata
+	log.Println("JSONresult= ")		
+	log.Println(JSONresult)		
+	log.Println(string(JSONresult))		
+	noURLs = false
+	return string(JSONresult), noURLs
+}
+
+func GetuserURLS(userid string) (output string, noURLs bool){
+/*	var UsrURLJSON []UsrURLJSONrecord
 	var JSONresult []byte
 	noURLs = true 
 	UsrShortURLs := Usr[userid]
@@ -335,9 +409,10 @@ func GetuserURLS(userid string) (output string, noURLs bool){
 		log.Println(JSONresult)		
 		log.Println(string(JSONresult))		
 		noURLs = false
-	}
+	}*/
 
-	return string(JSONresult), noURLs
+	//return string(JSONresult), noURLs
+	return S.retrieveUserURLS(userid)
 }
 
 func Storerecord(fullURL string) (ShortURLID, Status string){
