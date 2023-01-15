@@ -26,10 +26,13 @@ type UsrURLJSONrecord struct {
     FullURL string `json:"original_url"`    
 }
 
+
+
 var URL URLrecord
 var Usr Userrecord
 var dbPath string
 var RAMonly, PGdbOpened, dbPathexists bool
+
 var onlyOnce sync.Once
 
 var PGdb *pgxpool.Pool
@@ -126,6 +129,38 @@ func InitPGdb() {
 	
 }
 
+//В результате фиксируем тот тип базы данных, который удалось подключить, с которым будем работать.
+type connectRAM struct {}
+type connectFileDB struct {}
+type connectPGDB struct {}
+// Если вот так не объявить переменные, то не проходит статический тест, подчеркивает желтым, говорит, что такие типы не используются
+var DataBaseconnectRAM connectRAM
+var DataBaseconnectFileDB connectFileDB
+var DataBaseconnectPGDB connectPGDB
+//Переменная типа базы данных, которую будем использовать:
+//var DataBase struct{}
+var S storager
+
+func SetdbType(){
+
+	switch {
+		case PGdbOpened:
+			DataBase :=  DataBaseconnectPGDB		
+			//DataBase =  connectFileDB{}  так говорит, что объявленные выше типы не используются
+			S = DataBase	
+		case dbPathexists:
+			DataBase :=  DataBaseconnectFileDB
+			S = DataBase		
+		case RAMonly:
+			DataBase :=  DataBaseconnectRAM	
+			S = DataBase	
+		default:
+			DataBase :=  DataBaseconnectRAM	
+			S = DataBase	
+	}
+	
+}
+
 func Initdb() {
 	dbPath, dbPathexists = os.LookupEnv("FILE_STORAGE_PATH")
 	if (dbPathexists && dbPath != "") {
@@ -146,9 +181,81 @@ func Initdb() {
 
 //???Возможно в отдельный пакет инициализацию Postgres надо вынести?
 	InitPGdb()
+	SetdbType()
+
+	//fmt.Print(DataBase)
+}
+
+type storager interface{
+    store(fullURL string) (ShortURLID, status string)
+   /* storeRAM() string
+    storeFile() string
+    storePGDB() string*/
+    //retrieve() string
+
+    /*append(what, where string) string
+    retrieve(from, id string) string*/
+}
+
+func (conn connectRAM) store(fullURL string) (ShortURLID, Status string) {
+	onlyOnce.Do(Initdb)
+	id := strconv.Itoa(initconfig.NextID)
+	URL[id] = fullURL
+	initconfig.NextID = initconfig.NextID + initconfig.Step
+	return id, ""
+}
+
+func (conn connectFileDB) store(fullURL string) (ShortURLID, Status string) {
+	onlyOnce.Do(Initdb)
+	id := strconv.Itoa(initconfig.NextID)
+	URLJSONline := URLJSONrecord{
+		ID:			id,
+		FullURL:	fullURL,
+	}
+	JSONdata, err := json.Marshal(&URLJSONline)
+	if err != nil {
+		return err.Error(), ""
+	}
+	JSONdata = append(JSONdata, '\n')
+	//URL[id] = string(JSONdata)
+	URL[id] = fullURL
+
+	DBfile, _ := os.OpenFile(dbPath, os.O_RDWR|os.O_CREATE|os.O_APPEND , 0777)
+	_, err = DBfile.Write(JSONdata)	
+	if err != nil {	
+		return err.Error(), ""
+	}
+	DBfile.Close()
+	initconfig.NextID = initconfig.NextID + initconfig.Step
+	return id, ""
+}
+
+func (conn connectPGDB) store(fullURL string) (ShortURLID, Status string) {
+	onlyOnce.Do(Initdb)
+	id := strconv.Itoa(initconfig.NextID)
+	result, err := PGdb.Exec(context.Background(), `insert into urls(shortid, fullurl) values ($1, $2) on conflict (fullurl) DO NOTHING`, id, fullURL)
+	if err == nil {
+		if result.RowsAffected() == 0{
+			var ShortID string
+			err := PGdb.QueryRow(context.Background(), "SELECT urls.shortid FROM urls where fullurl=$1", fullURL).Scan(&ShortID)
+			if err != nil {
+				log.Println(err)
+			}
+			log.Printf("Value %q, already exist in DB, rows affected =%v, ShortURL id = %q", fullURL, result.RowsAffected(), ShortID)	
+			id = ShortID	
+			Status = "StatusConflict"	
+		} else {
+			log.Printf("Values %q, %q inserted successfully, rows affected =%v", id, fullURL, result.RowsAffected())
+			initconfig.NextID = initconfig.NextID + initconfig.Step
+		}
+	} else {
+		log.Println(err)
+	}
+	return id, Status
 }
 
 func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord{
+
 	DBfile, err := os.OpenFile(dbPath, os.O_RDONLY, 0777)
 	if err != nil {
 		log.Println("File does NOT EXIST")
@@ -290,14 +397,15 @@ func GetuserURLS(userid string) (output string, noURLs bool){
 
 func Storerecord(fullURL string) (ShortURLID, Status string){
 	onlyOnce.Do(Initdb)
+	id, Status := S.store(fullURL)
 	//id := strconv.Itoa(rand.Intn(9999))
-	id := strconv.Itoa(initconfig.NextID)
+	//id := strconv.Itoa(initconfig.NextID)
 	
 	/*for (!isnewID(id)){
 		id = strconv.Itoa(rand.Intn(9999))
 	}*/
 
-	if RAMonly {
+/*	if RAMonly {
 		URL[id] = fullURL
 		initconfig.NextID = initconfig.NextID + initconfig.Step
 	} else {
@@ -320,9 +428,9 @@ func Storerecord(fullURL string) (ShortURLID, Status string){
 		}
 		DBfile.Close()
 		initconfig.NextID = initconfig.NextID + initconfig.Step
-	}
+	}*/
 
-	if PGdbOpened {
+/*	if PGdbOpened {
 		result, err := PGdb.Exec(context.Background(), `insert into urls(shortid, fullurl) values ($1, $2) on conflict (fullurl) DO NOTHING`, id, fullURL)
 		if err == nil {
 			if result.RowsAffected() == 0{
@@ -341,7 +449,7 @@ func Storerecord(fullURL string) (ShortURLID, Status string){
 		} else {
 			log.Println(err)
 		}
-	}	
+	}	*/
 	return id, Status
 }
 
