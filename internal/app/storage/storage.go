@@ -147,15 +147,17 @@ func SetdbType(){
 	log.Println(dbPathexists)
 	log.Println(RAMonly)
 	switch true {
-		case RAMonly:
-			log.Println("case RAMonly")
-			DataBase :=  DataBaseconnectRAM	
-			S = DataBase
 		case PGdbOpened:
 			log.Println("case PGdbOpened")
 			DataBase :=  DataBaseconnectPGDB		
 			//DataBase =  connectFileDB{}  так говорит, что объявленные выше типы не используются
 			S = DataBase	
+
+		case RAMonly:
+			log.Println("case RAMonly")
+			DataBase :=  DataBaseconnectRAM	
+			S = DataBase
+
 		case dbPathexists:
 			log.Println("case dbPathexists")
 			DataBase :=  DataBaseconnectFileDB
