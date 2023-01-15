@@ -142,19 +142,27 @@ var DataBaseconnectPGDB connectPGDB
 var S storager
 
 func SetdbType(){
-
-	switch {
+	log.Println("TRY SetdbType")
+	log.Println(PGdbOpened)
+	log.Println(dbPathexists)
+	log.Println(RAMonly)
+	switch true {
+		case RAMonly:
+			log.Println("case RAMonly")
+			DataBase :=  DataBaseconnectRAM	
+			S = DataBase
 		case PGdbOpened:
+			log.Println("case PGdbOpened")
 			DataBase :=  DataBaseconnectPGDB		
 			//DataBase =  connectFileDB{}  так говорит, что объявленные выше типы не используются
 			S = DataBase	
 		case dbPathexists:
+			log.Println("case dbPathexists")
 			DataBase :=  DataBaseconnectFileDB
 			S = DataBase		
-		case RAMonly:
-			DataBase :=  DataBaseconnectRAM	
-			S = DataBase	
+	
 		default:
+			log.Println("case default")
 			DataBase :=  DataBaseconnectRAM	
 			S = DataBase	
 	}
@@ -188,9 +196,7 @@ func Initdb() {
 
 type storager interface{
     store(fullURL string) (ShortURLID, status string)
-   /* storeRAM() string
-    storeFile() string
-    storePGDB() string*/
+
     //retrieve() string
 
     /*append(what, where string) string
@@ -199,6 +205,7 @@ type storager interface{
 
 func (conn connectRAM) store(fullURL string) (ShortURLID, Status string) {
 	onlyOnce.Do(Initdb)
+	log.Println("Running store connectRAM")
 	id := strconv.Itoa(initconfig.NextID)
 	URL[id] = fullURL
 	initconfig.NextID = initconfig.NextID + initconfig.Step
