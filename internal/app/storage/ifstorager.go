@@ -98,11 +98,6 @@ func (conn connectRAM) retrieveURL(id string) (FullURL string) {
 func (conn connectFileDB) retrieveURL(id string) (FullURL string) {
 	FullURL = URL[id]
 	return FullURL
-/*	if (FullURL != ""){
-		return FullURL
-	} else {
-		return "http://google.com/404"		
-	}*/
 }
 func (conn connectPGDB) retrieveURL(id string) (FullURL string) {
 	err := PGdb.QueryRow(context.Background(), "SELECT urls.fullurl FROM urls where shortid=$1", id).Scan(&FullURL)
@@ -110,9 +105,76 @@ func (conn connectPGDB) retrieveURL(id string) (FullURL string) {
 		return err.Error()
 	}
 	return FullURL
-	/*if (FullURL != ""){
-		return FullURL
-	} else {
-		return "http://google.com/404"		
-	}*/
+}
+
+func (conn connectRAM) retrieveUserURLS (userid string) (output string, noURLs bool){
+	var UsrURLJSON []UsrURLJSONrecord
+	var JSONresult []byte
+	noURLs = true 
+	UsrShortURLs := Usr[userid]
+	if len(UsrShortURLs)>0{
+		for _, v := range UsrShortURLs {	
+				log.Println(v)
+				//Так нормально заполнять JSON перед маршаллингом?
+				UsrURLJSON = append(UsrURLJSON, UsrURLJSONrecord{
+					ShortURL:	initconfig.BaseURL + "/?id=" + v,
+					FullURL:	URL[v],
+				})				
+		}
+		JSONdata, err := json.Marshal(&UsrURLJSON)
+		if err != nil {
+			return err.Error(), noURLs
+		}
+		//JSONdata = append(JSONdata, '\n')
+		//URL[id] = string(JSONdata)
+		JSONresult = JSONdata
+		log.Println("JSONresult= ")		
+		log.Println(JSONresult)		
+		log.Println(string(JSONresult))		
+		noURLs = false
+	}
+	return string(JSONresult), noURLs
+}
+func (conn connectFileDB) retrieveUserURLS (userid string) (output string, noURLs bool){
+	return "", true
+}
+func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs bool){
+	var (
+		UsrURLJSON []UsrURLJSONrecord
+		JSONresult []byte
+		UID string
+		shortID string
+		FullURL string
+	)
+	noURLs = true
+	rows, err := PGdb.Query(context.Background(), "SELECT usr.uid, usr.shortid, urls.fullurl FROM users as usr LEFT JOIN urls ON urls.shortid = usr.shortid where uid=$1", userid)
+	if err != nil {
+		return err.Error(), noURLs
+	}
+	// обязательно закрываем перед возвратом функции
+	defer rows.Close()
+
+	// пробегаем по всем записям
+	for rows.Next() {
+		err := rows.Scan(&UID, &shortID, &FullURL)
+		if err != nil {
+			log.Fatal(err)
+		}
+		UsrURLJSON = append(UsrURLJSON, UsrURLJSONrecord{
+			ShortURL:	initconfig.BaseURL + "/?id=" + shortID,
+			FullURL:	FullURL,
+		})	
+	}
+	JSONdata, err := json.Marshal(&UsrURLJSON)
+	if err != nil {
+		return err.Error(), noURLs
+	}
+	//JSONdata = append(JSONdata, '\n')
+	//URL[id] = string(JSONdata)
+	JSONresult = JSONdata
+	log.Println("JSONresult= ")		
+	log.Println(JSONresult)		
+	log.Println(string(JSONresult))		
+	noURLs = false
+	return string(JSONresult), noURLs
 }
