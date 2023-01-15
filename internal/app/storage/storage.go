@@ -151,20 +151,18 @@ func SetdbType(){
 			log.Println("case PGdbOpened")
 			DataBase :=  DataBaseconnectPGDB		
 			//DataBase =  connectFileDB{}  так говорит, что объявленные выше типы не используются
-			S = DataBase	
-
-		case RAMonly:
-			log.Println("case RAMonly")
-			DataBase :=  DataBaseconnectRAM	
 			S = DataBase
-
 		case dbPathexists:
 			log.Println("case dbPathexists")
 			DataBase :=  DataBaseconnectFileDB
+			S = DataBase
+		case RAMonly:
+			log.Println("case RAMonly")
+			DataBase :=  DataBaseconnectRAM	
 			S = DataBase		
 	
 		default:
-			log.Println("case default")
+			log.Println("case default (RAMonly)")
 			DataBase :=  DataBaseconnectRAM	
 			S = DataBase	
 	}
@@ -183,6 +181,7 @@ func Initdb() {
 
 		} else {
 			RAMonly = true
+			dbPathexists = false
 			fmt.Println("DB file path is not set in env vars! Loading RAM storage...")
 			URL = make(URLrecord)
 	}	
@@ -192,8 +191,6 @@ func Initdb() {
 //???Возможно в отдельный пакет инициализацию Postgres надо вынести?
 	InitPGdb()
 	SetdbType()
-
-	//fmt.Print(DataBase)
 }
 
 type storager interface{
