@@ -239,11 +239,6 @@ func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord{
 	return URLs
 }
 
-func AssignShortURLtouser(userid, shortURLid string){
-	onlyOnce.Do(Initdb)
-	S.storeShortURLtouser(userid, shortURLid)
-}
-
 func CheckPGdbConn() (connected bool){
 	onlyOnce.Do(Initdb)
 	//defer PGdb.Close()
@@ -255,6 +250,11 @@ func CheckPGdbConn() (connected bool){
         log.Println("Ping db is ok")
 		return true
     }	
+}
+
+func AssignShortURLtouser(userid, shortURLid string){
+	onlyOnce.Do(Initdb)
+	S.storeShortURLtouser(userid, shortURLid)
 }
 
 func GetuserURLS(userid string) (output string, noURLs bool){
