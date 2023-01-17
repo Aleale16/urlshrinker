@@ -35,11 +35,15 @@ func Start(){
 	r.Use(middleware.Compress(5, "gzip"))
 	
 	r.Get("/", handler.GetHandler)
+	r.Get("/api/user/urls", handler.GetUsrURLsHandler)
+	r.Get("/ping", handler.GetPingHandler)
+
 	r.Post("/", handler.PostHandler)
 	r.Post("/api/shorten", handler.PostJSONHandler)
+	r.Post("/api/shorten/batch", handler.PostJSONbatchHandler)
 	//r.Get("/health-check", handler.StatusOKHandler)
 	
-
+	fmt.Println()
 	fmt.Println("Starting server...")
 /*	
     err := env.Parse(&SrvConfig)
@@ -77,6 +81,7 @@ func Start(){
 	os.Setenv("SERVER_ADDRESS", initconfig.SrvAddress)
 	os.Setenv("BASE_URL", initconfig.BaseURL)
 	os.Setenv("FILE_STORAGE_PATH", initconfig.FileDBpath)
+	os.Setenv("DATABASE_DSN", initconfig.PostgresDBURL)
 
 	log.Fatal(http.ListenAndServe(initconfig.SrvAddress, r))
 
