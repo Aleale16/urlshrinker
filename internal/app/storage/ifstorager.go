@@ -47,7 +47,7 @@ func (conn connectFileDB) storeURL(fullURL string) (ShortURLID, Status string) {
 func (conn connectPGDB) storeURL(fullURL string) (ShortURLID, Status string) {
 	onlyOnce.Do(Initdb)
 	id := strconv.Itoa(initconfig.NextID)
-	result, err := PGdb.Exec(context.Background(), `insert into urls(shortid, fullurl, active) values ($1, $2) on conflict (fullurl) DO NOTHING`, id, fullURL, true)
+	result, err := PGdb.Exec(context.Background(), `insert into urls(shortid, fullurl, active) values ($1, $2, $3) on conflict (fullurl) DO NOTHING`, id, fullURL, true)
 	if err == nil {
 		if result.RowsAffected() == 0 {
 			var ShortID string
