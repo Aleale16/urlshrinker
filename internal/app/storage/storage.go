@@ -159,8 +159,8 @@ func InitPGdb() {
 			
 			PGdbOpened = true
 			log.Println("PGdbOpened = TRUE") 	
-			go DelURLIDs(initconfig.InputIDstoDel)
-			select{ }
+			//go DelURLIDs(initconfig.InputIDstoDel)
+			//select{ }
 		}
 	} else {
 		log.Println("PGdbOpened = FALSE")

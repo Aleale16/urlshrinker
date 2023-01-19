@@ -393,6 +393,8 @@ func contains(s []string, e string) bool {
 func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 	var listURLids []string
 	var InvalidURLIDexists bool
+
+	storage.DeleteShortURLfromuser()
 	
 	// читаем Body (Тело POST запроса)
 	b, err := io.ReadAll(r.Body)
