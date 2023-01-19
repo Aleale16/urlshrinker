@@ -159,7 +159,8 @@ func InitPGdb() {
 			
 			PGdbOpened = true
 			log.Println("PGdbOpened = TRUE") 	
-
+			go DelURLIDs(initconfig.InputIDstoDel)
+			select{ }
 		}
 	} else {
 		log.Println("PGdbOpened = FALSE")
@@ -275,7 +276,7 @@ func AssignShortURLtouser(userid, shortURLid string){
 	S.storeShortURLtouser(userid, shortURLid)
 }
 
-func DeleteShortURLfromuser(userid string, shortURLid string){
+func DeleteShortURLfromuser(){
 	onlyOnce.Do(Initdb)
 	go DelURLIDs(initconfig.InputIDstoDel)
 	select{ }
