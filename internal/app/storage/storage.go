@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -129,6 +130,7 @@ func InitPGdb() {
 					uid character varying(10),
 					shortid character varying(10),
 					id integer NOT NULL DEFAULT nextval('users_id_seq'::regclass),
+					active boolean,
 					CONSTRAINT users_pkey PRIMARY KEY (id)
 				)`)
 			if err != nil {
@@ -154,12 +156,25 @@ func InitPGdb() {
 			} 
 			
 			PGdbOpened = true
-			log.Println("PGdbOpened = TRUE") 
+			log.Println("PGdbOpened = TRUE") 	
+
 		}
 	} else {
 		log.Println("PGdbOpened = FALSE")
 	}
 	
+}
+func DelURLIDs(ch chan string){
+	log.Println("Starting forever 'delete URLIDs for user' routine")
+    for {
+		time.Sleep(time.Second * 1)
+        fmt.Printf("Length of channel Input is %v and capacity of channel c is %v\n", len(ch), cap(ch))
+		if len(ch)>0{
+			for shortURLID := range ch {
+				S.deleteShortURLfromuser(shortURLID)
+			}
+		}
+	}
 }
 
 func SetdbType(){
@@ -193,8 +208,9 @@ func SetdbType(){
 type storager interface{
     storeURL(fullURL string) (ShortURLID, status string)
 	storeShortURLtouser(userid, shortURLid string)
+	deleteShortURLfromuser(shortURLid string)
     retrieveURL(id string) (FullURL string)
-	retrieveUserURLS(userid string) (output string, noURLs bool)
+	retrieveUserURLS(userid string) (output string, noURLs bool, UsrShortURLsonly []string)
 }
 
 func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord{
@@ -257,7 +273,14 @@ func AssignShortURLtouser(userid, shortURLid string){
 	S.storeShortURLtouser(userid, shortURLid)
 }
 
-func GetuserURLS(userid string) (output string, noURLs bool){
+func DeleteShortURLfromuser(userid string, shortURLid string){
+	onlyOnce.Do(Initdb)
+	go DelURLIDs(initconfig.InputIDstoDel)
+	select{ }
+	//S.deleteShortURLfromuser(shortURLid)
+}
+
+func GetuserURLS(userid string) (output string, noURLs bool, arrayUserURLs []string){
 	return S.retrieveUserURLS(userid)
 }
 

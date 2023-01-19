@@ -47,7 +47,7 @@ func (conn connectFileDB) storeURL(fullURL string) (ShortURLID, Status string) {
 func (conn connectPGDB) storeURL(fullURL string) (ShortURLID, Status string) {
 	onlyOnce.Do(Initdb)
 	id := strconv.Itoa(initconfig.NextID)
-	result, err := PGdb.Exec(context.Background(), `insert into urls(shortid, fullurl) values ($1, $2) on conflict (fullurl) DO NOTHING`, id, fullURL)
+	result, err := PGdb.Exec(context.Background(), `insert into urls(shortid, fullurl, active) values ($1, $2) on conflict (fullurl) DO NOTHING`, id, fullURL)
 	if err == nil {
 		if result.RowsAffected() == 0 {
 			var ShortID string
@@ -76,7 +76,7 @@ func (conn connectRAM) storeShortURLtouser(userid, shortURLid string){
 } 
 func (conn connectPGDB) storeShortURLtouser(userid, shortURLid string){
 	uid := userid
-	_, err := PGdb.Exec(context.Background(), `insert into users(uid, shortid) values ($1, $2)`, uid, shortURLid)
+	_, err := PGdb.Exec(context.Background(), `insert into users(uid, shortid, active) values ($1, $2, $3)`, uid, shortURLid, true)
 	if err == nil {
 		log.Println("User was created, URL assigned")
 	} else {
@@ -85,6 +85,20 @@ func (conn connectPGDB) storeShortURLtouser(userid, shortURLid string){
 	}
 } 
 func (conn connectFileDB) storeShortURLtouser(userid, shortURLid string){
+} 
+
+func (conn connectRAM) deleteShortURLfromuser(shortURLid string){
+} 
+func (conn connectPGDB) deleteShortURLfromuser(shortURLid string){
+	//uid := userid
+	_, err := PGdb.Exec(context.Background(), `update users set active = false where shortid=$1`, shortURLid)
+	if err == nil {
+		log.Printf("URL %v was disabled", shortURLid)
+	} else {
+		log.Println(err)
+	}
+} 
+func (conn connectFileDB) deleteShortURLfromuser(shortURLid string){
 } 
 
 func (conn connectRAM) retrieveURL(id string) (FullURL string) {
@@ -107,7 +121,7 @@ func (conn connectPGDB) retrieveURL(id string) (FullURL string) {
 	return FullURL
 }
 
-func (conn connectRAM) retrieveUserURLS (userid string) (output string, noURLs bool){
+func (conn connectRAM) retrieveUserURLS (userid string) (output string, noURLs bool, UsrShortURLsonly []string){
 	var UsrURLJSON []UsrURLJSONrecord
 	var JSONresult []byte
 	noURLs = true 
@@ -123,7 +137,7 @@ func (conn connectRAM) retrieveUserURLS (userid string) (output string, noURLs b
 		}
 		JSONdata, err := json.Marshal(&UsrURLJSON)
 		if err != nil {
-			return err.Error(), noURLs
+			return err.Error(), noURLs, UsrShortURLs
 		}
 		//JSONdata = append(JSONdata, '\n')
 		//URL[id] = string(JSONdata)
@@ -133,12 +147,12 @@ func (conn connectRAM) retrieveUserURLS (userid string) (output string, noURLs b
 		log.Println(string(JSONresult))		
 		noURLs = false
 	}
-	return string(JSONresult), noURLs
+	return string(JSONresult), noURLs, UsrShortURLs
 }
-func (conn connectFileDB) retrieveUserURLS (userid string) (output string, noURLs bool){
-	return "", true
+func (conn connectFileDB) retrieveUserURLS (userid string) (output string, noURLs bool, UsrShortURLsonly []string){
+	return "", true, []string{}
 }
-func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs bool){
+func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs bool, UsrShortURLsonly []string){
 	var (
 		UsrURLJSON []UsrURLJSONrecord
 		JSONresult []byte
@@ -146,10 +160,11 @@ func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs 
 		shortID string
 		FullURL string
 	)
+	var UsrShortURLs []string
 	noURLs = true
 	rows, err := PGdb.Query(context.Background(), "SELECT usr.uid, usr.shortid, urls.fullurl FROM users as usr LEFT JOIN urls ON urls.shortid = usr.shortid where uid=$1", userid)
 	if err != nil {
-		return err.Error(), noURLs
+		return err.Error(), noURLs, []string{}
 	}
 	// обязательно закрываем перед возвратом функции
 	defer rows.Close()
@@ -160,6 +175,7 @@ func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs 
 		if err != nil {
 			log.Fatal(err)
 		}
+		UsrShortURLs = append(UsrShortURLs, shortID)
 		UsrURLJSON = append(UsrURLJSON, UsrURLJSONrecord{
 			ShortURL:	initconfig.BaseURL + "/?id=" + shortID,
 			FullURL:	FullURL,
@@ -167,7 +183,7 @@ func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs 
 	}
 	JSONdata, err := json.Marshal(&UsrURLJSON)
 	if err != nil {
-		return err.Error(), noURLs
+		return err.Error(), noURLs, UsrShortURLs
 	}
 	//JSONdata = append(JSONdata, '\n')
 	//URL[id] = string(JSONdata)
@@ -176,5 +192,5 @@ func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs 
 	log.Println(JSONresult)		
 	log.Println(string(JSONresult))		
 	noURLs = false
-	return string(JSONresult), noURLs
+	return string(JSONresult), noURLs, UsrShortURLs
 }

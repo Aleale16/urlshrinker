@@ -20,7 +20,7 @@ import (
 	User       string `env:"USERNAME"`
 }*/
 func Start(){
-
+	
 	//var SrvConfig ServerConfig
 	//var UserName string
 	//storage.Initdb() //Убрали управление инициализацией хранилища отсюда в storage
@@ -41,8 +41,13 @@ func Start(){
 	r.Post("/", handler.PostHandler)
 	r.Post("/api/shorten", handler.PostJSONHandler)
 	r.Post("/api/shorten/batch", handler.PostJSONbatchHandler)
-	//r.Get("/health-check", handler.StatusOKHandler)
+
+	r.Delete("/api/user/urls", handler.DeleteURLsHandler)
+
 	
+	r.Get("/health-check", handler.StatusOKHandler)
+
+
 	fmt.Println()
 	fmt.Println("Starting server...")
 /*	

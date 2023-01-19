@@ -11,12 +11,15 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"sync"
+	"time"
 
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 	"github.com/Aleale16/urlshrinker/internal/app/storage"
 )
 
 func StatusOKHandler(w http.ResponseWriter, r *http.Request) {
+	var wg sync.WaitGroup
 	// A very simple health check.
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
@@ -24,7 +27,16 @@ func StatusOKHandler(w http.ResponseWriter, r *http.Request) {
 	// In the future we could report back on the status of our DB, or our cache
 	// (e.g. Redis) by performing a simple PING, and include them in the response.
 	io.WriteString(w, `{"alive": true}`)
-
+	n := 3
+	wg.Add(n)
+	go func() {
+		for i := 0; i < n; i++{
+			time.Sleep(time.Second * 2)
+			log.Println("Server is still alive!")
+			wg.Done()
+		}
+	}()	
+	wg.Wait()
 }
 /* Наверное, больше не пригодится, если и дальше использовать Chi
 func ReqHandler(w http.ResponseWriter, r *http.Request) {
@@ -123,7 +135,7 @@ func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
 			fmt.Println(id)
 			fmt.Println(validSign)
 			//if validSign {
-				userURLS, noURLs := storage.GetuserURLS(id)
+				userURLS, noURLs, _ := storage.GetuserURLS(id)
 			if noURLs{
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusNoContent)
@@ -139,7 +151,7 @@ func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(id)
 		fmt.Println(validSign)
 		//if validSign {
-			userURLS, noURLs := storage.GetuserURLS(id)
+			userURLS, noURLs, _ := storage.GetuserURLS(id)
 		if noURLs{
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusNoContent)
@@ -336,6 +348,109 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 
 	//return shortURLpath
 }
+
+//! DELETE /api/user/urls
+
+func getInputChan(listURLids []string) chan string {
+    // make return channel
+    //input := make(chan string, 100)
+	//var numbers []string
+
+    // sample numbers
+    //numbers := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
+	/*for _, v := range listURLids {	
+		log.Println(v)	
+		numbers = append(numbers, string(v))			
+	}*/
+
+    // run goroutine
+    go func() {
+        for _, URLid := range listURLids {
+            initconfig.InputIDstoDel <- URLid
+        }
+        // close channel once all numbers are sent to channel
+       // close(input)
+    }()
+
+    return initconfig.InputIDstoDel
+}
+
+func contains(s []string, e string) bool {
+    for _, a := range s {
+        if a == e {
+            return true
+        }
+    }
+    return false
+}
+
+func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
+	var listURLids []string
+	var InvalidURLIDexists bool
+	
+	// читаем Body (Тело POST запроса)
+	b, err := io.ReadAll(r.Body)
+	// обрабатываем ошибку
+	if err != nil {
+		http.Error(w, err.Error(), 400)
+		return
+	}
+	log.Println("DeleteURLsHandler body: " + string(b))
+	log.Println("Content-Encoding from req: " + r.Header.Get("Content-Encoding"))
+	err = json.Unmarshal(b, &listURLids)
+	if err != nil {
+		panic(err)
+	}
+	log.Println(listURLids)	
+
+	if len(listURLids)>0{
+		authorizationHeader := r.Header.Get("Authorization")
+		log.Println("authorizationHeader=" + authorizationHeader)
+		if authorizationHeader != ""{
+			log.Println("Checking authorizationHeader:")
+			validSign, id := checkSign(authorizationHeader)
+			log.Println(id)
+			log.Println(validSign)
+			
+			if validSign{
+				userURLS, noURLs, arrayUserURLs := storage.GetuserURLS(id)
+
+				if !noURLs && len(userURLS)>= len(listURLids){
+					InvalidURLIDexists = false
+					for _, v := range(listURLids){
+						if !InvalidURLIDexists{
+							if !contains(arrayUserURLs, v){
+								InvalidURLIDexists = true
+							}
+						}
+					}
+					if !InvalidURLIDexists {
+						getInputChan(listURLids)
+					}
+				} else {
+					InvalidURLIDexists = true
+					log.Println("No (invalid) ShortURLs for user")
+				}
+
+			}
+		}
+		
+		
+		//uid := "9999"
+		
+
+		
+	}
+	
+	
+}
+/*
+func bgfunc(chanInputIDs){
+	for shortURLID := range chanInputIDs {
+		storage.DeleteShortURLfromuser(shortURLID)
+	}
+
+}*/
 
 //! POST /api/shorten/batch
 //структура вводимого JSON
