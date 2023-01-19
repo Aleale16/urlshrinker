@@ -211,7 +211,7 @@ type storager interface{
     storeURL(fullURL string) (ShortURLID, status string)
 	storeShortURLtouser(userid, shortURLid string)
 	deleteShortURLfromuser(shortURLid string)
-    retrieveURL(id string) (FullURL string)
+    retrieveURL(id string) (FullURL string, Status string)
 	retrieveUserURLS(userid string) (output string, noURLs bool, UsrShortURLsonly []string)
 }
 
@@ -291,7 +291,9 @@ func Storerecord(fullURL string) (ShortURLID, Status string){
 	return S.storeURL(fullURL)
 }
 
-func Getrecord(id string) string {
+
+
+func Getrecord(id string) (FullURL, Status string) {
 	onlyOnce.Do(Initdb)
 	return S.retrieveURL(id)
 }

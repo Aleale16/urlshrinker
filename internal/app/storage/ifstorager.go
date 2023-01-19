@@ -47,7 +47,7 @@ func (conn connectFileDB) storeURL(fullURL string) (ShortURLID, Status string) {
 func (conn connectPGDB) storeURL(fullURL string) (ShortURLID, Status string) {
 	onlyOnce.Do(Initdb)
 	id := strconv.Itoa(initconfig.NextID)
-	result, err := PGdb.Exec(context.Background(), `insert into urls(shortid, fullurl) values ($1, $2) on conflict (fullurl) DO NOTHING`, id, fullURL)
+	result, err := PGdb.Exec(context.Background(), `insert into urls(shortid, fullurl, active) values ($1, $2) on conflict (fullurl) DO NOTHING`, id, fullURL, true)
 	if err == nil {
 		if result.RowsAffected() == 0 {
 			var ShortID string
@@ -102,24 +102,30 @@ func (conn connectPGDB) deleteShortURLfromuser(shortURLid string){
 func (conn connectFileDB) deleteShortURLfromuser(shortURLid string){
 } 
 
-func (conn connectRAM) retrieveURL(id string) (FullURL string) {
+func (conn connectRAM) retrieveURL(id string) (FullURL string, Status string) {
 	FullURL = URL[id]
 	if (FullURL != ""){
-		return FullURL
+		return FullURL, "307"
 	} else {
-		return "http://google.com/404"		
+		return "http://google.com/404", ""		
 	}
 }
-func (conn connectFileDB) retrieveURL(id string) (FullURL string) {
+func (conn connectFileDB) retrieveURL(id string) (FullURL string, Status string) {
 	FullURL = URL[id]
-	return FullURL
+	return FullURL, "307"
 }
-func (conn connectPGDB) retrieveURL(id string) (FullURL string) {
-	err := PGdb.QueryRow(context.Background(), "SELECT urls.fullurl FROM urls where shortid=$1", id).Scan(&FullURL)
+func (conn connectPGDB) retrieveURL(id string) (FullURL string, Status string) {
+	var activelink bool
+	err := PGdb.QueryRow(context.Background(), "SELECT urls.fullurl, urls.active FROM urls where shortid=$1", id).Scan(&FullURL, &activelink)
 	if err != nil {
-		return err.Error()
+		return err.Error(), ""
 	}
-	return FullURL
+	if activelink {
+		return FullURL, "307"
+		} else {
+			return FullURL, "410"
+		}
+	
 }
 
 func (conn connectRAM) retrieveUserURLS (userid string) (output string, noURLs bool, UsrShortURLsonly []string){

@@ -169,12 +169,18 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
         http.Error(w, "The query parameter is missing", http.StatusBadRequest)
         return
     }
-	record := storage.Getrecord(q)	
+	record, Status := storage.Getrecord(q)	
 	//if record != "http://google.com/404" {
 		// устанавливаем заголовок Location	
 		w.Header().Set("Location", record)
-		// устанавливаем статус-код 307
-		w.WriteHeader(http.StatusTemporaryRedirect)
+		switch Status{
+		case "307": // устанавливаем статус-код 307
+			w.WriteHeader(http.StatusTemporaryRedirect)
+		case "410": // устанавливаем статус-код 410
+			w.WriteHeader(http.StatusGone)
+		}
+		/*// устанавливаем статус-код 307
+		w.WriteHeader(http.StatusTemporaryRedirect)*/
 	//} else {
 	//	http.Error(w, "Short URL with id=" + q + " not set", http.StatusBadRequest)
 	//}
@@ -426,6 +432,8 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 					}
 					if !InvalidURLIDexists {
 						getInputChan(listURLids)
+						// устанавливаем статус-код 202
+						w.WriteHeader(http.StatusAccepted)
 					}
 				} else {
 					InvalidURLIDexists = true
