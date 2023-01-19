@@ -174,10 +174,10 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 		// устанавливаем заголовок Location	
 		w.Header().Set("Location", record)
 		switch Status{
-		case "307": // устанавливаем статус-код 307
-			w.WriteHeader(http.StatusTemporaryRedirect)
-		case "410": // устанавливаем статус-код 410
-			w.WriteHeader(http.StatusGone)
+			case "307": // устанавливаем статус-код 307
+				w.WriteHeader(http.StatusTemporaryRedirect)
+			case "410": // устанавливаем статус-код 410
+				w.WriteHeader(http.StatusGone)
 		}
 		/*// устанавливаем статус-код 307
 		w.WriteHeader(http.StatusTemporaryRedirect)*/
