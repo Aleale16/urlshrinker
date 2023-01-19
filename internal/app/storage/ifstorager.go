@@ -76,7 +76,8 @@ func (conn connectRAM) storeShortURLtouser(userid, shortURLid string){
 } 
 func (conn connectPGDB) storeShortURLtouser(userid, shortURLid string){
 	uid := userid
-	_, err := PGdb.Exec(context.Background(), `insert into users(uid, shortid, active) values ($1, $2, $3)`, uid, shortURLid, true)
+	//_, err := PGdb.Exec(context.Background(), `insert into users(uid, shortid, active) values ($1, $2, $3)`, uid, shortURLid, true)
+	_, err := PGdb.Exec(context.Background(), `insert into urls(uid, shortid, active) values ($1, $2, $3)`, uid, shortURLid, true)
 	if err == nil {
 		log.Println("User was created, URL assigned")
 	} else {
@@ -91,7 +92,7 @@ func (conn connectRAM) deleteShortURLfromuser(shortURLid string){
 } 
 func (conn connectPGDB) deleteShortURLfromuser(shortURLid string){
 	//uid := userid
-	_, err := PGdb.Exec(context.Background(), `update users set active = false where shortid=$1`, shortURLid)
+	_, err := PGdb.Exec(context.Background(), `update urls set active = false where shortid=$1`, shortURLid)
 	if err == nil {
 		log.Printf("URL %v was disabled", shortURLid)
 	} else {
@@ -162,7 +163,8 @@ func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs 
 	)
 	var UsrShortURLs []string
 	noURLs = true
-	rows, err := PGdb.Query(context.Background(), "SELECT usr.uid, usr.shortid, urls.fullurl FROM users as usr LEFT JOIN urls ON urls.shortid = usr.shortid where uid=$1", userid)
+	//rows, err := PGdb.Query(context.Background(), "SELECT usr.uid, usr.shortid, urls.fullurl FROM users as usr LEFT JOIN urls ON urls.shortid = usr.shortid where uid=$1", userid)
+	rows, err := PGdb.Query(context.Background(), "SELECT urls.uid, urls.shortid, urls.fullurl FROM urls where uid=$1", userid)
 	if err != nil {
 		return err.Error(), noURLs, []string{}
 	}
