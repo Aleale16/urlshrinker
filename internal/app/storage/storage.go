@@ -109,9 +109,9 @@ func InitPGdb() {
 					shortid character varying(10) ,
 					fullurl character varying(1000) ,
 					id integer NOT NULL DEFAULT nextval('urls_id_seq'::regclass),
-					uid character varying(10),
+					uid character varying(10) DEFAULT 0,
 					active boolean,
-					uidint integer,
+					uidint integer DEFAULT 0,
 					CONSTRAINT urls_pkey PRIMARY KEY (id)
 				);
 				ALTER TABLE public.urls ADD UNIQUE (fullurl)`)
