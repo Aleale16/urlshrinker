@@ -17,9 +17,11 @@ import (
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 	"github.com/Aleale16/urlshrinker/internal/app/storage"
 )
+var mu sync.Mutex
 
 func StatusOKHandler(w http.ResponseWriter, r *http.Request) {
 	var wg sync.WaitGroup
+	
 	// A very simple health check.
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
@@ -57,8 +59,9 @@ func defineCookie(w http.ResponseWriter, r *http.Request)(uid string){
 	//userid := []byte("8888")
 	userid := []byte(strconv.Itoa(initconfig.NextUID))
 	fmt.Println("New userid=" + strconv.Itoa(initconfig.NextUID))
+	mu.Lock()
 	initconfig.NextUID = initconfig.NextUID + initconfig.Step
-	
+	mu.Unlock()
       // подписываем алгоритмом HMAC, используя SHA256
 	  h := hmac.New(sha256.New, key)
 	  h.Write(userid)

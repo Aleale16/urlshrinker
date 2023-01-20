@@ -6,9 +6,12 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"sync"
 
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 )
+
+var mu sync.Mutex
 
 func (conn connectRAM) storeURL(fullURL string) (ShortURLID, Status string) {
 	//onlyOnce.Do(Initdb)
@@ -60,7 +63,9 @@ func (conn connectPGDB) storeURL(fullURL string) (ShortURLID, Status string) {
 			Status = "StatusConflict"
 		} else {
 			log.Printf("Values %q, %q inserted successfully, rows affected =%v", id, fullURL, result.RowsAffected())
+			mu.Lock()
 			initconfig.NextID = initconfig.NextID + initconfig.Step
+			mu.Unlock()
 		}
 	} else {
 		log.Println(err)
