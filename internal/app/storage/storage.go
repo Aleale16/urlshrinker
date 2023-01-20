@@ -78,6 +78,7 @@ func InitPGdb() {
 //----------------------------//
 	//urlExample := "postgres://postgres:1@localhost:5432/gotoschool"
     //os.Setenv("DATABASE_DSN", urlExample)
+	//initconfig.PostgresDBURL = urlExample
 	var DBLastURLID, DBLastUID string
 	PGdbOpened = false
 	if initconfig.PostgresDBURL != "" {

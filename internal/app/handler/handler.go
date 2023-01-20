@@ -361,6 +361,7 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 func getInputChan(listURLids []string) (ch chan string) {
     // make return channel
     //input := make(chan string, 100)
+    ch = make(chan string, 100)
 	//var numbers []string
 
     // sample numbers
