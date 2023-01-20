@@ -81,9 +81,9 @@ func (conn connectPGDB) storeShortURLtouser(userid, shortURLid string){
 	//_, err := PGdb.Exec(context.Background(), `insert into urls(uid, shortid, active) values ($1, $2, $3)`, uid, shortURLid, true)
 	_, err := PGdb.Exec(context.Background(), `update urls set uid = $1, uidint = $2 where shortid=$3`, uid, uidint, shortURLid)
 	if err == nil {
-		log.Println("User was created, URL assigned")
+		log.Printf("User %v was created, URL %v assigned", uid, shortURLid)
 	} else {
-		log.Println("User was not created (inserted), URL NOT assigned!")
+		log.Printf("User %v was not created (inserted), URL %v NOT assigned!", uid, shortURLid)
 		log.Println(err)
 	}
 } 
