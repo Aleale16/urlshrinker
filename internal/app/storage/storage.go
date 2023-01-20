@@ -262,7 +262,7 @@ func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord{
 }
 
 func CheckPGdbConn() (connected bool){
-	onlyOnce.Do(Initdb)
+	//onlyOnce.Do(Initdb)
 	//defer PGdb.Close()
     err := PGdb.Ping(context.Background())
     if err != nil {
@@ -275,12 +275,12 @@ func CheckPGdbConn() (connected bool){
 }
 
 func AssignShortURLtouser(userid, shortURLid string){
-	onlyOnce.Do(Initdb)
+	//onlyOnce.Do(Initdb)
 	S.storeShortURLtouser(userid, shortURLid)
 }
 
 func DeleteShortURLfromuser(ch chan string){
-	onlyOnce.Do(Initdb)
+	//onlyOnce.Do(Initdb)
 	//go DelURLIDs(initconfig.InputIDstoDel)
 	go DelURLIDs(ch)
 	//select{ }
@@ -292,13 +292,13 @@ func GetuserURLS(userid string) (output string, noURLs bool, arrayUserURLs []str
 }
 
 func Storerecord(fullURL string) (ShortURLID, Status string){
-	onlyOnce.Do(Initdb)
+	//onlyOnce.Do(Initdb)
 	return S.storeURL(fullURL)
 }
 
 
 
 func Getrecord(id string) (FullURL, Status string) {
-	onlyOnce.Do(Initdb)
+	//onlyOnce.Do(Initdb)
 	return S.retrieveURL(id)
 }

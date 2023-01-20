@@ -11,7 +11,7 @@ import (
 )
 
 func (conn connectRAM) storeURL(fullURL string) (ShortURLID, Status string) {
-	onlyOnce.Do(Initdb)
+	//onlyOnce.Do(Initdb)
 	log.Println("Running store connectRAM")
 	id := strconv.Itoa(initconfig.NextID)
 	URL[id] = fullURL
@@ -20,7 +20,7 @@ func (conn connectRAM) storeURL(fullURL string) (ShortURLID, Status string) {
 }
 
 func (conn connectFileDB) storeURL(fullURL string) (ShortURLID, Status string) {
-	onlyOnce.Do(Initdb)
+	//onlyOnce.Do(Initdb)
 	id := strconv.Itoa(initconfig.NextID)
 	URLJSONline := URLJSONrecord{
 		ID:      id,
@@ -45,7 +45,7 @@ func (conn connectFileDB) storeURL(fullURL string) (ShortURLID, Status string) {
 }
 
 func (conn connectPGDB) storeURL(fullURL string) (ShortURLID, Status string) {
-	onlyOnce.Do(Initdb)
+	//onlyOnce.Do(Initdb)
 	id := strconv.Itoa(initconfig.NextID)
 	result, err := PGdb.Exec(context.Background(), `insert into urls(shortid, fullurl, active) values ($1, $2, $3) on conflict (fullurl) DO NOTHING`, id, fullURL, true)
 	if err == nil {

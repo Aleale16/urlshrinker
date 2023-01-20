@@ -5,9 +5,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
 
 	"github.com/Aleale16/urlshrinker/internal/app/handler"
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
+	"github.com/Aleale16/urlshrinker/internal/app/storage"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -20,7 +22,7 @@ import (
 	User       string `env:"USERNAME"`
 }*/
 func Start(){
-	
+	var onlyOnce sync.Once
 	//var SrvConfig ServerConfig
 	//var UserName string
 	//storage.Initdb() //Убрали управление инициализацией хранилища отсюда в storage
@@ -87,6 +89,8 @@ func Start(){
 	os.Setenv("BASE_URL", initconfig.BaseURL)
 	os.Setenv("FILE_STORAGE_PATH", initconfig.FileDBpath)
 	os.Setenv("DATABASE_DSN", initconfig.PostgresDBURL)
+
+	onlyOnce.Do(storage.Initdb)
 
 	log.Fatal(http.ListenAndServe(initconfig.SrvAddress, r))
 
