@@ -357,7 +357,7 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 
 //! DELETE /api/user/urls
 
-func getInputChan(listURLids []string) chan string {
+func getInputChan(listURLids []string) (ch chan string) {
     // make return channel
     //input := make(chan string, 100)
 	//var numbers []string
@@ -372,13 +372,15 @@ func getInputChan(listURLids []string) chan string {
     // run goroutine
     go func() {
         for _, URLid := range listURLids {
-            initconfig.InputIDstoDel <- URLid
+            //initconfig.InputIDstoDel <- URLid
+            ch <- URLid
         }
         // close channel once all numbers are sent to channel
        // close(input)
     }()
 
-    return initconfig.InputIDstoDel
+    //return initconfig.InputIDstoDel
+    return ch
 }
 
 func contains(s []string, e string) bool {
@@ -393,8 +395,8 @@ func contains(s []string, e string) bool {
 func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 	var listURLids []string
 	var InvalidURLIDexists bool
-
-	storage.DeleteShortURLfromuser()
+	//var IDstoDel = make(chan string, 7)
+	//storage.DeleteShortURLfromuser()
 	
 	// читаем Body (Тело POST запроса)
 	b, err := io.ReadAll(r.Body)
@@ -415,11 +417,12 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 		authorizationHeader := r.Header.Get("Authorization")
 		log.Println("authorizationHeader=" + authorizationHeader)
 		if authorizationHeader != ""{
+		//if authorizationHeader == ""{
 			log.Println("Checking authorizationHeader:")
 			validSign, id := checkSign(authorizationHeader)
 			log.Println(id)
 			log.Println(validSign)
-			
+	//		validSign = true
 			if validSign{
 				userURLS, noURLs, arrayUserURLs := storage.GetuserURLS(id)
 
@@ -433,13 +436,14 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 						}
 					}
 					if !InvalidURLIDexists {
-						getInputChan(listURLids)
+						IDstoDel := getInputChan(listURLids)
 						// устанавливаем статус-код 202
 						w.WriteHeader(http.StatusAccepted)
+						storage.DeleteShortURLfromuser(IDstoDel)
 					}
 				} else {
 					InvalidURLIDexists = true
-					log.Println("No (invalid) ShortURLs for user")
+					log.Println("No (invalid) ShortURLs to delete for user")
 				}
 
 			}
