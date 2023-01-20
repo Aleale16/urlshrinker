@@ -277,7 +277,7 @@ func AssignShortURLtouser(userid, shortURLid string){
 }
 
 func DeleteShortURLfromuser(ch chan string){
-	//onlyOnce.Do(Initdb)
+	onlyOnce.Do(Initdb)
 	//go DelURLIDs(initconfig.InputIDstoDel)
 	go DelURLIDs(ch)
 	//select{ }

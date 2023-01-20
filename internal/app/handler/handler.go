@@ -420,8 +420,8 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 		//if authorizationHeader == ""{
 			log.Println("Checking authorizationHeader:")
 			validSign, id := checkSign(authorizationHeader)
-			log.Println(id)
-			log.Println(validSign)
+			log.Printf("User with %v", id)
+			log.Printf("Authenticated???: %v", validSign)
 	//		validSign = true
 			if validSign{
 				userURLS, noURLs, arrayUserURLs := storage.GetuserURLS(id)
@@ -447,15 +447,19 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 				}
 
 			}
-		}
+		} else {
+			log.Println("Empty authorizationHeader for user")
+		} 
 		
 		
 		//uid := "9999"
 		
 
 		
+	} else {
+		InvalidURLIDexists = true
+		log.Println("No (invalid) ShortURLs to delete for user")
 	}
-	
 	
 }
 /*
