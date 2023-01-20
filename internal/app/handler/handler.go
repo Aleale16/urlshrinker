@@ -160,6 +160,7 @@ func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte(userURLS))
 		}
 	}
+	fmt.Println("GET: /api/user/urls ")
 }
 
 func GetHandler(w http.ResponseWriter, r *http.Request) {
@@ -185,7 +186,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	//	http.Error(w, "Short URL with id=" + q + " not set", http.StatusBadRequest)
 	//}
 
-	fmt.Println("GET: " + q + " Redirect to " + record)
+	fmt.Println("GET: / " + q + " Redirect to " + record)
 }
 
 func GetPingHandler(w http.ResponseWriter, r *http.Request) {
@@ -279,7 +280,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 //типа return:
 	w.Write([]byte(shortURLpath))
 
-	fmt.Println("POST: " + string(body)+ " return id= "+ shortURLid)		
+	fmt.Println("POST: / " + string(body)+ " return id= "+ shortURLid)		
 
 	//return shortURLpath
 }
@@ -350,7 +351,7 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 	//w.Write([]byte(shortURLpathJSON))
 	//w.Write([]byte(shortURLpath))
 
-	fmt.Println("POST: " + string(b)+ " return id= "+ shortURLid + " return JSON= "+ string(shortURLpathJSONBz))	
+	fmt.Println("POST: /api/shorten " + string(b)+ " return id= "+ shortURLid + " return JSON= "+ string(shortURLpathJSONBz))	
 
 	//return shortURLpath
 }
