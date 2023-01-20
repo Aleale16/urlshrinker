@@ -70,7 +70,7 @@ func defineCookie(w http.ResponseWriter, r *http.Request)(uid string){
 	  fmt.Printf("%x", dst)
 	  fmt.Printf("%v\n", dst)
 
-	cookie := &http.Cookie{
+/*	cookie := &http.Cookie{
         Name:   "userid",
         Value:  hex.EncodeToString([]byte(signedcookie)),
         MaxAge: 300,
@@ -81,11 +81,14 @@ func defineCookie(w http.ResponseWriter, r *http.Request)(uid string){
 	http.SetCookie(w, cookie)
 
 	fmt.Println("cookie was set: " + cookie.Name + "; value= " + cookie.Value)
+
 	//if cookie.Value != ""{
 		//checkSign(cookie.Value)
 	//}
 	fmt.Println(r.Cookie("userid"))
-	w.Header().Set("Authorization", cookie.Value)
+	//w.Header().Set("Authorization", cookie.Value)
+	*/
+	w.Header().Set("Authorization", hex.EncodeToString([]byte(signedcookie)))
 	return string(userid)
 }
 
@@ -124,14 +127,18 @@ func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
 	authorizationHeader := r.Header.Get("Authorization")
 	fmt.Println("authorizationHeader=" + authorizationHeader)
 	if authorizationHeader == ""{
-		fmt.Println("Checking useridcookie:")
+		fmt.Println("Empty authorizationHeader:")
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusNoContent)
+		/*fmt.Println("Checking useridcookie:")
 		useridcookie, err:= r.Cookie("userid")
 		if err != nil{	
 			fmt.Println(err)
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusNoContent)
 		} else {	
-			validSign, id := checkSign(useridcookie.Value)
+			//validSign, id := checkSign(useridcookie.Value)
+			validSign, id := checkSign(authorizationHeader)
 			fmt.Println(id)
 			fmt.Println(validSign)
 			//if validSign {
@@ -142,9 +149,9 @@ func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
 			} else {
 				w.Header().Set("Content-Type", "application/json")
 				w.Write([]byte(userURLS))
-			}
+			}*/
 			//}
-		}
+		//}
 	} else {
 		fmt.Println("Checking authorizationHeader:")
 		validSign, id := checkSign(authorizationHeader)
@@ -201,6 +208,9 @@ func GetPingHandler(w http.ResponseWriter, r *http.Request) {
 
 //! POST /
 func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
+	authorizationHeader := r.Header.Get("Authorization")
+	fmt.Println("authorizationHeader=" + authorizationHeader)
+	
 /*	// читаем Body (Тело POST запроса)
 		b, err := io.ReadAll(r.Body)
 		// обрабатываем ошибку
@@ -237,7 +247,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
     log.Println(w, "body: %d", body)
 
 	uid := ""
-	fmt.Println(r.Cookie("userid"))
+/*	fmt.Println(r.Cookie("userid"))
 	useridcookie, err:= r.Cookie("userid")
 	if err != nil{	
 		fmt.Println(err)
@@ -255,6 +265,18 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 		//	defineCookie(w, r)
 		//}
 	}
+*/
+	if authorizationHeader == ""{
+		uid = defineCookie(w, r)
+		} else {
+			validSign, id := checkSign(authorizationHeader)
+			fmt.Println(id)
+			if !validSign {	
+				uid = defineCookie(w, r)
+			} else {
+				uid = id
+			}
+		}
 	
 	//w.Write([]byte(useridcookie.Value))
 	
