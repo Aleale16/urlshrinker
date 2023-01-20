@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"sync"
 	"time"
 
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
@@ -32,7 +31,7 @@ var Usr Userrecord
 var dbPath string
 var RAMonly, PGdbOpened, dbPathexists bool
 
-var onlyOnce sync.Once
+//var onlyOnce sync.Once
 
 var PGdb *pgxpool.Pool
 
