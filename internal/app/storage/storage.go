@@ -148,7 +148,8 @@ func InitPGdb() {
 				log.Println(err)
 			} 
 
-			err = PGdb.QueryRow(context.Background(), `select users.uid from users order by users.id desc limit 1`).Scan(&DBLastUID)
+			//err = PGdb.QueryRow(context.Background(), `select users.uid from users order by users.id desc limit 1`).Scan(&DBLastUID)
+			err = PGdb.QueryRow(context.Background(), `select urls.uid from urls order by urls.id desc limit 1`).Scan(&DBLastUID)
 			log.Println("DBLastUID =" + DBLastUID)
 			LastUID, _ := strconv.Atoi(DBLastUID)			
 			initconfig.NextUID = LastUID + initconfig.Step
