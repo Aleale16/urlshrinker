@@ -76,9 +76,10 @@ func (conn connectRAM) storeShortURLtouser(userid, shortURLid string){
 } 
 func (conn connectPGDB) storeShortURLtouser(userid, shortURLid string){
 	uid := userid
+	uidint, _ := strconv.Atoi(userid)
 	//_, err := PGdb.Exec(context.Background(), `insert into users(uid, shortid, active) values ($1, $2, $3)`, uid, shortURLid, true)
 	//_, err := PGdb.Exec(context.Background(), `insert into urls(uid, shortid, active) values ($1, $2, $3)`, uid, shortURLid, true)
-	_, err := PGdb.Exec(context.Background(), `update urls set uid = $1 where shortid=$2`, uid, shortURLid)
+	_, err := PGdb.Exec(context.Background(), `update urls set uid = $1, uidint = $2 where shortid=$3`, uid, uidint, shortURLid)
 	if err == nil {
 		log.Println("User was created, URL assigned")
 	} else {

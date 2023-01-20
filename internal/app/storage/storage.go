@@ -111,6 +111,7 @@ func InitPGdb() {
 					id integer NOT NULL DEFAULT nextval('urls_id_seq'::regclass),
 					uid character varying(10),
 					active boolean,
+					uidint integer,
 					CONSTRAINT urls_pkey PRIMARY KEY (id)
 				);
 				ALTER TABLE public.urls ADD UNIQUE (fullurl)`)
@@ -144,17 +145,17 @@ func InitPGdb() {
 			log.Println("DBLastURLID =" + DBLastURLID)
 			LastID, _ := strconv.Atoi(DBLastURLID)			
 			initconfig.NextID =LastID + initconfig.Step
-			log.Println(initconfig.NextID)
+			log.Printf("NextID= %v", initconfig.NextID)
 			if err != nil {
 				log.Println(err)
 			} 
 
 			//err = PGdb.QueryRow(context.Background(), `select users.uid from users order by users.id desc limit 1`).Scan(&DBLastUID)
-			err = PGdb.QueryRow(context.Background(), `select urls.uid from urls order by urls.id desc limit 1`).Scan(&DBLastUID)
+			err = PGdb.QueryRow(context.Background(), `select urls.uid from urls order by urls.uidint desc limit 1`).Scan(&DBLastUID)
 			log.Println("DBLastUID =" + DBLastUID)
 			LastUID, _ := strconv.Atoi(DBLastUID)			
 			initconfig.NextUID = LastUID + initconfig.Step
-			log.Print(initconfig.NextUID)
+			log.Printf("NextUID= %v", initconfig.NextUID)
 			if err != nil {
 				log.Println(err)
 			} 
@@ -184,9 +185,9 @@ func DelURLIDs(ch chan string){
 
 func SetdbType(){
 	log.Println("TRY SetdbType")
-	log.Println(PGdbOpened)
-	log.Println(dbPathexists)
-	log.Println(RAMonly)
+	log.Printf("PGdbOpened= %v", PGdbOpened)
+	log.Printf("dbPathexists= %v", dbPathexists)
+	log.Printf("RAMonly= %v", RAMonly)
 	switch true {
 		case PGdbOpened:
 			log.Println("case PGdbOpened")
