@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"time"
 
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -172,7 +171,7 @@ func InitPGdb() {
 func DelURLIDs(ch chan string){
 	log.Println("Starting async 'delete URLIDs for user' routine")
    // for {
-		time.Sleep(time.Second * 1)
+		//time.Sleep(time.Second * 1)
         fmt.Printf("Length of channel Input is %v and capacity of channel c is %v\n", len(ch), cap(ch))
 		if len(ch)>0{
 			for shortURLID := range ch {
