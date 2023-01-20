@@ -460,7 +460,7 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 		InvalidURLIDexists = true
 		log.Println("No (invalid) ShortURLs to delete for user")
 	}
-	
+	fmt.Println("DELETE: " + string(b))
 }
 /*
 func bgfunc(chanInputIDs){
