@@ -443,7 +443,9 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	log.Println(listURLids)	
-
+					// устанавливаем статус-код 202
+					w.WriteHeader(http.StatusAccepted)
+					
 	if len(listURLids)>0{
 		authorization:=""
 		authorizationHeader := r.Header.Get("Authorization")
@@ -467,7 +469,7 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 			log.Printf("User with %v", id)
 			log.Printf("Authenticated???: %v", validSign)
 		} else {
-			//validSign = false
+			//!!!validSign = false
 			validSign = true
 		}
 //		validSign = true
