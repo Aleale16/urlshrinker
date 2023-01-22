@@ -439,6 +439,7 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("DeleteURLsHandler body: " + string(b))
+	log.Println(r.Context())
 	log.Println("Content-Encoding from req: " + r.Header.Get("Content-Encoding"))
 	err = json.Unmarshal(b, &listURLids)
 	if err != nil {
