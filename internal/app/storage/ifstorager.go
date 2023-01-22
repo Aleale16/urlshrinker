@@ -114,7 +114,8 @@ func (conn connectRAM) retrieveURL(id string) (FullURL string, Status string) {
 	if (FullURL != ""){
 		return FullURL, "307"
 	} else {
-		return "http://google.com/404", "400"		
+		//return "http://google.com/404", "400"		
+		return "", "400"		
 	}
 }
 func (conn connectFileDB) retrieveURL(id string) (FullURL string, Status string) {
