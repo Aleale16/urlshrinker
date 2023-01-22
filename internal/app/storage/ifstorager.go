@@ -96,7 +96,7 @@ func (conn connectFileDB) storeShortURLtouser(userid, shortURLid string){
 } 
 
 func (conn connectRAM) deleteShortURLfromuser(shortURLid string){
-	URL[shortURLid]="*"+URL[shortURLid]
+	URL[shortURLid] = "*" + URL[shortURLid]
 	log.Printf("URL %v was disabled with *", shortURLid)
 } 
 func (conn connectPGDB) deleteShortURLfromuser(shortURLid string){
@@ -182,11 +182,11 @@ func (conn connectRAM) retrieveUserURLS (userid string) (output string, noURLs b
 		JSONresult = JSONdata
 		//log.Println("JSONresult= ")		
 		//log.Println(JSONresult)
-		shortURLpathJSONBz, err := json.MarshalIndent(string(JSONdata), "", "  ")
+		shortURLpathJSONBz, err := json.MarshalIndent(&UsrURLJSON, "", "  ")
 		if err != nil {
 			panic(err)
 		}		
-		log.Printf("JSONresult= %v", string(shortURLpathJSONBz))		
+		log.Printf("retrieveUserURLS JSONresult= %v", string(shortURLpathJSONBz))		
 		noURLs = false
 	}
 	return string(JSONresult), noURLs, UsrShortURLs
@@ -234,7 +234,7 @@ func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs 
 	JSONresult = JSONdata
 	//log.Println("JSONresult= ")		
 	//log.Println(JSONresult)		
-	shortURLpathJSONBz, err := json.MarshalIndent(string(JSONdata), "", "  ")
+	shortURLpathJSONBz, err := json.MarshalIndent(&UsrURLJSON, "", "  ")
 	if err != nil {
 		panic(err)
 	}		
