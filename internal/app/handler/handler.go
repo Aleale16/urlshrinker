@@ -74,7 +74,7 @@ func defineCookie(w http.ResponseWriter, r *http.Request)(uid string){
 	  fmt.Printf("%x", dst)
 	  fmt.Printf("%v\n", dst)
 
-/*	cookie := &http.Cookie{
+	cookie := &http.Cookie{
         Name:   "userid",
         Value:  hex.EncodeToString([]byte(signedcookie)),
         MaxAge: 300,
@@ -91,7 +91,7 @@ func defineCookie(w http.ResponseWriter, r *http.Request)(uid string){
 	//}
 	fmt.Println(r.Cookie("userid"))
 	//w.Header().Set("Authorization", cookie.Value)
-	*/
+	
 	w.Header().Set("Authorization", hex.EncodeToString([]byte(signedcookie)))
 	return string(userid)
 }
@@ -448,61 +448,61 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println(listURLids)	
 
 	if len(listURLids)>0{
+		authorization:=""
 		authorizationHeader := r.Header.Get("Authorization")
 		log.Println("authorizationHeader=" + authorizationHeader)
 		if authorizationHeader != ""{
-		//if authorizationHeader == ""{
-			log.Println("Checking authorizationHeader:")
-			validSign, id := checkSign(authorizationHeader)
-			log.Printf("User with %v", id)
-			log.Printf("Authenticated???: %v", validSign)
-	//		validSign = true
-			if validSign{
-				userURLS, noURLs, arrayUserURLs := storage.GetuserURLS(id)
-
-				if !noURLs && len(userURLS)>= len(listURLids){
-					InvalidURLIDexists = false
-					for _, v := range(listURLids){
-						if !InvalidURLIDexists{
-							if !contains(arrayUserURLs, v){
-								InvalidURLIDexists = true
-							}
-						}
-					}
-					if !InvalidURLIDexists {
-						IDstoDel := getInputChan(listURLids)
-						// устанавливаем статус-код 202
-						w.WriteHeader(http.StatusAccepted)
-						storage.DeleteShortURLfromuser(IDstoDel)
-					}
-				} else {
-					InvalidURLIDexists = true
-					log.Println("No (invalid) ShortURLs to delete for user")
-				}
-
-			}
+			authorization = authorizationHeader
 		} else {
 			log.Println("Empty authorizationHeader for user")
-		} 
-		
-		
-		//uid := "9999"
-		
+			fmt.Println("Checking useridcookie:")
+			useridcookie, err:= r.Cookie("userid")
+			
+			if err != nil{	
+				fmt.Println(err)
+			} else {	
+				authorization = useridcookie.Value
+				log.Println("useridcookie=" + useridcookie.Value)
+			}
+		}
 
-		
+		log.Println("Checking authorization:")
+		validSign, id := checkSign(authorization)
+		log.Printf("User with %v", id)
+		log.Printf("Authenticated???: %v", validSign)
+//		validSign = true
+		if validSign{
+			userURLS, noURLs, arrayUserURLs := storage.GetuserURLS(id)
+
+			if !noURLs && len(userURLS)>= len(listURLids){
+				InvalidURLIDexists = false
+				for _, v := range(listURLids){
+					if !InvalidURLIDexists{
+						if !contains(arrayUserURLs, v){
+							InvalidURLIDexists = true
+						}
+					}
+				}
+				if !InvalidURLIDexists {
+					IDstoDel := getInputChan(listURLids)
+					// устанавливаем статус-код 202
+					w.WriteHeader(http.StatusAccepted)
+					storage.DeleteShortURLfromuser(IDstoDel)
+				}
+			} else {
+				InvalidURLIDexists = true
+				log.Println("No (invalid) ShortURLs to delete for user")
+			}
+		} else {
+			InvalidURLIDexists = true
+			log.Println("No (invalid SIGN) ShortURLs to delete for user")
+		}
 	} else {
 		InvalidURLIDexists = true
-		log.Println("No (invalid) ShortURLs to delete for user")
+		log.Println("No (EMPTY LIST) ShortURLs to delete for user")
 	}
 	fmt.Println("DELETE: " + string(b))
 }
-/*
-func bgfunc(chanInputIDs){
-	for shortURLID := range chanInputIDs {
-		storage.DeleteShortURLfromuser(shortURLID)
-	}
-
-}*/
 
 //! POST /api/shorten/batch
 //структура вводимого JSON
