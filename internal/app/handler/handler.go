@@ -271,7 +271,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 	if authorization == ""{
 		uid = defineCookie(w, r)
 		} else {
-			validSign, id := checkSign(authorizationHeader)
+			validSign, id := checkSign(authorization)
 			fmt.Println(id)
 			if !validSign {	
 				uid = defineCookie(w, r)
@@ -289,13 +289,14 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 	//вот так из пакета initconfig:
 	//shortURLpath :=initconfig.BaseURL + "/?id="+ shortURLid
 	shortURLpath :=initconfig.BaseURL + "/"+ shortURLid
-	storage.AssignShortURLtouser(uid, shortURLid)
+	
 	
 	//w.Header().Set("Content-Encoding", "gzip, deflate, br")
 	if Status == "StatusConflict"{
 		// устанавливаем статус-код 409
 		w.WriteHeader(http.StatusConflict)
 	} else {
+		storage.AssignShortURLtouser(uid, shortURLid)
 		// устанавливаем статус-код 201
 		w.WriteHeader(http.StatusCreated)
 	}
