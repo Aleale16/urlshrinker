@@ -68,7 +68,8 @@ func TestReqHandlerPost(t *testing.T) {
 	}
 
 	// Check the response body is what we expect.
-	expected := "http://localhost:8080/?id=..."
+	//expected := "http://localhost:8080/?id=..."
+	expected := "http://localhost:8080/..."
 	if rr.Body.String() == "" {
 		t.Errorf("handler returned unexpected body: got %v want %v",
 			rr.Body.String(), expected)
@@ -81,7 +82,8 @@ func TestReqHandlerPost(t *testing.T) {
 
 func TestReqHandlerGet1(t *testing.T) {
 //Запрос существующего id
-	reqget, err := http.NewRequest("GET", "/?id=7943", nil)
+	//reqget, err := http.NewRequest("GET", "/?id=7943", nil)
+	reqget, err := http.NewRequest("GET", "/7943", nil)
 	if err != nil {
 		t.Fatal(err)
 	}	
@@ -112,7 +114,8 @@ func TestReqHandlerGet1(t *testing.T) {
 
 func TestReqHandlerGet2(t *testing.T) {
 //запрос несуществующего id
-	reqget, err := http.NewRequest("GET", "/?id=xxxx", nil)
+	//reqget, err := http.NewRequest("GET", "/?id=xxxx", nil)
+	reqget, err := http.NewRequest("GET", "/xxxx", nil)
 	if err != nil {
 		t.Fatal(err)
 	}	
