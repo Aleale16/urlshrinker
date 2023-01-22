@@ -173,8 +173,10 @@ func DelURLIDs(ch chan string){
         fmt.Printf("Length of channel Input is %v and capacity of channel c is %v\n", len(ch), cap(ch))
 		if len(ch)>0{
 			for shortURLID := range ch {
+				fmt.Printf("Length of channel Input is %v\n", len(ch))
 				S.deleteShortURLfromuser(shortURLID)
 			}
+			close(ch)
 		}
 	
 }
