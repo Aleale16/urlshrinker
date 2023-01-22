@@ -96,6 +96,8 @@ func (conn connectFileDB) storeShortURLtouser(userid, shortURLid string){
 } 
 
 func (conn connectRAM) deleteShortURLfromuser(shortURLid string){
+
+	
 } 
 func (conn connectPGDB) deleteShortURLfromuser(shortURLid string){
 	//uid := userid
@@ -160,7 +162,7 @@ func (conn connectRAM) retrieveUserURLS (userid string) (output string, noURLs b
 		JSONresult = JSONdata
 		//log.Println("JSONresult= ")		
 		//log.Println(JSONresult)
-		shortURLpathJSONBz, err := json.MarshalIndent(JSONdata, "", "  ")
+		shortURLpathJSONBz, err := json.MarshalIndent(string(JSONdata), "", "  ")
 		if err != nil {
 			panic(err)
 		}		
@@ -212,7 +214,7 @@ func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs 
 	JSONresult = JSONdata
 	//log.Println("JSONresult= ")		
 	//log.Println(JSONresult)		
-	shortURLpathJSONBz, err := json.MarshalIndent(JSONdata, "", "  ")
+	shortURLpathJSONBz, err := json.MarshalIndent(string(JSONdata), "", "  ")
 	if err != nil {
 		panic(err)
 	}		
