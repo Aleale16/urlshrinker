@@ -145,7 +145,8 @@ func (conn connectRAM) retrieveUserURLS (userid string) (output string, noURLs b
 				log.Println(v)
 				//Так нормально заполнять JSON перед маршаллингом?
 				UsrURLJSON = append(UsrURLJSON, UsrURLJSONrecord{
-					ShortURL:	initconfig.BaseURL + "/?id=" + v,
+					//ShortURL:	initconfig.BaseURL + "/?id=" + v,
+					ShortURL:	initconfig.BaseURL + "/" + v,
 					FullURL:	URL[v],
 				})				
 		}
@@ -192,7 +193,8 @@ func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs 
 		}
 		UsrShortURLs = append(UsrShortURLs, shortID)
 		UsrURLJSON = append(UsrURLJSON, UsrURLJSONrecord{
-			ShortURL:	initconfig.BaseURL + "/?id=" + shortID,
+			//ShortURL:	initconfig.BaseURL + "/?id=" + shortID,
+			ShortURL:	initconfig.BaseURL + "/" + shortID,
 			FullURL:	FullURL,
 		})	
 	}

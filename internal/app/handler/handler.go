@@ -10,6 +10,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"path"
 	"strconv"
 	"sync"
 	"time"
@@ -174,7 +175,8 @@ func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetHandler(w http.ResponseWriter, r *http.Request) {
-	q := r.URL.Query().Get("id")
+	//q := r.URL.Query().Get("id")
+	q := path.Base(r.URL.String())
 	//q := r.URL.String()
     if q == "" {
         http.Error(w, "The query parameter is missing", http.StatusBadRequest)
@@ -288,7 +290,8 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 	//shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid	
 	//shortURLpath := BaseURL + "/?id="+ shortURLid Как сюда передать переменную из server.go?	
 	//вот так из пакета initconfig:
-	shortURLpath :=initconfig.BaseURL + "/?id="+ shortURLid
+	//shortURLpath :=initconfig.BaseURL + "/?id="+ shortURLid
+	shortURLpath :=initconfig.BaseURL + "/"+ shortURLid
 	storage.AssignShortURLtouser(uid, shortURLid)
 	
 	//w.Header().Set("Content-Encoding", "gzip, deflate, br")
@@ -350,7 +353,8 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 	shortURLid, Status := storage.Storerecord(string(postJSON.URL))
 	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
 	//shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid
-	shortURLpath := initconfig.BaseURL + "/?id="+ shortURLid
+	//shortURLpath := initconfig.BaseURL + "/?id="+ shortURLid
+	shortURLpath := initconfig.BaseURL + "/"+ shortURLid
 	
 	var shortURLpathJSON resultData
 	shortURLpathJSON.ShortURL = shortURLpath
@@ -538,7 +542,8 @@ func PostJSONbatchHandler(w http.ResponseWriter, r *http.Request) /*(shortURL st
 				shortURLid, _ := storage.Storerecord(string(v.URL))
 				resultbatchJSON = append(resultbatchJSON, resultbatchData{
 					ID:	v.ID,
-					ShortURL:	initconfig.BaseURL + "/?id=" + shortURLid,
+					//ShortURL:	initconfig.BaseURL + "/?id=" + shortURLid,
+					ShortURL:	initconfig.BaseURL + "/" + shortURLid,
 				})	
 		}
 	}
