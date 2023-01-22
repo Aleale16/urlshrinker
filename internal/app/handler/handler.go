@@ -229,6 +229,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
 	// обработаем ситуацию, если на вход может прийти сжатое содержимое	
 	// переменная reader будет равна r.Body или *gzip.Reader
 	var reader io.Reader
+	var authorization, useridcookieVal string
 	if r.Header.Get("Content-Encoding") == "gzip" {
 		w.Header().Set("Accept-Encoding", "gzip")
 		w.Header().Set("Content-Encoding", "gzip, deflate, br")
@@ -254,26 +255,20 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/{
     log.Println(w, "body: %d", body)
 
 	uid := ""
-/*	fmt.Println(r.Cookie("userid"))
+	fmt.Println(r.Cookie("userid"))
 	useridcookie, err:= r.Cookie("userid")
 	if err != nil{	
 		fmt.Println(err)
-		uid = defineCookie(w, r)
 	} else {
-		//if useridcookie.Value == "" {
-			validSign, id := checkSign(useridcookie.Value)
-			fmt.Println(id)
-			if !validSign {	
-				uid = defineCookie(w, r)
-			} else {
-				uid = id
-			}
-		//} else {
-		//	defineCookie(w, r)
-		//}
+		useridcookieVal = useridcookie.Value
 	}
-*/
-	if authorizationHeader == ""{
+
+	if authorizationHeader != ""{
+		authorization = authorizationHeader
+	} else {
+		authorization = useridcookieVal
+	}
+	if authorization == ""{
 		uid = defineCookie(w, r)
 		} else {
 			validSign, id := checkSign(authorizationHeader)
@@ -427,7 +422,8 @@ func contains(s []string, e string) bool {
 
 func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 	var listURLids []string
-	var InvalidURLIDexists bool
+	var InvalidURLIDexists, validSign bool
+	var id string
 	//var IDstoDel = make(chan string, 7)
 	//storage.DeleteShortURLfromuser()
 	
@@ -456,8 +452,7 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 		} else {
 			log.Println("Empty authorizationHeader for user")
 			fmt.Println("Checking useridcookie:")
-			useridcookie, err:= r.Cookie("userid")
-			
+			useridcookie, err:= r.Cookie("userid")			
 			if err != nil{	
 				fmt.Println(err)
 			} else {	
@@ -465,11 +460,14 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 				log.Println("useridcookie=" + useridcookie.Value)
 			}
 		}
-
-		log.Println("Checking authorization:")
-		validSign, id := checkSign(authorization)
-		log.Printf("User with %v", id)
-		log.Printf("Authenticated???: %v", validSign)
+		if authorization!= ""{
+			log.Println("Checking authorization:")
+			validSign, id = checkSign(authorization)
+			log.Printf("User with %v", id)
+			log.Printf("Authenticated???: %v", validSign)
+		} else {
+			validSign = false
+		}
 //		validSign = true
 		if validSign{
 			userURLS, noURLs, arrayUserURLs := storage.GetuserURLS(id)
@@ -495,7 +493,7 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		} else {
 			InvalidURLIDexists = true
-			log.Println("No (invalid SIGN) ShortURLs to delete for user")
+			log.Println("No (invalid or empty SIGN) ShortURLs to delete for user")
 		}
 	} else {
 		InvalidURLIDexists = true
