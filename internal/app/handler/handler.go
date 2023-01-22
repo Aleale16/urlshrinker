@@ -79,8 +79,8 @@ func defineCookie(w http.ResponseWriter, r *http.Request)(uid string){
         Value:  hex.EncodeToString([]byte(signedcookie)),
         MaxAge: 300,
 		Path:  "/",
-		HttpOnly: true,
-        Secure:   true,
+		//HttpOnly: true,
+        //Secure:   true,
     }
 	http.SetCookie(w, cookie)
 
@@ -445,7 +445,7 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println(listURLids)	
 					// устанавливаем статус-код 202
 					w.WriteHeader(http.StatusAccepted)
-					
+
 	if len(listURLids)>0{
 		authorization:=""
 		authorizationHeader := r.Header.Get("Authorization")
