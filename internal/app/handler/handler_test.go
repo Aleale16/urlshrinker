@@ -83,7 +83,7 @@ func TestReqHandlerPost(t *testing.T) {
 func TestReqHandlerGet1(t *testing.T) {
 //Запрос существующего id
 	//reqget, err := http.NewRequest("GET", "/?id=7943", nil)
-	reqget, err := http.NewRequest("GET", "/7943", nil)
+	reqget, err := http.NewRequest("GET", "/111", nil)
 	if err != nil {
 		t.Fatal(err)
 	}	
@@ -123,9 +123,9 @@ func TestReqHandlerGet2(t *testing.T) {
 	handler := http.HandlerFunc(GetHandler)
 	handler.ServeHTTP(rr, reqget)
 	status := rr.Code
-	if  status != http.StatusTemporaryRedirect {
+	if  status != http.StatusBadRequest {
 		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusTemporaryRedirect)
+			status, http.StatusBadRequest)
 	}
 	expected := "http://google.com/404"
 	header := rr.Header()
