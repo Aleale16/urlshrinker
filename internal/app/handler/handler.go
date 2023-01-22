@@ -189,6 +189,8 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 		switch Status{
 			case "307": // устанавливаем статус-код 307
 				w.WriteHeader(http.StatusTemporaryRedirect)
+			case "400": // устанавливаем статус-код 307
+				w.WriteHeader(http.StatusBadRequest)
 			case "410": // устанавливаем статус-код 410
 				w.WriteHeader(http.StatusGone)
 		}
