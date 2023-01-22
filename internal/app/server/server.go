@@ -36,7 +36,8 @@ func Start(){
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Compress(5, "gzip"))
 	
-	r.Get("/", handler.GetHandler)
+	//reqstring:= chi.URLParam(r)
+	r.Get("/{id}", handler.GetHandler)
 	r.Get("/api/user/urls", handler.GetUsrURLsHandler)
 	r.Get("/ping", handler.GetPingHandler)
 
