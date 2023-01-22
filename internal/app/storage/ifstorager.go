@@ -158,9 +158,13 @@ func (conn connectRAM) retrieveUserURLS (userid string) (output string, noURLs b
 		//JSONdata = append(JSONdata, '\n')
 		//URL[id] = string(JSONdata)
 		JSONresult = JSONdata
-		log.Println("JSONresult= ")		
-		log.Println(JSONresult)		
-		log.Println(string(JSONresult))		
+		//log.Println("JSONresult= ")		
+		//log.Println(JSONresult)
+		shortURLpathJSONBz, err := json.MarshalIndent(JSONdata, "", "  ")
+		if err != nil {
+			panic(err)
+		}		
+		log.Printf("JSONresult= %v", string(shortURLpathJSONBz))		
 		noURLs = false
 	}
 	return string(JSONresult), noURLs, UsrShortURLs
@@ -206,9 +210,13 @@ func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs 
 	//JSONdata = append(JSONdata, '\n')
 	//URL[id] = string(JSONdata)
 	JSONresult = JSONdata
-	log.Println("JSONresult= ")		
-	log.Println(JSONresult)		
-	log.Println(string(JSONresult))		
+	//log.Println("JSONresult= ")		
+	//log.Println(JSONresult)		
+	shortURLpathJSONBz, err := json.MarshalIndent(JSONdata, "", "  ")
+	if err != nil {
+		panic(err)
+	}		
+	log.Printf("JSONresult= %v", string(shortURLpathJSONBz))		
 	noURLs = false
 	return string(JSONresult), noURLs, UsrShortURLs
 }

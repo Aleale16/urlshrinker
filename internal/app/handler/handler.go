@@ -338,7 +338,7 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 	//type Example struct {
 	//	URL   string `valid:"url"`
 	//}
-	log.Println("Content-Encoding from req: " + r.Header.Get("Content-Encoding"))
+	log.Println("Content-Encoding from JSON req: " + r.Header.Get("Content-Encoding"))
 
 	var postJSON inputData
 	err = json.Unmarshal(b, &postJSON)
@@ -436,41 +436,41 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	log.Println("DeleteURLsHandler body: " + string(b))
-	log.Println(r.Context())
-	log.Println("Content-Encoding from req: " + r.Header.Get("Content-Encoding"))
+	//log.Println(r.Context())
+	//log.Println("Content-Encoding from Delete req: " + r.Header.Get("Content-Encoding"))
 	err = json.Unmarshal(b, &listURLids)
 	if err != nil {
 		panic(err)
 	}
-	log.Println(listURLids)	
-					// устанавливаем статус-код 202
-					w.WriteHeader(http.StatusAccepted)
+	//log.Println(listURLids)
+
+		// устанавливаем статус-код 202
+		//w.WriteHeader(http.StatusAccepted)
 
 	if len(listURLids)>0{
 		authorization:=""
 		authorizationHeader := r.Header.Get("Authorization")
-		log.Println("authorizationHeader=" + authorizationHeader)
+		//log.Println("authorizationHeader=" + authorizationHeader)
 		if authorizationHeader != ""{
 			authorization = authorizationHeader
 		} else {
 			log.Println("Empty authorizationHeader for user")
-			fmt.Println("Checking useridcookie:")
+			//fmt.Println("Checking useridcookie:")
 			useridcookie, err:= r.Cookie("userid")			
 			if err != nil{	
 				fmt.Println(err)
 			} else {	
 				authorization = useridcookie.Value
-				log.Println("useridcookie=" + useridcookie.Value)
+				log.Printf("Checking useridcookie= %v", useridcookie.Value)
 			}
 		}
 		if authorization!= ""{
 			log.Println("Checking authorization:")
 			validSign, id = checkSign(authorization)
-			log.Printf("User with %v", id)
-			log.Printf("Authenticated???: %v", validSign)
+			log.Printf("User with %v Authenticated???: %v", id, validSign)
 		} else {
-			//!!!validSign = false
-			validSign = true
+			validSign = false
+			//validSign = true
 		}
 //		validSign = true
 		if validSign{
@@ -529,7 +529,7 @@ func PostJSONbatchHandler(w http.ResponseWriter, r *http.Request) /*(shortURL st
 	}
 	//отладка всё что было в POST запросе
 	log.Println("PostJSONHandler body: " + string(b))
-	log.Println("Content-Encoding from req: " + r.Header.Get("Content-Encoding"))
+	log.Println("Content-Encoding from batch req: " + r.Header.Get("Content-Encoding"))
 
 	var inputbatchJSON []inputbatchData
 	var resultbatchJSON []resultbatchData
