@@ -176,7 +176,7 @@ func DelURLIDs(ch chan string){
 				fmt.Printf("Length of channel Input is %v\n", len(ch))
 				S.deleteShortURLfromuser(shortURLID)
 			}
-			close(ch)
+			//close(ch)
 		}
 	
 }
