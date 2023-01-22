@@ -160,8 +160,6 @@ func InitPGdb() {
 			
 			PGdbOpened = true
 			log.Println("PGdbOpened = TRUE") 	
-			//go DelURLIDs(initconfig.InputIDstoDel)
-			//select{ }
 		}
 	} else {
 		log.Println("PGdbOpened = FALSE")
@@ -170,7 +168,7 @@ func InitPGdb() {
 }
 func DelURLIDs(ch chan string){
 	log.Println("Starting async 'delete URLIDs for user' routine")
-   // for {
+  
 		//time.Sleep(time.Second * 1)
         fmt.Printf("Length of channel Input is %v and capacity of channel c is %v\n", len(ch), cap(ch))
 		if len(ch)>0{
@@ -178,7 +176,7 @@ func DelURLIDs(ch chan string){
 				S.deleteShortURLfromuser(shortURLID)
 			}
 		}
-	//}
+	
 }
 
 func SetdbType(){
@@ -279,10 +277,9 @@ func AssignShortURLtouser(userid, shortURLid string){
 
 func DeleteShortURLfromuser(ch chan string){
 	//onlyOnce.Do(Initdb)
-	//go DelURLIDs(initconfig.InputIDstoDel)
+
 	go DelURLIDs(ch)
-	//select{ }
-	//S.deleteShortURLfromuser(shortURLid)
+
 }
 
 func GetuserURLS(userid string) (output string, noURLs bool, arrayUserURLs []string){

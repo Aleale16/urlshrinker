@@ -96,8 +96,8 @@ func (conn connectFileDB) storeShortURLtouser(userid, shortURLid string){
 } 
 
 func (conn connectRAM) deleteShortURLfromuser(shortURLid string){
-
-	
+	URL[shortURLid]="*"+URL[shortURLid]
+	log.Printf("URL %v was disabled with *", shortURLid)
 } 
 func (conn connectPGDB) deleteShortURLfromuser(shortURLid string){
 	//uid := userid
@@ -111,14 +111,33 @@ func (conn connectPGDB) deleteShortURLfromuser(shortURLid string){
 func (conn connectFileDB) deleteShortURLfromuser(shortURLid string){
 } 
 
+func containsinStr(s string, e string) bool {
+    for _, a := range s {
+        if string(a) == e {
+            return true
+        }
+    }
+    return false
+}
 func (conn connectRAM) retrieveURL(id string) (FullURL string, Status string) {
 	FullURL = URL[id]
+	withAsterisk := containsinStr(FullURL , "*")
+	switch true {
+		case (FullURL == ""):
+			return "http://google.com/404", "400"
+		case (withAsterisk):
+			return "", "409"
+		default:
+			return FullURL, "307"
+	}
+	/*
 	if (FullURL != ""){
 		return FullURL, "307"
 	} else {
 		return "http://google.com/404", "400"		
 		//return "", "400"		
 	}
+	*/
 }
 func (conn connectFileDB) retrieveURL(id string) (FullURL string, Status string) {
 	FullURL = URL[id]
