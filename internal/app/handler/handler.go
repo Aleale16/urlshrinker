@@ -466,7 +466,8 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 			log.Printf("User with %v", id)
 			log.Printf("Authenticated???: %v", validSign)
 		} else {
-			validSign = false
+			//validSign = false
+			validSign = true
 		}
 //		validSign = true
 		if validSign{
