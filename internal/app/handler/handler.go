@@ -16,7 +16,6 @@ import (
 	"time"
 
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
-
 	"github.com/Aleale16/urlshrinker/internal/app/storage"
 )
 var mu sync.Mutex

@@ -122,11 +122,12 @@ func containsinStr(s string, e string) bool {
 func (conn connectRAM) retrieveURL(id string) (FullURL string, Status string) {
 	FullURL = URL[id]
 	withAsterisk := containsinStr(FullURL , "*")
+	log.Printf("withAsterisk = %v", withAsterisk)
 	switch true {
 		case (FullURL == ""):
 			return "http://google.com/404", "400"
 		case (withAsterisk):
-			return "", "409"
+			return "", "410"
 		default:
 			return FullURL, "307"
 	}
