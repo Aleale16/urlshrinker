@@ -489,7 +489,10 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 					IDstoDel := getInputChan(listURLids)
 					// устанавливаем статус-код 202
 					w.WriteHeader(http.StatusAccepted)
+					log.Printf("ShortURLs %v queued to delete for user %v", listURLids, id)
 					storage.DeleteShortURLfromuser(IDstoDel)
+				} else {
+					log.Printf("ShortURLs %v DECLINED to delete for user %v", listURLids, id)
 				}
 			} else {
 				InvalidURLIDexists = true
