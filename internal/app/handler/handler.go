@@ -388,7 +388,7 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 func getInputChan(listURLids []string) (ch chan string) {
     // make return channel
     //input := make(chan string, 100)
-    ch = make(chan string, 100)
+    //ch = make(chan string, 100)
 	//var numbers []string
 
     // sample numbers
@@ -401,15 +401,15 @@ func getInputChan(listURLids []string) (ch chan string) {
     // run goroutine
     go func() {
         for _, URLid := range listURLids {
-            //initconfig.InputIDstoDel <- URLid
-            ch <- URLid
+            initconfig.InputIDstoDel <- URLid
+            // <- URLid
         }
         // close channel once all numbers are sent to channel
        // close(input)
     }()
 
-    //return initconfig.InputIDstoDel
-    return ch
+    return initconfig.InputIDstoDel
+    //return ch
 }
 
 func contains(s []string, e string) bool {
@@ -425,27 +425,20 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 	var listURLids []string
 	var InvalidURLIDexists, validSign bool
 	var id string
-	var IDstoDel = make(chan string, 100)
+	//var IDstoDel = make(chan string, 7)
 	//storage.DeleteShortURLfromuser()
-	
-	// читаем Body (Тело POST запроса)
+
 	b, err := io.ReadAll(r.Body)
-	// обрабатываем ошибку
 	if err != nil {
 		http.Error(w, err.Error(), 400)
 		return
 	}
 	log.Println("DeleteURLsHandler body: " + string(b))
-	//log.Println(r.Context())
-	//log.Println("Content-Encoding from Delete req: " + r.Header.Get("Content-Encoding"))
 	err = json.Unmarshal(b, &listURLids)
 	if err != nil {
 		panic(err)
 	}
 	//log.Println(listURLids)
-
-		// устанавливаем статус-код 202
-		//w.WriteHeader(http.StatusAccepted)
 
 	if len(listURLids)>0{
 		authorization:=""
@@ -486,7 +479,7 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 					}
 				}
 				if !InvalidURLIDexists {
-					IDstoDel = getInputChan(listURLids)
+					IDstoDel := getInputChan(listURLids)
 					// устанавливаем статус-код 202
 					w.WriteHeader(http.StatusAccepted)
 					log.Printf("ShortURLs %v queued to delete for user %v", listURLids, id)
