@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"sync"
 )
 var FileDBpath, BaseURL, SrvAddress string
 var SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag *string
@@ -11,6 +12,8 @@ var NextID = 111
 var NextUID = 9999
 var Step = 111
 var PostgresDBURL string
+var InputIDstoDel = make(chan string, 7)
+var WG sync.WaitGroup
 
 func InitFlags() {	
 	SrvAddressflag = flag.String("a", "127.0.0.1:8080", "SERVER_ADDRESS flag")

@@ -8,7 +8,6 @@ import (
 	"log"
 	"os"
 	"strconv"
-	"sync"
 
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -31,7 +30,7 @@ var Usr Userrecord
 var dbPath string
 var RAMonly, PGdbOpened, dbPathexists bool
 
-var onlyOnce sync.Once
+//var onlyOnce sync.Once
 
 var PGdb *pgxpool.Pool
 
@@ -77,6 +76,7 @@ func InitPGdb() {
 //----------------------------//
 	//urlExample := "postgres://postgres:1@localhost:5432/gotoschool"
     //os.Setenv("DATABASE_DSN", urlExample)
+	//initconfig.PostgresDBURL = urlExample
 	var DBLastURLID, DBLastUID string
 	PGdbOpened = false
 	if initconfig.PostgresDBURL != "" {
@@ -107,6 +107,9 @@ func InitPGdb() {
 					shortid character varying(10) ,
 					fullurl character varying(1000) ,
 					id integer NOT NULL DEFAULT nextval('urls_id_seq'::regclass),
+					uid character varying(10) DEFAULT 0,
+					active boolean,
+					uidint integer DEFAULT 0,
 					CONSTRAINT urls_pkey PRIMARY KEY (id)
 				);
 				ALTER TABLE public.urls ADD UNIQUE (fullurl)`)
@@ -129,6 +132,7 @@ func InitPGdb() {
 					uid character varying(10),
 					shortid character varying(10),
 					id integer NOT NULL DEFAULT nextval('users_id_seq'::regclass),
+					
 					CONSTRAINT users_pkey PRIMARY KEY (id)
 				)`)
 			if err != nil {
@@ -139,34 +143,49 @@ func InitPGdb() {
 			log.Println("DBLastURLID =" + DBLastURLID)
 			LastID, _ := strconv.Atoi(DBLastURLID)			
 			initconfig.NextID =LastID + initconfig.Step
-			log.Println(initconfig.NextID)
+			log.Printf("NextID= %v", initconfig.NextID)
 			if err != nil {
 				log.Println(err)
 			} 
 
-			err = PGdb.QueryRow(context.Background(), `select users.uid from users order by users.id desc limit 1`).Scan(&DBLastUID)
+			//err = PGdb.QueryRow(context.Background(), `select users.uid from users order by users.id desc limit 1`).Scan(&DBLastUID)
+			err = PGdb.QueryRow(context.Background(), `select urls.uid from urls order by urls.uidint desc limit 1`).Scan(&DBLastUID)
 			log.Println("DBLastUID =" + DBLastUID)
 			LastUID, _ := strconv.Atoi(DBLastUID)			
 			initconfig.NextUID = LastUID + initconfig.Step
-			log.Print(initconfig.NextUID)
+			log.Printf("NextUID= %v", initconfig.NextUID)
 			if err != nil {
 				log.Println(err)
 			} 
 			
 			PGdbOpened = true
-			log.Println("PGdbOpened = TRUE") 
+			log.Println("PGdbOpened = TRUE") 	
 		}
 	} else {
 		log.Println("PGdbOpened = FALSE")
 	}
 	
 }
+func DelURLIDs(ch chan string){
+	log.Println("Starting async 'delete URLIDs for user' routine")
+  
+		//time.Sleep(time.Second * 1)
+        fmt.Printf("Length of channel Input is %v and capacity of channel c is %v\n", len(ch), cap(ch))
+		if len(ch)>0{
+			for shortURLID := range ch {
+				fmt.Printf("Length of channel Input is %v\n", len(ch))
+				S.deleteShortURLfromuser(shortURLID)
+			}
+			//close(ch)
+		}
+	
+}
 
 func SetdbType(){
 	log.Println("TRY SetdbType")
-	log.Println(PGdbOpened)
-	log.Println(dbPathexists)
-	log.Println(RAMonly)
+	log.Printf("PGdbOpened= %v", PGdbOpened)
+	log.Printf("dbPathexists= %v", dbPathexists)
+	log.Printf("RAMonly= %v", RAMonly)
 	switch true {
 		case PGdbOpened:
 			log.Println("case PGdbOpened")
@@ -193,8 +212,9 @@ func SetdbType(){
 type storager interface{
     storeURL(fullURL string) (ShortURLID, status string)
 	storeShortURLtouser(userid, shortURLid string)
-    retrieveURL(id string) (FullURL string)
-	retrieveUserURLS(userid string) (output string, noURLs bool)
+	deleteShortURLfromuser(shortURLid string)
+    retrieveURL(id string) (FullURL string, Status string)
+	retrieveUserURLS(userid string) (output string, noURLs bool, UsrShortURLsonly []string)
 }
 
 func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord{
@@ -240,7 +260,7 @@ func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord{
 }
 
 func CheckPGdbConn() (connected bool){
-	onlyOnce.Do(Initdb)
+	//onlyOnce.Do(Initdb)
 	//defer PGdb.Close()
     err := PGdb.Ping(context.Background())
     if err != nil {
@@ -253,20 +273,29 @@ func CheckPGdbConn() (connected bool){
 }
 
 func AssignShortURLtouser(userid, shortURLid string){
-	onlyOnce.Do(Initdb)
+	//onlyOnce.Do(Initdb)
 	S.storeShortURLtouser(userid, shortURLid)
 }
 
-func GetuserURLS(userid string) (output string, noURLs bool){
+func DeleteShortURLfromuser(ch chan string){
+	//onlyOnce.Do(Initdb)
+
+	go DelURLIDs(ch)
+
+}
+
+func GetuserURLS(userid string) (output string, noURLs bool, arrayUserURLs []string){
 	return S.retrieveUserURLS(userid)
 }
 
 func Storerecord(fullURL string) (ShortURLID, Status string){
-	onlyOnce.Do(Initdb)
+	//onlyOnce.Do(Initdb)
 	return S.storeURL(fullURL)
 }
 
-func Getrecord(id string) string {
-	onlyOnce.Do(Initdb)
+
+
+func Getrecord(id string) (FullURL, Status string) {
+	//onlyOnce.Do(Initdb)
 	return S.retrieveURL(id)
 }
