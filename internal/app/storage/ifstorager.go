@@ -121,7 +121,7 @@ func containsinStr(s string, e string) bool {
 }
 
 func (conn connectRAM) retrieveURL(id string) (FullURL string, Status string) {
-	log.Debug().Msg("RAM retrieveURL")
+	log.Debug().Msgf("RAM retrieveURL ID=%v", id)
 	FullURL = URL[id]
 	withAsterisk := containsinStr(FullURL , "*")
 	log.Printf("withAsterisk = %v", withAsterisk)
@@ -143,10 +143,12 @@ func (conn connectRAM) retrieveURL(id string) (FullURL string, Status string) {
 	*/
 }
 func (conn connectFileDB) retrieveURL(id string) (FullURL string, Status string) {
+	log.Debug().Msgf("FileDB retrieveURL ID=%v", id)
 	FullURL = URL[id]
 	return FullURL, "307"
 }
 func (conn connectPGDB) retrieveURL(id string) (FullURL string, Status string) {
+	log.Debug().Msgf("PGDB retrieveURL ID=%v", id)
 	var activelink bool
 	err := PGdb.QueryRow(context.Background(), "SELECT urls.fullurl, urls.active FROM urls where shortid=$1", id).Scan(&FullURL, &activelink)
 	if err != nil {
