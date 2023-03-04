@@ -13,7 +13,6 @@ import (
 	"path"
 	"strconv"
 	"sync"
-	"time"
 
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 	"github.com/Aleale16/urlshrinker/internal/app/storage"
@@ -21,7 +20,7 @@ import (
 var mu sync.Mutex
 
 func StatusOKHandler(w http.ResponseWriter, r *http.Request) {
-	var wg sync.WaitGroup
+	//var wg sync.WaitGroup
 	
 	// A very simple health check.
 	w.WriteHeader(http.StatusOK)
@@ -30,7 +29,7 @@ func StatusOKHandler(w http.ResponseWriter, r *http.Request) {
 	// In the future we could report back on the status of our DB, or our cache
 	// (e.g. Redis) by performing a simple PING, and include them in the response.
 	io.WriteString(w, `{"alive": true}`)
-	n := 3
+/*	n := 3
 	wg.Add(n)
 	go func() {
 		for i := 0; i < n; i++{
@@ -39,7 +38,7 @@ func StatusOKHandler(w http.ResponseWriter, r *http.Request) {
 			wg.Done()
 		}
 	}()	
-	wg.Wait()
+	wg.Wait()*/
 }
 /* Наверное, больше не пригодится, если и дальше использовать Chi
 func ReqHandler(w http.ResponseWriter, r *http.Request) {
@@ -109,7 +108,7 @@ func checkSign(msg string) (validSign bool, val string){
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println("data=" + string(data))
+	//fmt.Println("data=" + string(data))
 	id = string(data[sha256.Size:])
 	val = id
 	//id = binary.BigEndian.Uint32(data[:4])
@@ -118,11 +117,38 @@ func checkSign(msg string) (validSign bool, val string){
 	h.Write(data[sha256.Size:])
 	sign = h.Sum(nil) 
 	if hmac.Equal(sign, data[:sha256.Size]) {
-		fmt.Println("Подпись подлинная. ID:", id)
+		//fmt.Println("Подпись подлинная. ID:", id)
 		validSign = true
-	} else {
+	} /*else {
 		fmt.Println("Подпись неверна. Где-то ошибка! ID:", id)
-	}	
+	}	*/
+	return validSign, val
+}
+
+func checkSignOptimized(msg string) (validSign bool, val string){
+	var key = []byte("secret key")
+	var (
+		data []byte // декодированное сообщение с подписью
+		id   string // значение идентификатора
+		err  error
+		sign []byte // HMAC-подпись от идентификатора
+	)
+	validSign = false
+	data, err = hex.DecodeString(msg)
+	if err != nil {
+		panic(err)
+	}
+	//fmt.Println("data=" + string(data))
+	id = string(data[sha256.Size:])
+	val = id
+	//id = binary.BigEndian.Uint32(data[:4])
+	//id = binary.BigEndian.Uint32(data[sha256.Size:])
+	h := hmac.New(sha256.New, key)
+	h.Write(data[sha256.Size:])
+	sign = h.Sum(nil) 
+
+	validSign = hmac.Equal(sign, data[:sha256.Size])
+
 	return validSign, val
 }
 

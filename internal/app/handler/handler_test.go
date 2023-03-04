@@ -10,6 +10,19 @@ import (
 	"github.com/Aleale16/urlshrinker/internal/app/storage"
 )
 
+func BenchmarkServerstart(b *testing.B) {
+	b.Run("variant01", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			checkSign("982c62b2730d5ffe217d69e8e82fd1e0aa4e0154a80323ea20678189b14b1e1d75736572333333")
+		}
+	})
+	b.Run("variant02", func(b *testing.B) {
+		for i := 0; i < b.N; i++ {
+			checkSignOptimized("982c62b2730d5ffe217d69e8e82fd1e0aa4e0154a80323ea20678189b14b1e1d75736572333333")
+		}
+	})
+} 
+
 func TestHealthCheckHandler(t *testing.T) {
 	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
 	// pass 'nil' as the third parameter.
