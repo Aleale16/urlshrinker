@@ -119,6 +119,7 @@ func containsinStr(s string, e string) bool {
     }
     return false
 }
+
 func (conn connectRAM) retrieveURL(id string) (FullURL string, Status string) {
 	FullURL = URL[id]
 	withAsterisk := containsinStr(FullURL , "*")
