@@ -3,19 +3,20 @@ package storage
 import (
 	"context"
 	"encoding/json"
-	"log"
+
 	"os"
 	"strconv"
 	"sync"
 
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
+	"github.com/rs/zerolog/log"
 )
 
 var mu sync.Mutex
 
 func (conn connectRAM) storeURL(fullURL string) (ShortURLID, Status string) {
 	//onlyOnce.Do(Initdb)
-	log.Println("Running store connectRAM")
+	log.Info().Msg("Running store connectRAM")
 	id := strconv.Itoa(initconfig.NextID)
 	URL[id] = fullURL
 	initconfig.NextID = initconfig.NextID + initconfig.Step
@@ -56,7 +57,7 @@ func (conn connectPGDB) storeURL(fullURL string) (ShortURLID, Status string) {
 			var ShortID string
 			err := PGdb.QueryRow(context.Background(), "SELECT urls.shortid FROM urls where fullurl=$1", fullURL).Scan(&ShortID)
 			if err != nil {
-				log.Println(err)
+				log.Info().Msg(err.Error())
 			}
 			log.Printf("Value %q, already exist in DB, rows affected =%v, ShortURL id = %q", fullURL, result.RowsAffected(), ShortID)
 			id = ShortID
@@ -68,7 +69,7 @@ func (conn connectPGDB) storeURL(fullURL string) (ShortURLID, Status string) {
 			mu.Unlock()
 		}
 	} else {
-		log.Println(err)
+		log.Info().Msg(err.Error())
 	}
 	return id, Status
 }
@@ -76,8 +77,7 @@ func (conn connectPGDB) storeURL(fullURL string) (ShortURLID, Status string) {
 func (conn connectRAM) storeShortURLtouser(userid, shortURLid string){
 	uid := userid
 	Usr[uid] = append(Usr[uid], shortURLid)
-	log.Println("AssignShortURLtouser: " + string(uid)+ " shortURLid= " )	
-	log.Println(Usr[uid])
+	log.Info().Msgf("AssignShortURLtouser: " + string(uid)+ " shortURLid= %v", Usr[uid] )	
 } 
 func (conn connectPGDB) storeShortURLtouser(userid, shortURLid string){
 	uid := userid
@@ -89,7 +89,7 @@ func (conn connectPGDB) storeShortURLtouser(userid, shortURLid string){
 		log.Printf("User %v was created, URL %v assigned", uid, shortURLid)
 	} else {
 		log.Printf("User %v was not created (inserted), URL %v NOT assigned!", uid, shortURLid)
-		log.Println(err)
+		log.Info().Msg(err.Error())
 	}
 } 
 func (conn connectFileDB) storeShortURLtouser(userid, shortURLid string){
@@ -105,7 +105,7 @@ func (conn connectPGDB) deleteShortURLfromuser(shortURLid string){
 	if err == nil {
 		log.Printf("URL %v was disabled", shortURLid)
 	} else {
-		log.Println(err)
+		log.Info().Msg(err.Error())
 	}
 } 
 func (conn connectFileDB) deleteShortURLfromuser(shortURLid string){
@@ -121,6 +121,7 @@ func containsinStr(s string, e string) bool {
 }
 
 func (conn connectRAM) retrieveURL(id string) (FullURL string, Status string) {
+	log.Debug().Msg("RAM retrieveURL")
 	FullURL = URL[id]
 	withAsterisk := containsinStr(FullURL , "*")
 	log.Printf("withAsterisk = %v", withAsterisk)
@@ -166,7 +167,7 @@ func (conn connectRAM) retrieveUserURLS (userid string) (output string, noURLs b
 	UsrShortURLs := Usr[userid]
 	if len(UsrShortURLs)>0{
 		for _, v := range UsrShortURLs {	
-				log.Println(v)
+				log.Info().Msg(v)
 				//Так нормально заполнять JSON перед маршаллингом?
 				UsrURLJSON = append(UsrURLJSON, UsrURLJSONrecord{
 					//ShortURL:	initconfig.BaseURL + "/?id=" + v,
@@ -181,11 +182,11 @@ func (conn connectRAM) retrieveUserURLS (userid string) (output string, noURLs b
 		//JSONdata = append(JSONdata, '\n')
 		//URL[id] = string(JSONdata)
 		JSONresult = JSONdata
-		//log.Println("JSONresult= ")		
-		//log.Println(JSONresult)
+		//log.Info().Msg("JSONresult= ")		
+		//log.Info().Msg(JSONresult)
 		shortURLpathJSONBz, err := json.MarshalIndent(&UsrURLJSON, "", "  ")
 		if err != nil {
-			panic(err)
+			panic(err.Error())
 		}		
 		log.Printf("retrieveUserURLS JSONresult= %v", string(shortURLpathJSONBz))		
 		noURLs = false
@@ -216,7 +217,7 @@ func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs 
 	for rows.Next() {
 		err := rows.Scan(&UID, &shortID, &FullURL)
 		if err != nil {
-			log.Fatal(err)
+			log.Fatal().Msg(err.Error())
 		}
 		UsrShortURLs = append(UsrShortURLs, shortID)
 		UsrURLJSON = append(UsrURLJSON, UsrURLJSONrecord{
@@ -232,11 +233,11 @@ func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs 
 	//JSONdata = append(JSONdata, '\n')
 	//URL[id] = string(JSONdata)
 	JSONresult = JSONdata
-	//log.Println("JSONresult= ")		
-	//log.Println(JSONresult)		
+	//log.Info().Msg("JSONresult= ")		
+	//log.Info().Msg(JSONresult)		
 	shortURLpathJSONBz, err := json.MarshalIndent(&UsrURLJSON, "", "  ")
 	if err != nil {
-		panic(err)
+		panic(err.Error())
 	}		
 	log.Printf("JSONresult= %v", string(shortURLpathJSONBz))		
 	noURLs = false

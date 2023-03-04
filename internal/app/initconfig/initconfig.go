@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"sync"
+
+	"github.com/rs/zerolog"
 )
 var FileDBpath, BaseURL, SrvAddress string
 var SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag *string
@@ -24,6 +26,8 @@ func InitFlags() {
 	
 
 func SetinitVars() {
+
+	zerolog.SetGlobalLevel(zerolog.DebugLevel)
 
 	baseURLENV, baseURLexists := os.LookupEnv("BASE_URL")
 	srvAddressENV, srvAddressexists := os.LookupEnv("SERVER_ADDRESS")
