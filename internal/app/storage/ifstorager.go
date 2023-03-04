@@ -212,7 +212,6 @@ func (conn connectPGDB) retrieveUserURLS (userid string) (output string, noURLs 
 	}
 	// обязательно закрываем перед возвратом функции
 	defer rows.Close()
-
 	// пробегаем по всем записям
 	for rows.Next() {
 		err := rows.Scan(&UID, &shortID, &FullURL)
