@@ -3,7 +3,6 @@ package initconfig
 import (
 	"flag"
 	"fmt"
-
 	"os"
 	"sync"
 
