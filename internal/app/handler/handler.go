@@ -185,10 +185,10 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	record, Status := storage.Getrecord(q)	
 	//if record != "http://google.com/404" {
 		// устанавливаем заголовок Location	
-		
+		w.Header().Set("Location", record)
 		switch Status{
 			case "307": 
-				w.Header().Set("Location", record)
+				
 			// устанавливаем статус-код 307
 				w.WriteHeader(http.StatusTemporaryRedirect)
 			case "400": // устанавливаем статус-код 400
@@ -196,14 +196,14 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 			case "410": // устанавливаем статус-код 410
 				w.WriteHeader(http.StatusGone)
 		}
-		
+
 		/*// устанавливаем статус-код 307
 		w.WriteHeader(http.StatusTemporaryRedirect)*/
 	//} else {
 	//	http.Error(w, "Short URL with id=" + q + " not set", http.StatusBadRequest)
 	//}
 
-	fmt.Println("GET: / " + q + " Redirect to " + record + "http.Status=" + Status)
+	fmt.Println("GET: / " + q + " Redirect to " + record + " http.Status=" + Status)
 }
 
 func GetPingHandler(w http.ResponseWriter, r *http.Request) {
