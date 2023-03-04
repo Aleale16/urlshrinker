@@ -16,8 +16,10 @@ func main() {
 
 	flag.Parse()	
 
-	initconfig.SetinitVars()
+	initconfig.SetinitVars()	
 	
 	server.Start()
+
+
 	
 }

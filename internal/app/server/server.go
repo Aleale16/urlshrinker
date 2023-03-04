@@ -11,6 +11,8 @@ import (
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 	"github.com/Aleale16/urlshrinker/internal/app/storage"
 
+	//	_ "net/http/pprof" // подключаем пакет pprof
+
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
