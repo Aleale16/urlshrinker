@@ -291,7 +291,6 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/ {
 		return
 	}
 	log.Println(w, "body: %d", body)
-
 	uid := ""
 	fmt.Println(r.Cookie("userid"))
 	useridcookie, err := r.Cookie("userid")
