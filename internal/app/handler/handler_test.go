@@ -21,7 +21,7 @@ func BenchmarkServerstart(b *testing.B) {
 			checkSignOptimized("982c62b2730d5ffe217d69e8e82fd1e0aa4e0154a80323ea20678189b14b1e1d75736572333333")
 		}
 	})
-} 
+}
 
 func TestHealthCheckHandler(t *testing.T) {
 	// Create a request to pass to our handler. We don't have any query parameters for now, so we'll
@@ -57,7 +57,7 @@ func TestHealthCheckHandler(t *testing.T) {
 
 func TestReqHandlerPost(t *testing.T) {
 	storage.Initdb()
-	var body = []byte("https://ya.ru")	
+	var body = []byte("https://ya.ru")
 	//Описание тела запроса в JSON
 	//var body = []byte(`{"message": "mail.ru"}`)
 
@@ -67,7 +67,7 @@ func TestReqHandlerPost(t *testing.T) {
 
 	if err != nil {
 		t.Fatal(err)
-	}	
+	}
 	//reqpost.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
 
 	rr := httptest.NewRecorder()
@@ -90,23 +90,23 @@ func TestReqHandlerPost(t *testing.T) {
 
 	fmt.Println(reqpost.URL)
 	fmt.Println(rr.Body.String())
-	
+
 }
 
 func TestReqHandlerGet1(t *testing.T) {
-//Запрос существующего id
+	//Запрос существующего id
 	//reqget, err := http.NewRequest("GET", "/?id=7943", nil)
 	reqget, err := http.NewRequest("GET", "/111", nil)
 	if err != nil {
 		t.Fatal(err)
-	}	
+	}
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(GetHandler)
 	handler.ServeHTTP(rr, reqget)
 
 	// Check the status code is what we expect.
 	status := rr.Code
-	if  status != http.StatusTemporaryRedirect {
+	if status != http.StatusTemporaryRedirect {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusTemporaryRedirect)
 	}
@@ -116,27 +116,27 @@ func TestReqHandlerGet1(t *testing.T) {
 	header := rr.Header()
 	if header.Get("Location") == "" {
 		t.Errorf("handler returned unexpected header: got %v want %v",
-		header.Get("Location"), expected)
+			header.Get("Location"), expected)
 	}
 
 	fmt.Println(reqget.URL)
 	fmt.Println(status)
 	fmt.Println(header.Get("Location"))
-	
+
 }
 
 func TestReqHandlerGet2(t *testing.T) {
-//запрос несуществующего id
+	//запрос несуществующего id
 	//reqget, err := http.NewRequest("GET", "/?id=xxxx", nil)
 	reqget, err := http.NewRequest("GET", "/xxxx", nil)
 	if err != nil {
 		t.Fatal(err)
-	}	
+	}
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(GetHandler)
 	handler.ServeHTTP(rr, reqget)
 	status := rr.Code
-	if  status != http.StatusBadRequest {
+	if status != http.StatusBadRequest {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusBadRequest)
 	}
@@ -144,30 +144,30 @@ func TestReqHandlerGet2(t *testing.T) {
 	header := rr.Header()
 	if header.Get("Location") != expected {
 		t.Errorf("handler returned unexpected header: got %v want %v",
-		header.Get("Location"), expected)
+			header.Get("Location"), expected)
 	}
 
 	fmt.Println(reqget.URL)
 	fmt.Println(status)
 	fmt.Println(header.Get("Location"))
-	
+
 }
 
 func TestReqHandlerGet3(t *testing.T) {
-//id отсутствует
+	//id отсутствует
 	reqget, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
 		t.Fatal(err)
-	}	
+	}
 	rr := httptest.NewRecorder()
 	handler := http.HandlerFunc(GetHandler)
 	handler.ServeHTTP(rr, reqget)
 	status := rr.Code
-	if  status != http.StatusBadRequest {
+	if status != http.StatusBadRequest {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusBadRequest)
 	}
 	fmt.Println(reqget.URL)
 	fmt.Println(status)
-	
+
 }

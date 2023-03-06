@@ -17,13 +17,15 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 )
 
-/*type ServerConfig struct {
-	SrvAddress string `env:"SERVER_ADDRESS"`
-	BaseURL    string `env:"BASE_URL"`
-	fileDBpath    string `env:"FILE_STORAGE_PATH"`
-	User       string `env:"USERNAME"`
-}*/
-func Start(){
+/*
+	type ServerConfig struct {
+		SrvAddress string `env:"SERVER_ADDRESS"`
+		BaseURL    string `env:"BASE_URL"`
+		fileDBpath    string `env:"FILE_STORAGE_PATH"`
+		User       string `env:"USERNAME"`
+	}
+*/
+func Start() {
 	var onlyOnce sync.Once
 	//var SrvConfig ServerConfig
 	//var UserName string
@@ -37,7 +39,7 @@ func Start(){
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(middleware.Compress(5, "gzip"))
-	
+
 	r.Get("/{id}", handler.GetHandler)
 	r.Get("/api/user/urls", handler.GetUsrURLsHandler)
 	r.Get("/ping", handler.GetPingHandler)
@@ -48,42 +50,40 @@ func Start(){
 
 	r.Delete("/api/user/urls", handler.DeleteURLsHandler)
 
-	
 	r.Get("/health-check", handler.StatusOKHandler)
-
 
 	fmt.Println()
 	fmt.Println("Starting server...")
-/*	
-    err := env.Parse(&SrvConfig)
-    if err != nil {
-        log.Fatal(err)
-    }
+	/*
+	       err := env.Parse(&SrvConfig)
+	       if err != nil {
+	           log.Fatal(err)
+	       }
 
-    log.Println(SrvConfig)
+	       log.Println(SrvConfig)
 
-	if (SrvConfig.User=="") {
-		UserName = "Noname"
-		} else {
-			UserName = SrvConfig.User
-		}
-	log.Println("USERNAME: " + UserName)
-*/
-	if initconfig.BaseURL == ""{
+	   	if (SrvConfig.User=="") {
+	   		UserName = "Noname"
+	   		} else {
+	   			UserName = SrvConfig.User
+	   		}
+	   	log.Println("USERNAME: " + UserName)
+	*/
+	if initconfig.BaseURL == "" {
 		//нет ни переменной окружения ни флага
 		initconfig.BaseURL = "http://localhost:8080"
 		log.Print("BASE_URL: " + "Loaded default: " + initconfig.BaseURL)
 	}
 	log.Println("BASE_URL: " + initconfig.BaseURL)
 
-	if initconfig.FileDBpath == ""{
+	if initconfig.FileDBpath == "" {
 		//нет ни переменной окружения ни флага
 		log.Print("FILE_STORAGE_PATH: not set")
 	}
 
-	if initconfig.SrvAddress == ""{
+	if initconfig.SrvAddress == "" {
 		//нет ни переменной окружения ни флага
-		initconfig.SrvAddress ="localhost:8080" 
+		initconfig.SrvAddress = "localhost:8080"
 		log.Print("SERVER_ADDRESS: " + "Loaded default: " + initconfig.SrvAddress)
 	}
 
@@ -96,18 +96,12 @@ func Start(){
 
 	log.Fatal(http.ListenAndServe(initconfig.SrvAddress, r))
 
-			//os.Setenv("SERVER_ADDRESS", "localhost:8080")
-			//log.Print("SERVER_ADDRESS: "+"Loaded default: " + os.Getenv("SERVER_ADDRESS"))
-			
-			//log.Print("SERVER_ADDRESS: " + "Loaded env: " + os.Getenv("SERVER_ADDRESS"))
-			//log.Fatal(http.ListenAndServe(os.Getenv("SERVER_ADDRESS"), r))
-    
+	//os.Setenv("SERVER_ADDRESS", "localhost:8080")
+	//log.Print("SERVER_ADDRESS: "+"Loaded default: " + os.Getenv("SERVER_ADDRESS"))
 
+	//log.Print("SERVER_ADDRESS: " + "Loaded env: " + os.Getenv("SERVER_ADDRESS"))
+	//log.Fatal(http.ListenAndServe(os.Getenv("SERVER_ADDRESS"), r))
 
-
-
-
-	
 	/*http.HandleFunc("/health-check", handler.StatusOKHandler)
 
 	http.HandleFunc("/", handler.ReqHandler) //Мне так не нравится, хочется тип запроса обработать уже здесь.
@@ -120,5 +114,5 @@ func Start(){
 			//Handler: handler1,
 		}
 		server.ListenAndServe()*/
-		
+
 }
