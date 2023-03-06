@@ -1,3 +1,4 @@
+// package handler declares all handlers for service
 package handler
 
 import (
@@ -17,8 +18,11 @@ import (
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 	"github.com/Aleale16/urlshrinker/internal/app/storage"
 )
+
+//mu - controls globar vars increment (+1)
 var mu sync.Mutex
 
+//StatusOKHandler - the most important handler across the whole service. If shows if service alive as json {"alive": true}
 func StatusOKHandler(w http.ResponseWriter, r *http.Request) {
 	//var wg sync.WaitGroup
 	
@@ -51,7 +55,7 @@ func ReqHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.Method)
 }
 */
-
+// defineCookie - issue auth cookie if not exist and pass it via Authorisation header
 func defineCookie(w http.ResponseWriter, r *http.Request)(uid string){
 
 	var key = []byte("secret key")
@@ -68,6 +72,8 @@ func defineCookie(w http.ResponseWriter, r *http.Request)(uid string){
 	  dst := h.Sum(nil)
 
 	 //вот это вообще было не очевидно:! 
+	 //signedcookie -  consist of two pieces 
+	 //signedcookie := string(dst) + string(userid)
 	  signedcookie := string(dst) + string(userid)
   
 	  fmt.Printf("%x", dst)
