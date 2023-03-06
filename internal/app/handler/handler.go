@@ -344,7 +344,6 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/ {
 	w.Write([]byte(shortURLpath))
 
 	fmt.Println("POST: / " + string(body) + " return id= " + shortURLid)
-
 	//return shortURLpath
 }
 
