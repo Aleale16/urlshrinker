@@ -22,7 +22,7 @@ import (
 //mu - controls globar vars increment (+1)
 var mu sync.Mutex
 
-//StatusOKHandler - the most important handler across the whole service. If shows if service alive as json {"alive": true}
+//StatusOKHandler - the most important handler across the whole service. It shows if service alive as json {"alive": true}
 func StatusOKHandler(w http.ResponseWriter, r *http.Request) {
 	//var wg sync.WaitGroup
 	
