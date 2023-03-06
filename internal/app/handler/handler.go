@@ -55,7 +55,9 @@ func ReqHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r.Method)
 }
 */
-// defineCookie - issue auth cookie if not exist and pass it via Authorisation header
+
+//defineCookie - issue auth cookie if not exist and pass it via Authorisation header
+ //signedcookie := string(dst) + string(userid)
 func defineCookie(w http.ResponseWriter, r *http.Request)(uid string){
 
 	var key = []byte("secret key")
