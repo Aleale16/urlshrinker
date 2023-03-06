@@ -167,7 +167,6 @@ func TestReqHandlerGet3(t *testing.T) {
 		t.Errorf("handler returned wrong status code: got %v want %v",
 			status, http.StatusBadRequest)
 	}
-
 	fmt.Println(reqget.URL)
 	fmt.Println(status)
 	
