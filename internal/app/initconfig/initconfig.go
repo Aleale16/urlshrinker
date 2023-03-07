@@ -1,3 +1,4 @@
+// Package initconfig declares all global variables and init functions for service.
 package initconfig
 
 import (
@@ -10,15 +11,33 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-var FileDBpath, BaseURL, SrvAddress string
-var SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag *string
-var NextID = 111
-var NextUID = 9999
-var Step = 111
+// Variables using across the service.
+var (
+	// FileDBpath, BaseURL, SrvAddress - store database options.
+	FileDBpath, BaseURL, SrvAddress string
+	// SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag - store possible flags.
+	SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag *string
+)
+
+var (
+	// NextID - global shortID counter.
+	NextID = 111
+	// NextUID - global userID counter.
+	NextUID = 9999
+	// Step - global step
+	Step = 111
+)
+
+// PostgresDBURL - init database URL string.
 var PostgresDBURL string
+
+// InputIDstoDel - init channel with ids to delete.
 var InputIDstoDel = make(chan string, 7)
+
+// WG - init waitgroup.
 var WG sync.WaitGroup
 
+// InitFlags - init flags.
 func InitFlags() {
 	SrvAddressflag = flag.String("a", "127.0.0.1:8080", "SERVER_ADDRESS flag")
 	BaseURLflag = flag.String("b", "http://127.0.0.1:8080", "BASE_URL flag")
@@ -26,6 +45,7 @@ func InitFlags() {
 	FileDBpathflag = flag.String("f", "../../internal/app/storage/database.txt", "FILE_STORAGE_PATH flag")
 }
 
+// SetinitVars - init global vars according to ENV vars and flags passed.
 func SetinitVars() {
 
 	zerolog.SetGlobalLevel(zerolog.DebugLevel)
