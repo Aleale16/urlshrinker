@@ -244,8 +244,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("GET: / " + q + " Redirect to " + record + " http.Status=" + Status)
 }
 
-// GetPingHandler - checks DB connection
-// Deprecated: not used
+// GetPingHandler - checks DB connection. Not used.
 func GetPingHandler(w http.ResponseWriter, r *http.Request) {
 	// работаем с базой storage.PGdb
 	if storage.CheckPGdbConn() {
@@ -363,7 +362,8 @@ type resultData struct {
 	ShortURL string `json:"result"`
 }
 
-// ! POST /api/shorten PostJSONHandler - storing JSON fullURL, returning JSON shortID
+// ! POST /api/shorten 
+// PostJSONHandler - storing JSON fullURL, returning JSON shortID
 func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/ {
 	// читаем Body (Тело POST запроса)
 	b, err := io.ReadAll(r.Body)
@@ -569,7 +569,7 @@ func PostJSONbatchHandler(w http.ResponseWriter, r *http.Request) /*(shortURL st
 
 	var inputbatchJSON []inputbatchData
 	var resultbatchJSON []resultbatchData
-	var JSONresult []byte
+	var resultJSON []byte
 	err = json.Unmarshal(b, &inputbatchJSON)
 	if err != nil {
 		panic(err)
@@ -588,16 +588,16 @@ func PostJSONbatchHandler(w http.ResponseWriter, r *http.Request) /*(shortURL st
 			})
 		}
 	}
-	JSONdata, err := json.Marshal(&resultbatchJSON)
+	dataJSON, err := json.Marshal(&resultbatchJSON)
 	if err != nil {
 		log.Println(err.Error())
 	}
 
-	JSONresult = JSONdata
+	resultJSON = dataJSON
 	w.Header().Set("Content-Type", "application/json")
 	// устанавливаем статус-код 201
 	w.WriteHeader(http.StatusCreated)
 	//типа return:
-	w.Write(JSONresult)
-	fmt.Println("POST: " + string(b) + " return JSON= " + string(JSONresult))
+	w.Write(resultJSON)
+	fmt.Println("POST: " + string(b) + " return JSON= " + string(resultJSON))
 }
