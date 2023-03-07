@@ -255,7 +255,7 @@ func GetPingHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("GetPingHandler: finished")
 }
 
-// ! POST / 
+// ! POST /
 // PostHandler - storing plaintext or compressed fullURL, returning shortID.
 func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/ {
 	authorizationHeader := r.Header.Get("Authorization")
