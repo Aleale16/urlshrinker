@@ -19,7 +19,6 @@ var (
 	SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag *string
 )
 
-
 // PostgresDBURL - init database URL string.
 var PostgresDBURL string
 
