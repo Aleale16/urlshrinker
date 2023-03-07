@@ -19,14 +19,6 @@ var (
 	SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag *string
 )
 
-var (
-	// NextID - global shortID counter.
-	NextID = 111
-	// NextUID - global userID counter.
-	NextUID = 9999
-	// Step - global step
-	Step = 111
-)
 
 // PostgresDBURL - init database URL string.
 var PostgresDBURL string
