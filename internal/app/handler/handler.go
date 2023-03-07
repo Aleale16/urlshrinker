@@ -1,4 +1,4 @@
-// package handler declares all handlers for service
+// Package handler declares all handlers for service.
 package handler
 
 import (
@@ -19,10 +19,10 @@ import (
 	"github.com/Aleale16/urlshrinker/internal/app/storage"
 )
 
-// mu - controls globar vars increment (+1)
+// mu - controls globar vars increment (+1).
 var mu sync.Mutex
 
-// StatusOKHandler - the most important handler across the whole service. It shows if service alive as json {"alive": true}
+// StatusOKHandler - the most important handler across the whole service. It shows if service alive as json {"alive": true}.
 func StatusOKHandler(w http.ResponseWriter, r *http.Request) {
 	//var wg sync.WaitGroup
 
@@ -57,8 +57,8 @@ func ReqHandler(w http.ResponseWriter, r *http.Request) {
 }
 */
 
-// defineCookie - issue auth cookie if not exist and pass it via Authorisation header
-// signedcookie := string(dst) + string(userid)
+// defineCookie - issue auth cookie if not exist and pass it via Authorisation header.
+// signedcookie := string(dst) + string(userid).
 func defineCookie(w http.ResponseWriter, r *http.Request) (uid string) {
 
 	var key = []byte("secret key")
@@ -104,7 +104,7 @@ func defineCookie(w http.ResponseWriter, r *http.Request) (uid string) {
 	return string(userid)
 }
 
-// checkSign - checks is sinature is valid
+// checkSign - checks is sinature is valid.
 func checkSign(msg string) (validSign bool, val string) {
 	var key = []byte("secret key")
 	var (
@@ -135,7 +135,7 @@ func checkSign(msg string) (validSign bool, val string) {
 	return validSign, val
 }
 
-// checkSignOptimized - created to compare perfomance in pprof
+// checkSignOptimized - created to compare perfomance in pprof.
 func checkSignOptimized(msg string) (validSign bool, val string) {
 	var key = []byte("secret key")
 	var (
@@ -163,7 +163,7 @@ func checkSignOptimized(msg string) (validSign bool, val string) {
 	return validSign, val
 }
 
-// GetUsrURLsHandler - GETs user's fullURLs by Authorization token
+// GetUsrURLsHandler - GETs user's fullURLs by Authorization token.
 func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
 	//То, что автотест ожидает, а затем отправляет токен в поле заголовка Authorization можно было узнать только в результате просмотра текста автотеста!
 	authorizationHeader := r.Header.Get("Authorization")
@@ -212,7 +212,7 @@ func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("GET: /api/user/urls ")
 }
 
-// GetHandler - GETs fullURL by its shortID for any user
+// GetHandler - GETs fullURL by its shortID for any user.
 func GetHandler(w http.ResponseWriter, r *http.Request) {
 	//q := r.URL.Query().Get("id")
 	q := path.Base(r.URL.String())
@@ -255,7 +255,8 @@ func GetPingHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("GetPingHandler: finished")
 }
 
-// ! POST / PostHandler - storing plaintext or compressed fullURL, returning shortID
+// ! POST / 
+// PostHandler - storing plaintext or compressed fullURL, returning shortID.
 func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/ {
 	authorizationHeader := r.Header.Get("Authorization")
 	fmt.Println("authorizationHeader=" + authorizationHeader)
@@ -363,7 +364,7 @@ type resultData struct {
 }
 
 // ! POST /api/shorten
-// PostJSONHandler - storing JSON fullURL, returning JSON shortID
+// PostJSONHandler - storing JSON fullURL, returning JSON shortID.
 func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/ {
 	// читаем Body (Тело POST запроса)
 	b, err := io.ReadAll(r.Body)
@@ -459,7 +460,7 @@ func contains(s []string, e string) bool {
 	return false
 }
 
-// DeleteURLsHandler - deletes fullURLs by JSON with shortURLs
+// DeleteURLsHandler - deletes fullURLs by JSON with shortURLs.
 func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 	var listURLids []string
 	var InvalidURLIDexists, validSign bool
