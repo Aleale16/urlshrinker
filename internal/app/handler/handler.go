@@ -104,6 +104,7 @@ func defineCookie(w http.ResponseWriter, r *http.Request) (uid string) {
 	return string(userid)
 }
 
+// checkSign - checks is sinature is valid
 func checkSign(msg string) (validSign bool, val string) {
 	var key = []byte("secret key")
 	var (
@@ -134,6 +135,7 @@ func checkSign(msg string) (validSign bool, val string) {
 	return validSign, val
 }
 
+// checkSignOptimized - created to compare perfomance in pprof
 func checkSignOptimized(msg string) (validSign bool, val string) {
 	var key = []byte("secret key")
 	var (
@@ -161,6 +163,7 @@ func checkSignOptimized(msg string) (validSign bool, val string) {
 	return validSign, val
 }
 
+// GetUsrURLsHandler - GETs user's fullURLs by Authorization token
 func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
 	//То, что автотест ожидает, а затем отправляет токен в поле заголовка Authorization можно было узнать только в результате просмотра текста автотеста!
 	authorizationHeader := r.Header.Get("Authorization")
@@ -209,6 +212,7 @@ func GetUsrURLsHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("GET: /api/user/urls ")
 }
 
+// GetHandler - GETs fullURL by its shortID for any user
 func GetHandler(w http.ResponseWriter, r *http.Request) {
 	//q := r.URL.Query().Get("id")
 	q := path.Base(r.URL.String())
@@ -223,7 +227,6 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Location", record)
 	switch Status {
 	case "307":
-
 		// устанавливаем статус-код 307
 		w.WriteHeader(http.StatusTemporaryRedirect)
 	case "400": // устанавливаем статус-код 400
@@ -241,6 +244,8 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("GET: / " + q + " Redirect to " + record + " http.Status=" + Status)
 }
 
+// GetPingHandler - checks DB connection
+// Deprecated: not used
 func GetPingHandler(w http.ResponseWriter, r *http.Request) {
 	// работаем с базой storage.PGdb
 	if storage.CheckPGdbConn() {
@@ -251,7 +256,7 @@ func GetPingHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("GetPingHandler: finished")
 }
 
-// ! POST /
+// ! POST / PostHandler - storing plaintext or compressed fullURL, returning shortID
 func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/ {
 	authorizationHeader := r.Header.Get("Authorization")
 	fmt.Println("authorizationHeader=" + authorizationHeader)
@@ -358,7 +363,7 @@ type resultData struct {
 	ShortURL string `json:"result"`
 }
 
-// ! POST /api/shorten
+// ! POST /api/shorten PostJSONHandler - storing JSON fullURL, returning JSON shortID
 func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/ {
 	// читаем Body (Тело POST запроса)
 	b, err := io.ReadAll(r.Body)
@@ -454,6 +459,7 @@ func contains(s []string, e string) bool {
 	return false
 }
 
+// DeleteURLsHandler - deletes fullURLs by JSON with shortURLs
 func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 	var listURLids []string
 	var InvalidURLIDexists, validSign bool
@@ -548,6 +554,7 @@ type resultbatchData struct {
 	ShortURL string `json:"short_url"`
 }
 
+// PostJSONbatchHandler - stores JSON fullURLS, returns JSON shortIDs.
 func PostJSONbatchHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/ {
 	// читаем Body (Тело POST запроса)
 	b, err := io.ReadAll(r.Body)
