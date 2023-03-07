@@ -362,7 +362,7 @@ type resultData struct {
 	ShortURL string `json:"result"`
 }
 
-// ! POST /api/shorten 
+// ! POST /api/shorten
 // PostJSONHandler - storing JSON fullURL, returning JSON shortID
 func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/ {
 	// читаем Body (Тело POST запроса)
