@@ -39,7 +39,7 @@ var WG sync.WaitGroup
 
 // InitFlags - init flags.
 func InitFlags() {
-	
+
 	SrvAddressflag = flag.String("a", "127.0.0.1:8080", "SERVER_ADDRESS flag")
 	BaseURLflag = flag.String("b", "http://127.0.0.1:8080", "BASE_URL flag")
 	PostgresDBURLflag = flag.String("d", "postgres://postgres:1@localhost:5432/gotoschool", "DATABASE_DSN flag")
