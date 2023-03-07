@@ -61,6 +61,7 @@ func ReqHandler(w http.ResponseWriter, r *http.Request) {
 // signedcookie := string(dst) + string(userid).
 func defineCookie(w http.ResponseWriter, r *http.Request) (uid string) {
 
+	// key - set secret key.
 	var key = []byte("secret key")
 	//userid := []byte(strconv.Itoa(rand.Intn(9999)))
 	//userid := []byte("8888")
@@ -221,11 +222,11 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "The query parameter is missing", http.StatusBadRequest)
 		return
 	}
-	record, Status := storage.Getrecord(q)
+	record, status := storage.Getrecord(q)
 	//if record != "http://google.com/404" {
 	// устанавливаем заголовок Location
 	w.Header().Set("Location", record)
-	switch Status {
+	switch status {
 	case "307":
 		// устанавливаем статус-код 307
 		w.WriteHeader(http.StatusTemporaryRedirect)
@@ -241,7 +242,7 @@ func GetHandler(w http.ResponseWriter, r *http.Request) {
 	//	http.Error(w, "Short URL with id=" + q + " not set", http.StatusBadRequest)
 	//}
 
-	fmt.Println("GET: / " + q + " Redirect to " + record + " http.Status=" + Status)
+	fmt.Println("GET: / " + q + " Redirect to " + record + " http.Status=" + status)
 }
 
 // GetPingHandler - checks DB connection. Not used.
@@ -271,7 +272,10 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/ {
 	*/
 	// обработаем ситуацию, если на вход может прийти сжатое содержимое
 	// переменная reader будет равна r.Body или *gzip.Reader
+
 	var reader io.Reader
+
+	// authorization, useridcookieVal - stores auth and cookie.
 	var authorization, useridcookieVal string
 	if r.Header.Get("Content-Encoding") == "gzip" {
 		w.Header().Set("Accept-Encoding", "gzip")
@@ -324,7 +328,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/ {
 
 	//w.Write([]byte(useridcookie.Value))
 
-	shortURLid, Status := storage.Storerecord(string(body))
+	shortURLid, status := storage.Storerecord(string(body))
 	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
 	//shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid
 	//shortURLpath := BaseURL + "/?id="+ shortURLid Как сюда передать переменную из server.go?
@@ -333,7 +337,7 @@ func PostHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)*/ {
 	shortURLpath := initconfig.BaseURL + "/" + shortURLid
 
 	//w.Header().Set("Content-Encoding", "gzip, deflate, br")
-	if Status == "StatusConflict" {
+	if status == "StatusConflict" {
 		// устанавливаем статус-код 409
 		w.WriteHeader(http.StatusConflict)
 	} else {
@@ -381,7 +385,11 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 	//}
 	log.Println("Content-Encoding from JSON req: " + r.Header.Get("Content-Encoding"))
 
-	var postJSON inputData
+	// Variables for JSON processing.
+	var (
+		postJSON         inputData
+		shortURLpathJSON resultData
+	)
 	err = json.Unmarshal(b, &postJSON)
 	if err != nil {
 		panic(err)
@@ -389,17 +397,16 @@ func PostJSONHandler(w http.ResponseWriter, r *http.Request) /*(shortURL string)
 	//отладка что было в поле url в POST запросе
 	log.Println(postJSON.URL)
 
-	shortURLid, Status := storage.Storerecord(string(postJSON.URL))
+	shortURLid, status := storage.Storerecord(string(postJSON.URL))
 	//shortURLpath := "http://localhost:8080/?id="+ shortURLid
 	//shortURLpath := os.Getenv("BASE_URL") + "/?id="+ shortURLid
 	//shortURLpath := initconfig.BaseURL + "/?id="+ shortURLid
 	shortURLpath := initconfig.BaseURL + "/" + shortURLid
 
-	var shortURLpathJSON resultData
 	shortURLpathJSON.ShortURL = shortURLpath
 
 	w.Header().Set("Content-Type", "application/json")
-	if Status == "StatusConflict" {
+	if status == "StatusConflict" {
 		// устанавливаем статус-код 409
 		w.WriteHeader(http.StatusConflict)
 	} else {
@@ -462,9 +469,12 @@ func contains(s []string, e string) bool {
 
 // DeleteURLsHandler - deletes fullURLs by JSON with shortURLs.
 func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
-	var listURLids []string
-	var InvalidURLIDexists, validSign bool
-	var id string
+	// Vars for delete process.
+	var (
+		listURLids                    []string
+		invalidURLIDexists, validSign bool
+		id                            string
+	)
 	//var IDstoDel = make(chan string, 7)
 	//storage.DeleteShortURLfromuser()
 
@@ -510,15 +520,15 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 			userURLS, noURLs, arrayUserURLs := storage.GetuserURLS(id)
 
 			if !noURLs && len(userURLS) >= len(listURLids) {
-				InvalidURLIDexists = false
+				invalidURLIDexists = false
 				for _, v := range listURLids {
-					if !InvalidURLIDexists {
+					if !invalidURLIDexists {
 						if !contains(arrayUserURLs, v) {
-							InvalidURLIDexists = true
+							invalidURLIDexists = true
 						}
 					}
 				}
-				if !InvalidURLIDexists {
+				if !invalidURLIDexists {
 					IDstoDel := getInputChan(listURLids)
 					// устанавливаем статус-код 202
 					w.WriteHeader(http.StatusAccepted)
@@ -528,15 +538,15 @@ func DeleteURLsHandler(w http.ResponseWriter, r *http.Request) {
 					log.Printf("ShortURLs %v DECLINED to delete for user %v", listURLids, id)
 				}
 			} else {
-				InvalidURLIDexists = true
+				invalidURLIDexists = true
 				log.Println("No (invalid) ShortURLs to delete for user")
 			}
 		} else {
-			InvalidURLIDexists = true
+			invalidURLIDexists = true
 			log.Println("No (invalid or empty SIGN) ShortURLs to delete for user")
 		}
 	} else {
-		InvalidURLIDexists = true
+		invalidURLIDexists = true
 		log.Println("No (EMPTY LIST) ShortURLs to delete for user")
 	}
 	fmt.Println("DELETE: " + string(b))
@@ -568,9 +578,12 @@ func PostJSONbatchHandler(w http.ResponseWriter, r *http.Request) /*(shortURL st
 	log.Println("PostJSONHandler body: " + string(b))
 	log.Println("Content-Encoding from batch req: " + r.Header.Get("Content-Encoding"))
 
-	var inputbatchJSON []inputbatchData
-	var resultbatchJSON []resultbatchData
-	var resultJSON []byte
+	// Variables for JSON processing.
+	var (
+		inputbatchJSON  []inputbatchData
+		resultbatchJSON []resultbatchData
+		resultJSON      []byte
+	)
 	err = json.Unmarshal(b, &inputbatchJSON)
 	if err != nil {
 		panic(err)

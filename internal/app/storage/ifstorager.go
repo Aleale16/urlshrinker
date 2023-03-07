@@ -15,6 +15,7 @@ import (
 
 var mu sync.Mutex
 
+// storeURL - store URL if connectRAM.
 func (conn connectRAM) storeURL(fullURL string) (ShortURLID, Status string) {
 	//onlyOnce.Do(Initdb)
 	log.Info().Msg("Running store connectRAM")
@@ -24,6 +25,7 @@ func (conn connectRAM) storeURL(fullURL string) (ShortURLID, Status string) {
 	return id, ""
 }
 
+// storeURL - store URL if connectFileDB.
 func (conn connectFileDB) storeURL(fullURL string) (ShortURLID, Status string) {
 	//onlyOnce.Do(Initdb)
 	id := strconv.Itoa(initconfig.NextID)
@@ -49,12 +51,14 @@ func (conn connectFileDB) storeURL(fullURL string) (ShortURLID, Status string) {
 	return id, ""
 }
 
+// storeURL - store URL if connectPGDB.
 func (conn connectPGDB) storeURL(fullURL string) (ShortURLID, Status string) {
 	//onlyOnce.Do(Initdb)
 	id := strconv.Itoa(initconfig.NextID)
 	result, err := PGdb.Exec(context.Background(), `insert into urls(shortid, fullurl, active) values ($1, $2, $3) on conflict (fullurl) DO NOTHING`, id, fullURL, true)
 	if err == nil {
 		if result.RowsAffected() == 0 {
+			// ShortID load from request
 			var ShortID string
 			err := PGdb.QueryRow(context.Background(), "SELECT urls.shortid FROM urls where fullurl=$1", fullURL).Scan(&ShortID)
 			if err != nil {
@@ -75,11 +79,14 @@ func (conn connectPGDB) storeURL(fullURL string) (ShortURLID, Status string) {
 	return id, Status
 }
 
+// storeShortURLtouser - store ShortURL to user if connectRAM.
 func (conn connectRAM) storeShortURLtouser(userid, shortURLid string) {
 	uid := userid
 	Usr[uid] = append(Usr[uid], shortURLid)
 	log.Info().Msgf("AssignShortURLtouser: "+string(uid)+" shortURLid= %v", Usr[uid])
 }
+
+// storeShortURLtouser - store ShortURL to user if connectPGDB.
 func (conn connectPGDB) storeShortURLtouser(userid, shortURLid string) {
 	uid := userid
 	uidint, _ := strconv.Atoi(userid)
@@ -93,13 +100,19 @@ func (conn connectPGDB) storeShortURLtouser(userid, shortURLid string) {
 		log.Info().Msg(err.Error())
 	}
 }
+
+// storeShortURLtouser - store ShortURL to user if connectFileDB.
+// Deprecated: not required.
 func (conn connectFileDB) storeShortURLtouser(userid, shortURLid string) {
 }
 
+// deleteShortURLfromuser - delete ShortURL to user if connectRAM.
 func (conn connectRAM) deleteShortURLfromuser(shortURLid string) {
 	URL[shortURLid] = "*" + URL[shortURLid]
 	log.Printf("URL %v was disabled with *", shortURLid)
 }
+
+// deleteShortURLfromuser - delete ShortURL to user if connectPGDB.
 func (conn connectPGDB) deleteShortURLfromuser(shortURLid string) {
 	//uid := userid
 	_, err := PGdb.Exec(context.Background(), `update urls set active = false where shortid=$1`, shortURLid)
@@ -109,9 +122,12 @@ func (conn connectPGDB) deleteShortURLfromuser(shortURLid string) {
 		log.Info().Msg(err.Error())
 	}
 }
+
+// deleteShortURLfromuser - delete ShortURL to user if connectFileDB.
 func (conn connectFileDB) deleteShortURLfromuser(shortURLid string) {
 }
 
+// containsinStr - check if Substring exist in String.
 func containsinStr(s string, e string) bool {
 	for _, a := range s {
 		if string(a) == e {
@@ -121,6 +137,7 @@ func containsinStr(s string, e string) bool {
 	return false
 }
 
+// retrieveURL - retrieve URL if connectRAM
 func (conn connectRAM) retrieveURL(id string) (FullURL string, Status string) {
 	log.Debug().Msgf("RAM retrieveURL ID=%v", id)
 	FullURL = URL[id]
@@ -143,13 +160,18 @@ func (conn connectRAM) retrieveURL(id string) (FullURL string, Status string) {
 		}
 	*/
 }
+
+// retrieveURL - retrieve URL if connectFileDB
 func (conn connectFileDB) retrieveURL(id string) (FullURL string, Status string) {
 	log.Debug().Msgf("FileDB retrieveURL ID=%v", id)
 	FullURL = URL[id]
 	return FullURL, "307"
 }
+
+// retrieveURL - retrieve URL if connectPGDB
 func (conn connectPGDB) retrieveURL(id string) (FullURL string, Status string) {
 	log.Debug().Msgf("PGDB retrieveURL ID=%v", id)
+	// activelink load from request
 	var activelink bool
 	err := PGdb.QueryRow(context.Background(), "SELECT urls.fullurl, urls.active FROM urls where shortid=$1", id).Scan(&FullURL, &activelink)
 	if err != nil {
@@ -163,9 +185,13 @@ func (conn connectPGDB) retrieveURL(id string) (FullURL string, Status string) {
 
 }
 
+// retrieveUserURLS - retrieve User URLs if connectRAM
 func (conn connectRAM) retrieveUserURLS(userid string) (output string, noURLs bool, UsrShortURLsonly []string) {
-	var UsrURLJSON []UsrURLJSONrecord
-	var JSONresult []byte
+	// JSON vars
+	var (
+		UsrURLJSON []UsrURLJSONrecord
+		JSONresult []byte
+	)
 	noURLs = true
 	UsrShortURLs := Usr[userid]
 	if len(UsrShortURLs) > 0 {
@@ -196,18 +222,23 @@ func (conn connectRAM) retrieveUserURLS(userid string) (output string, noURLs bo
 	}
 	return string(JSONresult), noURLs, UsrShortURLs
 }
+
+// retrieveUserURLS - retrieve User URLs if connectFileDB
 func (conn connectFileDB) retrieveUserURLS(userid string) (output string, noURLs bool, UsrShortURLsonly []string) {
 	return "", true, []string{}
 }
+
+// retrieveUserURLS - retrieve User URLs if connectPGDB
 func (conn connectPGDB) retrieveUserURLS(userid string) (output string, noURLs bool, UsrShortURLsonly []string) {
+	// JSON vars
 	var (
-		UsrURLJSON []UsrURLJSONrecord
-		JSONresult []byte
-		UID        string
-		shortID    string
-		FullURL    string
+		UsrURLJSON   []UsrURLJSONrecord
+		JSONresult   []byte
+		UID          string
+		shortID      string
+		FullURL      string
+		UsrShortURLs []string
 	)
-	var UsrShortURLs []string
 	noURLs = true
 	//rows, err := PGdb.Query(context.Background(), "SELECT usr.uid, usr.shortid, urls.fullurl FROM users as usr LEFT JOIN urls ON urls.shortid = usr.shortid where uid=$1", userid)
 	rows, err := PGdb.Query(context.Background(), "SELECT urls.uid, urls.shortid, urls.fullurl FROM urls where uid=$1", userid)

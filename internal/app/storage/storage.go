@@ -14,41 +14,59 @@ import (
 	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 )
 
-type URLrecord map[string]string
-type Userrecord map[string][]string
+// RAM storage types.
+type (
+	URLrecord  map[string]string
+	Userrecord map[string][]string
+)
+
+// JSON input record.
 type URLJSONrecord struct {
 	ID      string `json:"id"`
 	FullURL string `json:"fullurl"`
 }
 
+// JSON input record.
 type UsrURLJSONrecord struct {
 	ShortURL string `json:"short_url"`
 	FullURL  string `json:"original_url"`
 }
 
-var URL URLrecord
-var Usr Userrecord
-var dbPath string
-var RAMonly, PGdbOpened, dbPathexists bool
+// RAM storage vars.
+var (
+	URL URLrecord
+	Usr Userrecord
+)
 
-//var onlyOnce sync.Once
+// DB storage vars.
+var (
+	dbPath                            string
+	RAMonly, PGdbOpened, dbPathexists bool
+)
 
+// var onlyOnce sync.Once
+// PGdb - DB pool.
 var PGdb *pgxpool.Pool
 
-// Будем фиксировать тот тип базы данных, который удалось подключить, с которым будем работать. Для каждого типа имплементируем методы интерфейса Storager в файле ifstorager.go
-type connectRAM struct{}
-type connectFileDB struct{}
-type connectPGDB struct{}
+// Будем фиксировать тот тип базы данных, который удалось подключить, с которым будем работать. Для каждого типа имплементируем методы интерфейса Storager в файле ifstorager.go.
+type (
+	connectRAM    struct{}
+	connectFileDB struct{}
+	connectPGDB   struct{}
+)
 
-// Если вот так не объявить переменные, то не проходит статический тест, подчеркивает желтым, говорит, что такие типы не используются
-var DataBaseconnectRAM connectRAM
-var DataBaseconnectFileDB connectFileDB
-var DataBaseconnectPGDB connectPGDB
+// Если вот так не объявить переменные, то не проходит статический тест, подчеркивает желтым, говорит, что такие типы не используются.
+var (
+	DataBaseconnectRAM    connectRAM
+	DataBaseconnectFileDB connectFileDB
+	DataBaseconnectPGDB   connectPGDB
+)
 
 // Переменная типа базы данных, которую будем использовать:
 // var DataBase struct{}
 var S storager
 
+// Initdb - inits RAM or filetoRAM DB.
 func Initdb() {
 	dbPath, dbPathexists = os.LookupEnv("FILE_STORAGE_PATH")
 	if dbPathexists && dbPath != "" {
@@ -72,6 +90,7 @@ func Initdb() {
 	SetdbType()
 }
 
+// InitPGdb - inits Postgres DB.
 func InitPGdb() {
 
 	//----------------------------//
@@ -80,6 +99,7 @@ func InitPGdb() {
 	//urlExample := "postgres://postgres:1@localhost:5432/gotoschool"
 	//os.Setenv("DATABASE_DSN", urlExample)
 	//initconfig.PostgresDBURL = urlExample
+	// DBLastURLID, DBLastUID - DB IDs.
 	var DBLastURLID, DBLastUID string
 	PGdbOpened = false
 	if initconfig.PostgresDBURL != "" {
@@ -169,6 +189,8 @@ func InitPGdb() {
 	}
 
 }
+
+// DelURLIDs - deletes shortIDs.
 func DelURLIDs(ch chan string) {
 	log.Println("Starting async 'delete URLIDs for user' routine")
 
@@ -184,6 +206,7 @@ func DelURLIDs(ch chan string) {
 
 }
 
+// SetdbType - set DB variant.
 func SetdbType() {
 	log.Println("TRY SetdbType")
 	log.Printf("PGdbOpened= %v", PGdbOpened)
@@ -262,6 +285,7 @@ func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord {
 	return URLs
 }
 
+// CheckPGdbConn - Check if Postgres DB is connected.
 func CheckPGdbConn() (connected bool) {
 	//onlyOnce.Do(Initdb)
 	//defer PGdb.Close()
@@ -275,11 +299,13 @@ func CheckPGdbConn() (connected bool) {
 	}
 }
 
+// AssignShortURLtouser - Assign ShortURL to user
 func AssignShortURLtouser(userid, shortURLid string) {
 	//onlyOnce.Do(Initdb)
 	S.storeShortURLtouser(userid, shortURLid)
 }
 
+// DeleteShortURLfromuser - Delete ShortURL from user
 func DeleteShortURLfromuser(ch chan string) {
 	//onlyOnce.Do(Initdb)
 
@@ -287,15 +313,18 @@ func DeleteShortURLfromuser(ch chan string) {
 
 }
 
+// GetuserURLS - returns user URLs.
 func GetuserURLS(userid string) (output string, noURLs bool, arrayUserURLs []string) {
 	return S.retrieveUserURLS(userid)
 }
 
+// Storerecord - stores user URLs.
 func Storerecord(fullURL string) (ShortURLID, Status string) {
 	//onlyOnce.Do(Initdb)
 	return S.storeURL(fullURL)
 }
 
+// Getrecord - returns URLs.
 func Getrecord(id string) (FullURL, Status string) {
 	//onlyOnce.Do(Initdb)
 	return S.retrieveURL(id)
