@@ -119,6 +119,7 @@ func SetinitVars() {
 	}
 }
 
+// isFlagPassed - checks if flaf is passed
 func isFlagPassed(name string) bool {
 	found := false
 	flag.Visit(func(f *flag.Flag) {
