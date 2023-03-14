@@ -7,7 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Aleale16/urlshrinker/internal/app/storage"
+	//"github.com/Aleale16/urlshrinker/internal/app/storage"
+	"urlshrinker/internal/app/storage"
 )
 
 func BenchmarkServerstart(b *testing.B) {

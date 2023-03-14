@@ -10,7 +10,8 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
+	//"github.com/Aleale16/urlshrinker/internal/app/initconfig"
+	"urlshrinker/internal/app/initconfig"
 )
 
 var mu sync.Mutex
