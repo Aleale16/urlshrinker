@@ -262,10 +262,10 @@ func TestReqHandlerGetURLforUser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	
+
 	rr := httptest.NewRecorder()
 
-	reqget.Header.Set("Authorization","15b94b695561803cbf3bd2ef218518b3fce9661d0eba8ddf23fcd6deb556d0a939393939")
+	reqget.Header.Set("Authorization", "15b94b695561803cbf3bd2ef218518b3fce9661d0eba8ddf23fcd6deb556d0a939393939")
 	handler := http.HandlerFunc(GetUsrURLsHandler)
 	handler.ServeHTTP(rr, reqget)
 	status := rr.Code
@@ -308,10 +308,10 @@ func TestReqHandlerDelURLforUser(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	
+
 	rr := httptest.NewRecorder()
-	reqget.Header.Set("Authorization","15b94b695561803cbf3bd2ef218518b3fce9661d0eba8ddf23fcd6deb556d0a939393939")
-	
+	reqget.Header.Set("Authorization", "15b94b695561803cbf3bd2ef218518b3fce9661d0eba8ddf23fcd6deb556d0a939393939")
+
 	handler := http.HandlerFunc(DeleteURLsHandler)
 	handler.ServeHTTP(rr, reqget)
 	status := rr.Code
