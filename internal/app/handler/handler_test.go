@@ -256,6 +256,32 @@ func TestReqHandlerGet3(t *testing.T) {
 
 }
 
+func TestReqHandlerGetURLforUser(t *testing.T) {
+	//id отсутствует
+	reqget, err := http.NewRequest("GET", "/api/user/urls", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	
+	rr := httptest.NewRecorder()
+
+	reqget.Header.Set("Authorization","15b94b695561803cbf3bd2ef218518b3fce9661d0eba8ddf23fcd6deb556d0a939393939")
+	handler := http.HandlerFunc(GetUsrURLsHandler)
+	handler.ServeHTTP(rr, reqget)
+	status := rr.Code
+	if status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+	if contenttype := rr.Header().Get("Content-Type"); contenttype != "application/json" {
+		t.Errorf("handler returned wrong Content-Type: got %v want %v",
+			contenttype, "application/json")
+	}
+	fmt.Println(reqget.URL)
+	fmt.Println(status)
+
+}
+
 func TestGetPingHandler(t *testing.T) {
 	type args struct {
 		w http.ResponseWriter
@@ -266,12 +292,37 @@ func TestGetPingHandler(t *testing.T) {
 		args args
 	}{
 		// TODO: Add test cases.
+
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			GetPingHandler(tt.args.w, tt.args.r)
 		})
 	}
+}
+
+func TestReqHandlerDelURLforUser(t *testing.T) {
+
+	var body = []byte(`["222"]`)
+	reqget, err := http.NewRequest("DELETE", "/api/user/urls", bytes.NewBuffer(body))
+	if err != nil {
+		t.Fatal(err)
+	}
+	
+	rr := httptest.NewRecorder()
+	reqget.Header.Set("Authorization","15b94b695561803cbf3bd2ef218518b3fce9661d0eba8ddf23fcd6deb556d0a939393939")
+	
+	handler := http.HandlerFunc(DeleteURLsHandler)
+	handler.ServeHTTP(rr, reqget)
+	status := rr.Code
+	if status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	fmt.Println(reqget.URL)
+	fmt.Println(status)
+
 }
 
 func TestSign(t *testing.T) {
