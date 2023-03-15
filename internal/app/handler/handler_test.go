@@ -2,12 +2,11 @@ package handler
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	//"github.com/Aleale16/urlshrinker/internal/app/storage"
 	"urlshrinker/internal/app/storage"
 )
 
@@ -94,6 +93,89 @@ func TestReqHandlerPost(t *testing.T) {
 
 }
 
+func TestReqHandlerPostJSON(t *testing.T) {
+	//storage.Initdb()
+	//var body = []byte("https://ya.ru")
+	//Описание тела запроса в JSON
+	var body = []byte(`{"url": "yajson.ru"}`)
+
+	reqpost, err := http.NewRequest("POST", "/api/shorten", bytes.NewBuffer(body))
+	//Передача JSON в запрос
+	//reqpost, err := http.NewRequest("POST", "/", bytes.NewReader(body))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	//reqpost.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(PostJSONHandler)
+	handler.ServeHTTP(rr, reqpost)
+
+	if contenttype := rr.Header().Get("Content-Type"); contenttype != "application/json" {
+		t.Errorf("handler returned wrong Content-Type: got %v want %v",
+		contenttype, "application/json")
+	}
+
+	// Check the status code is what we expect.
+	if status := rr.Code; status != http.StatusCreated {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusCreated)
+	}
+
+	fmt.Println(reqpost.URL)
+	fmt.Println(rr.Body.String())
+	fmt.Println(rr.Header().Get("Content-Type"))
+
+}
+
+func TestReqHandlerPostbatchJSON(t *testing.T) {
+	//storage.Initdb()
+	//var body = []byte("https://ya.ru")
+	//Описание тела запроса в JSON
+
+	type shortenRequest struct {
+		CorrelationID string `json:"correlation_id"`
+		OriginalURL   string `json:"original_url"`
+	}
+	requestData := []shortenRequest{ 
+		{
+			CorrelationID: "123456",
+			OriginalURL:   "https://yabatch.ru",
+		},
+	}
+	//var body = []byte(`{{"correlation_id":"123456","original_url":"https://yabatch.ru"},}`)
+ 	body, _ := json.Marshal(requestData)
+	reqpost, err := http.NewRequest("POST", "/api/shorten/batch", bytes.NewBuffer(body))
+	//Передача JSON в запрос
+	//reqpost, err := http.NewRequest("POST", "/", bytes.NewReader(body))
+
+	if err != nil {
+		t.Fatal(err)
+	}
+	//reqpost.Header.Set("Content-Type", "application/x-www-form-urlencoded; charset=UTF-8")
+
+	rr := httptest.NewRecorder()
+	handler := http.HandlerFunc(PostJSONbatchHandler)
+	handler.ServeHTTP(rr, reqpost)
+
+	if contenttype := rr.Header().Get("Content-Type"); contenttype != "application/json" {
+		t.Errorf("handler returned wrong Content-Type: got %v want %v",
+		contenttype, "application/json")
+	}
+
+	// Check the status code is what we expect.
+	if status := rr.Code; status != http.StatusCreated {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusCreated)
+	}
+
+	fmt.Println(reqpost.URL)
+	fmt.Println(rr.Body.String())
+	fmt.Println(rr.Header().Get("Content-Type"))
+
+}
+
 func TestReqHandlerGet1(t *testing.T) {
 	//Запрос существующего id
 	//reqget, err := http.NewRequest("GET", "/?id=7943", nil)
@@ -171,4 +253,36 @@ func TestReqHandlerGet3(t *testing.T) {
 	fmt.Println(reqget.URL)
 	fmt.Println(status)
 
+}
+
+func TestGetPingHandler(t *testing.T) {
+	type args struct {
+		w http.ResponseWriter
+		r *http.Request
+	}
+	tests := []struct {
+		name string
+		args args
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			GetPingHandler(tt.args.w, tt.args.r)
+		})
+	}
+}
+
+func TestSign(t *testing.T) {
+	validSign, val := checkSign("15b94b695561803cbf3bd2ef218518b3fce9661d0eba8ddf23fcd6deb556d0a939393939")
+	if validSign != true {
+		t.Errorf("Wrong Sign state: got %v want %v",
+		validSign, true)
+	}
+	if val != "9999" {
+		t.Errorf("Wrong id retrieved: got %v want %v",
+		val, "9999")
+	}
+	fmt.Println(validSign)
+	fmt.Println(val)
 }
