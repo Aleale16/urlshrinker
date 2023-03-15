@@ -114,7 +114,7 @@ func TestReqHandlerPostJSON(t *testing.T) {
 
 	if contenttype := rr.Header().Get("Content-Type"); contenttype != "application/json" {
 		t.Errorf("handler returned wrong Content-Type: got %v want %v",
-		contenttype, "application/json")
+			contenttype, "application/json")
 	}
 
 	// Check the status code is what we expect.
@@ -138,14 +138,14 @@ func TestReqHandlerPostbatchJSON(t *testing.T) {
 		CorrelationID string `json:"correlation_id"`
 		OriginalURL   string `json:"original_url"`
 	}
-	requestData := []shortenRequest{ 
+	requestData := []shortenRequest{
 		{
 			CorrelationID: "123456",
 			OriginalURL:   "https://yabatch.ru",
 		},
 	}
 	//var body = []byte(`{{"correlation_id":"123456","original_url":"https://yabatch.ru"},}`)
- 	body, _ := json.Marshal(requestData)
+	body, _ := json.Marshal(requestData)
 	reqpost, err := http.NewRequest("POST", "/api/shorten/batch", bytes.NewBuffer(body))
 	//Передача JSON в запрос
 	//reqpost, err := http.NewRequest("POST", "/", bytes.NewReader(body))
@@ -161,7 +161,7 @@ func TestReqHandlerPostbatchJSON(t *testing.T) {
 
 	if contenttype := rr.Header().Get("Content-Type"); contenttype != "application/json" {
 		t.Errorf("handler returned wrong Content-Type: got %v want %v",
-		contenttype, "application/json")
+			contenttype, "application/json")
 	}
 
 	// Check the status code is what we expect.
@@ -277,11 +277,11 @@ func TestSign(t *testing.T) {
 	validSign, val := checkSign("15b94b695561803cbf3bd2ef218518b3fce9661d0eba8ddf23fcd6deb556d0a939393939")
 	if validSign != true {
 		t.Errorf("Wrong Sign state: got %v want %v",
-		validSign, true)
+			validSign, true)
 	}
 	if val != "9999" {
 		t.Errorf("Wrong id retrieved: got %v want %v",
-		val, "9999")
+			val, "9999")
 	}
 	fmt.Println(validSign)
 	fmt.Println(val)
