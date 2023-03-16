@@ -7,17 +7,14 @@ import (
 	"github.com/Aleale16/urlshrinker/internal/app/server"
 )
 
-
-
 func main() {
 
-	
 	initconfig.InitFlags()
 
-	flag.Parse()	
+	flag.Parse()
 
 	initconfig.SetinitVars()
-	
+
 	server.Start()
-	
+
 }
