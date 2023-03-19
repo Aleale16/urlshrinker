@@ -5,6 +5,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 
 	"urlshrinker/internal/app/initconfig"
 	"urlshrinker/internal/app/server"
@@ -35,9 +36,18 @@ func main() {
 	if buildVersion == "" {buildVersion = "N/A"}
 	if buildDate == "" {buildDate = "N/A"}
 	if buildCommit == "" {buildCommit = "N/A"}
-	fmt.Printf("Build version: %s", buildVersion)
-	fmt.Printf("Build date: %s", buildDate)
-	fmt.Printf("Build commit: %s", buildCommit)
+	_, err := fmt.Printf("Build version: %s", buildVersion)
+	if err!=nil {
+		log.Print(err)
+	}
+	_, err = fmt.Printf("Build date: %s", buildDate)
+	if err!=nil {
+		log.Print(err)
+	}
+	_, err = fmt.Printf("Build commit: %s", buildCommit)
+	if err!=nil {
+		log.Print(err)
+	}
 
 	//staticlint.Runinc18Checks()
 
@@ -48,5 +58,7 @@ func main() {
 	initconfig.SetinitVars()
 
 	server.Start()
+
+	//os.Exit(10)
 
 }

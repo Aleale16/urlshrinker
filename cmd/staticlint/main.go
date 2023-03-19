@@ -1,9 +1,12 @@
 package main
 
 import (
-	"os"
+	"inc18checker/errcheckanalyzer.go"
 
 	"github.com/kisielk/errcheck/errcheck"
+
+	//"github.com/kisielk/errcheck/errcheck"
+
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/multichecker"
 	"golang.org/x/tools/go/analysis/passes/printf"
@@ -16,7 +19,7 @@ import (
 func main() {
 	// определяем map подключаемых правил
 	checks := map[string]bool{
-		//"SA*": true,
+		"SA*": true,
 		"S1039":  true,
 		"ST1000": true,
 		"QF1006": true,
@@ -29,7 +32,7 @@ func main() {
 		}
 	}
 
-	//mychecks = append(mychecks, errcheckanalyzer.ErrCheckAnalyzer)
+	mychecks = append(mychecks, errcheckanalyzer.ErrCheckAnalyzer)
 	mychecks = append(mychecks, printf.Analyzer)
 	mychecks = append(mychecks, shadow.Analyzer)
 	mychecks = append(mychecks, shift.Analyzer)
@@ -42,7 +45,7 @@ func main() {
 
 	//var return_Url string
 	//fmt.Println(return_Url)
-	os.Exit(10)
+	//os.Exit(10)
 	//f, _ := os.OpenFile("notes.txt", os.O_RDWR|os.O_CREATE, 0755)
 
 }
