@@ -8,6 +8,7 @@ import (
 	"golang.org/x/tools/go/analysis"
 )
 
+// Pass struct of analyzer
 type Pass struct {
 	// отобразим здесь только важные поля
 	Fset         *token.FileSet // информация о позиции токенов
@@ -46,6 +47,7 @@ func isErrorType(t types.Type) bool {
 // resultErrors возвращает булев массив со значениями true,
 // если тип i-го возвращаемого значения соответствует ошибке.
 func resultErrors(pass *analysis.Pass, call *ast.CallExpr) []bool {
+	//try to find t type
 	switch t := pass.TypesInfo.Types[call].Type.(type) {
 	case *types.Named: // возвращается значение
 		return []bool{isErrorType(t)}
@@ -78,6 +80,7 @@ func isReturnError(pass *analysis.Pass, call *ast.CallExpr) bool {
 
 // run analysis
 func run(pass *analysis.Pass) (interface{}, error) {
+	//expr run fing if ExprStmt
 	expr := func(x *ast.ExprStmt) {
 		// проверяем, что выражение представляет собой вызов функции,
 		// у которой возвращаемая ошибка никак не обрабатывается
@@ -87,14 +90,14 @@ func run(pass *analysis.Pass) (interface{}, error) {
 			}
 		}
 	}
-
+	//FuncMainsearchEnd run fing if FuncDecl
 	FuncMainsearchEnd := func(x *ast.FuncDecl) /*(endPos token.Pos)*/ {
 		//pass.Reportf(x.Pos(), x.Name.String())
 		//pass.Reportf(x.End(), "end of func")
 		//fmt.Println(pass.Fset.Position(x.End()).Line)
 		FuncMainEnd = (pass.Fset.Position(x.End()).Line)
 	}
-
+	//funcIdent run fing if Ident
 	funcIdent := func(x *ast.Ident) {
 		if pass.Fset.Position(x.Pos()).Line <= FuncMainEnd {
 			pass.Reportf(x.Pos(), "os."+x.Name+" is forbidden to call from main function of main pkg ")
@@ -102,6 +105,7 @@ func run(pass *analysis.Pass) (interface{}, error) {
 	}
 
 	//n.(*ast.FuncType)
+	//lastIdent initialization
 	lastIdent := ""
 	for _, file := range pass.Files {
 		if file.Name.Name == "main" {
