@@ -86,52 +86,52 @@ func run(pass *analysis.Pass) (interface{}, error) {
 				pass.Reportf(x.Pos(), "expression returns unchecked error")
 			}
 		}
-	}	
-
-	FuncMainsearchEnd := func(x *ast.FuncDecl) /*(endPos token.Pos)*/{		
-			//pass.Reportf(x.Pos(), x.Name.String())
-			//pass.Reportf(x.End(), "end of func")
-			//fmt.Println(pass.Fset.Position(x.End()).Line)
-			FuncMainEnd = (pass.Fset.Position(x.End()).Line)
 	}
 
-	funcIdent := func(x *ast.Ident) {		
+	FuncMainsearchEnd := func(x *ast.FuncDecl) /*(endPos token.Pos)*/ {
+		//pass.Reportf(x.Pos(), x.Name.String())
+		//pass.Reportf(x.End(), "end of func")
+		//fmt.Println(pass.Fset.Position(x.End()).Line)
+		FuncMainEnd = (pass.Fset.Position(x.End()).Line)
+	}
+
+	funcIdent := func(x *ast.Ident) {
 		if pass.Fset.Position(x.Pos()).Line <= FuncMainEnd {
-			pass.Reportf(x.Pos(),"os." + x.Name + " is forbidden to call from main function of main pkg ")
+			pass.Reportf(x.Pos(), "os."+x.Name+" is forbidden to call from main function of main pkg ")
 		}
 	}
 
 	//n.(*ast.FuncType)
 	lastIdent := ""
 	for _, file := range pass.Files {
-	if file.Name.Name == "main" {	
-		// функцией ast.Inspect проходим по всем узлам AST
-		ast.Inspect(file, func(node ast.Node) bool {
-			//pass.Reportf(file.Pos(),file.Name.Name)
-			switch x := node.(type) {
-			case *ast.ExprStmt: // выражение
-				expr(x)
+		if file.Name.Name == "main" {
+			// функцией ast.Inspect проходим по всем узлам AST
+			ast.Inspect(file, func(node ast.Node) bool {
+				//pass.Reportf(file.Pos(),file.Name.Name)
+				switch x := node.(type) {
+				case *ast.ExprStmt: // выражение
+					expr(x)
 
-			case *ast.FuncDecl:
-				if x.Name.String() == "main"{
-					FuncMainsearchEnd(x)			
-				}
+				case *ast.FuncDecl:
+					if x.Name.String() == "main" {
+						FuncMainsearchEnd(x)
+					}
 
-			case *ast.Ident:
-				if x.Name == "os" {
-					lastIdent = "os"
-				} else {
-					if lastIdent == "os" && x.Name == "Exit"{	
-						lastIdent = ""			
-						funcIdent(x)
+				case *ast.Ident:
+					if x.Name == "os" {
+						lastIdent = "os"
 					} else {
-						lastIdent = ""
+						if lastIdent == "os" && x.Name == "Exit" {
+							lastIdent = ""
+							funcIdent(x)
+						} else {
+							lastIdent = ""
+						}
 					}
 				}
-			}
-			return true
-		})
-	}
+				return true
+			})
+		}
 	}
 	return nil, nil
 }

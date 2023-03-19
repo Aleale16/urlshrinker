@@ -1,7 +1,7 @@
 package main
 
 import (
-	"inc18checker/errcheckanalyzer.go"
+	"inc18checker/errcheckanalyzer"
 
 	"github.com/kisielk/errcheck/errcheck"
 
@@ -19,7 +19,7 @@ import (
 func main() {
 	// определяем map подключаемых правил
 	checks := map[string]bool{
-		"SA*": true,
+		"SA*":    true,
 		"S1039":  true,
 		"ST1000": true,
 		"QF1006": true,

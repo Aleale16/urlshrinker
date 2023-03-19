@@ -20,32 +20,37 @@ import (
 // Build commit: <buildCommit> (or "N/A" if no value)
 var (
 	// buildVersion - global buildVersion value.
-	buildVersion  string
+	buildVersion string
 	// buildDate - global buildDate value.
-	buildDate  string
+	buildDate string
 	// buildCommit - buildCommit value.
-	buildCommit  string
+	buildCommit string
 )
 
 func main() {
 
-
 	// fmt.Printf("Build version: %s", initconfig.BuildVersion)
 	// fmt.Printf("Build date: %s", initconfig.BuildDate)
 	// fmt.Printf("Build commit: %s", initconfig.BuildCommit)
-	if buildVersion == "" {buildVersion = "N/A"}
-	if buildDate == "" {buildDate = "N/A"}
-	if buildCommit == "" {buildCommit = "N/A"}
+	if buildVersion == "" {
+		buildVersion = "N/A"
+	}
+	if buildDate == "" {
+		buildDate = "N/A"
+	}
+	if buildCommit == "" {
+		buildCommit = "N/A"
+	}
 	_, err := fmt.Printf("Build version: %s", buildVersion)
-	if err!=nil {
+	if err != nil {
 		log.Print(err)
 	}
 	_, err = fmt.Printf("Build date: %s", buildDate)
-	if err!=nil {
+	if err != nil {
 		log.Print(err)
 	}
 	_, err = fmt.Printf("Build commit: %s", buildCommit)
-	if err!=nil {
+	if err != nil {
 		log.Print(err)
 	}
 
