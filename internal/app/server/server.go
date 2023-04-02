@@ -117,11 +117,14 @@ func Start() {
 			// для TLS-конфигурации используем менеджер сертификатов
 			TLSConfig: manager.TLSConfig(),
 		}
+		log.Print("ENABLE_HTTPS: " + "HTTPS_mode_enabled")
 		log.Fatal(server.ListenAndServeTLS("", ""))
 	} else {
 		log.Print("ENABLE_HTTPS: " + "Loaded default: NO HTTPS")
 		log.Fatal(http.ListenAndServe("localhost:8080", r))
 	}
+
+	//log.Fatal(http.ListenAndServe("localhost:8080", r))
 
 	//os.Setenv("SERVER_ADDRESS", "localhost:8080")
 	//log.Print("SERVER_ADDRESS: "+"Loaded default: " + os.Getenv("SERVER_ADDRESS"))
