@@ -15,8 +15,10 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
-	"github.com/Aleale16/urlshrinker/internal/app/storage"
+	//"github.com/Aleale16/urlshrinker/internal/app/initconfig"
+	//"github.com/Aleale16/urlshrinker/internal/app/storage"
+	"urlshrinker/internal/app/initconfig"
+	"urlshrinker/internal/app/storage"
 )
 
 // mu - controls globar vars increment (+1).

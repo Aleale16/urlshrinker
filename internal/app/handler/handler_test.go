@@ -7,8 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
-	"github.com/Aleale16/urlshrinker/internal/app/storage"
+	"urlshrinker/internal/app/storage"
 )
 
 func BenchmarkServerstart(b *testing.B) {
@@ -282,25 +281,53 @@ func TestReqHandlerGetURLforUser(t *testing.T) {
 
 }
 
-func TestGetPingHandler(t *testing.T) {
-	type args struct {
-		w http.ResponseWriter
-		r *http.Request
-	}
-	tests := []struct {
-		name string
-		args args
-	}{
-		// TODO: Add test cases.
+/*
+	func TestGetPingHandler(t *testing.T) {
+		// type args struct {
+		// 	w http.ResponseWriter
+		// 	r *http.Request
+		// }
+		type want struct {
+	        //contentType string
+	        statusCode  int
+	    }
+		tests := []struct {
+			name string
+			//args args
+	        want    want
+		}{
+			// TODO: Add test cases.
+			{
+				name: "connection is OK",
+				want: want{
+	                //contentType: "application/json",
+	                statusCode:  200,
+				},
+			},
 
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			GetPingHandler(tt.args.w, tt.args.r)
-		})
-	}
-}
+		}
+		for _, tt := range tests {
+			t.Run(tt.name, func(t *testing.T) {
 
+				request := httptest.NewRequest(http.MethodGet, "/", nil)
+
+	            // создаём новый Recorder
+	            w := httptest.NewRecorder()
+	            // определяем хендлер
+	            h := http.HandlerFunc(GetPingHandler)
+	            // запускаем сервер
+	            h.ServeHTTP(w, request)
+	            res := w.Result()
+
+	            // проверяем код ответа
+	            if res.StatusCode != tt.want.statusCode {
+	                t.Errorf("Expected status code %d, got %d", tt.want.statusCode, w.Code)
+	            }
+
+			})
+		}
+	}
+*/
 func TestReqHandlerDelURLforUser(t *testing.T) {
 
 	var body = []byte(`["222"]`)
@@ -337,4 +364,18 @@ func TestSign(t *testing.T) {
 	}
 	fmt.Println(validSign)
 	fmt.Println(val)
+
+}
+func TestSignOptimized(t *testing.T) {
+	validSignopt, valopt := checkSignOptimized("15b94b695561803cbf3bd2ef218518b3fce9661d0eba8ddf23fcd6deb556d0a939393939")
+	if validSignopt != true {
+		t.Errorf("Wrong SignOptimized state: got %v want %v",
+			validSignopt, true)
+	}
+	if valopt != "9999" {
+		t.Errorf("Wrong id retrieved: got %v want %v",
+			valopt, "9999")
+	}
+	fmt.Println(validSignopt)
+	fmt.Println(valopt)
 }

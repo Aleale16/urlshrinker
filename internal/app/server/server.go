@@ -7,9 +7,12 @@ import (
 	"os"
 	"sync"
 
-	"github.com/Aleale16/urlshrinker/internal/app/handler"
-	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
-	"github.com/Aleale16/urlshrinker/internal/app/storage"
+	//"github.com/Aleale16/urlshrinker/internal/app/handler"
+	//"github.com/Aleale16/urlshrinker/internal/app/initconfig"
+	//"github.com/Aleale16/urlshrinker/internal/app/storage"
+	"urlshrinker/internal/app/handler"
+	"urlshrinker/internal/app/initconfig"
+	"urlshrinker/internal/app/storage"
 
 	//	_ "net/http/pprof" // подключаем пакет pprof
 

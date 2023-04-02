@@ -11,7 +11,8 @@ import (
 
 	"github.com/jackc/pgx/v5/pgxpool"
 
-	"github.com/Aleale16/urlshrinker/internal/app/initconfig"
+	//"github.com/Aleale16/urlshrinker/internal/app/initconfig"
+	"urlshrinker/internal/app/initconfig"
 )
 
 // RAM storage types.
