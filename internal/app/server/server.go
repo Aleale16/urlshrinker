@@ -94,7 +94,7 @@ func Start() {
 	os.Setenv("SERVER_ADDRESS", initconfig.SrvAddress)
 	os.Setenv("BASE_URL", initconfig.BaseURL)
 	os.Setenv("FILE_STORAGE_PATH", initconfig.FileDBpath)
-	os.Setenv("DATABASE_DSN", initconfig.PostgresDBURL)	
+	os.Setenv("DATABASE_DSN", initconfig.PostgresDBURL)
 	onlyOnce.Do(storage.Initdb)
 
 	if initconfig.SrvRunHTTPS == "HTTPS_mode_enabled" {
@@ -123,8 +123,6 @@ func Start() {
 		//log.Fatal(http.ListenAndServe("localhost:8080", r))
 		log.Fatal(http.ListenAndServe(os.Getenv("SERVER_ADDRESS"), r))
 	}
-
-	
 
 	//log.Fatal(http.ListenAndServe("localhost:8080", r))
 
