@@ -49,7 +49,7 @@ func SetinitVars() {
 	srvAddressENV, srvAddressexists := os.LookupEnv("SERVER_ADDRESS")
 	fileDBpathENV, fileDBpathexists := os.LookupEnv("FILE_STORAGE_PATH")
 	postgresDBURLENV, postgresDBURLexists := os.LookupEnv("DATABASE_DSN")
-	SrvRunHTTPSENV, SrvRunHTTPSexists := os.LookupEnv("ENABLE_HTTPS")
+	srvRunHTTPSENV, srvRunHTTPSexists := os.LookupEnv("ENABLE_HTTPS")
 
 	if !srvAddressexists {
 		SrvAddress = *SrvAddressflag
@@ -111,7 +111,7 @@ func SetinitVars() {
 		FileDBpath = fileDBpathENV
 		fmt.Println("Set from ENV: FileDBpath:", FileDBpath)
 	}
-	if !SrvRunHTTPSexists {
+	if !srvRunHTTPSexists {
 		if *SrvRunHTTPSflag {
 			SrvRunHTTPS = "HTTPS_mode_enabled"
 			fmt.Print("Set from flag: SrvRunHTTPS:", *SrvRunHTTPSflag)
@@ -119,7 +119,7 @@ func SetinitVars() {
 			fmt.Print("ENABLE_HTTPS: not set ")
 		}
 	} else {
-		SrvRunHTTPS = SrvRunHTTPSENV
+		SrvRunHTTPS = srvRunHTTPSENV
 		fmt.Println("Set from ENV: SrvRunHTTPS:", SrvRunHTTPS)
 	}
 }
