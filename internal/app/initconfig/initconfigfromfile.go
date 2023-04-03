@@ -9,11 +9,11 @@ import (
 
 // JSON input record.
 type ConfigJSONrecord struct {
-	ServerAddress    string `json:"server_address"`
-	BaseURL          string `json:"base_url"`
+	ServerAddress   string `json:"server_address"`
+	BaseURL         string `json:"base_url"`
 	FileStoragePath string `json:"file_storage_path"`
-	DatabaseDSN      string `json:"database_dsn"`
-	EnableHTTPS      string `json:"enable_https"`
+	DatabaseDSN     string `json:"database_dsn"`
+	EnableHTTPS     string `json:"enable_https"`
 }
 
 // config JSON input.
