@@ -66,14 +66,14 @@ func main() {
 	initconfig.SetinitVars()
 
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
-    defer stop()
+	defer stop()
 
 	go server.Start()
 
 	<-ctx.Done()
-    if ctx.Err() != nil {
-        fmt.Printf("Ошибка:%v\n", ctx.Err())
-    }
+	if ctx.Err() != nil {
+		fmt.Printf("Ошибка:%v\n", ctx.Err())
+	}
 	//os.Exit(10)
 
 }
