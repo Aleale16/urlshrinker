@@ -9,11 +9,11 @@ import (
 
 // JSON input record.
 type ConfigJSONrecord struct {
-	SERVER_ADDRESS    string `json:"server_address"`
-	BASE_URL          string `json:"base_url"`
-	FILE_STORAGE_PATH string `json:"file_storage_path"`
-	DATABASE_DSN      string `json:"database_dsn"`
-	ENABLE_HTTPS      string `json:"enable_https"`
+	ServerAddress    string `json:"server_address"`
+	BaseURL          string `json:"base_url"`
+	FileStoragePath string `json:"file_storage_path"`
+	DatabaseDSN      string `json:"database_dsn"`
+	EnableHTTPS      string `json:"enable_https"`
 }
 
 // config JSON input.
@@ -51,19 +51,19 @@ func addInitVarsFromConfigFile() {
 				panic(err)
 			}
 			if SrvAddress == "" {
-				SrvAddress = configJSON.SERVER_ADDRESS
+				SrvAddress = configJSON.ServerAddress
 			}
 			if BaseURL == "" {
-				BaseURL = configJSON.BASE_URL
-			}
-			if PostgresDBURL == "" {
-				PostgresDBURL = configJSON.DATABASE_DSN
+				BaseURL = configJSON.BaseURL
 			}
 			if FileDBpath == "" {
-				FileDBpath = configJSON.FILE_STORAGE_PATH
+				FileDBpath = configJSON.FileStoragePath
+			}
+			if PostgresDBURL == "" {
+				PostgresDBURL = configJSON.DatabaseDSN
 			}
 			if SrvRunHTTPS == "" {
-				SrvRunHTTPS = configJSON.ENABLE_HTTPS
+				SrvRunHTTPS = configJSON.EnableHTTPS
 			}
 		}
 	}
