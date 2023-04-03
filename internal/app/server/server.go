@@ -120,7 +120,8 @@ func Start() {
 		log.Fatal(server.ListenAndServeTLS("", ""))
 	} else {
 		log.Print("ENABLE_HTTPS: " + "Loaded default: NO HTTPS")
-		log.Fatal(http.ListenAndServe("localhost:8080", r))
+		//log.Fatal(http.ListenAndServe("localhost:8080", r))
+		log.Fatal(http.ListenAndServe(os.Getenv("SERVER_ADDRESS"), r))
 	}
 
 	
