@@ -14,10 +14,10 @@ import (
 // Variables using across the service.
 var (
 	// FileDBpath, BaseURL, SrvAddress - store database options. SrvRunHTTPS - store server HTTPS mode.
-	FileDBpath, BaseURL, SrvAddress, SrvRunHTTPS string
+	FileDBpath, BaseURL, SrvAddress, SrvRunHTTPS, SrvConfigFile string
 	// SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag, SrvRunHTTPSflag - store possible flags.
-	SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag *string
-	SrvRunHTTPSflag                                                *bool
+	SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag, SrvConfigFileflag *string
+	SrvRunHTTPSflag                                                                   *bool
 )
 
 // PostgresDBURL - init database URL string.
@@ -37,6 +37,7 @@ func InitFlags() {
 	PostgresDBURLflag = flag.String("d", "postgres://postgres:1@localhost:5432/gotoschool", "DATABASE_DSN flag")
 	FileDBpathflag = flag.String("f", "../../internal/app/storage/database.txt", "FILE_STORAGE_PATH flag")
 	SrvRunHTTPSflag = flag.Bool("s", false, "ENABLE_HTTPS flag")
+	SrvConfigFileflag = flag.String("c", "", "CONFIG flag")
 }
 
 // SetinitVars - init global vars according to ENV vars and flags passed.
@@ -122,9 +123,12 @@ func SetinitVars() {
 		SrvRunHTTPS = srvRunHTTPSENV
 		fmt.Println("Set from ENV: SrvRunHTTPS:", SrvRunHTTPS)
 	}
+
+	addInitVarsFromConfigFile()
+
 }
 
-// isFlagPassed - checks if flaf is passed
+// isFlagPassed - checks if flag is passed
 func isFlagPassed(name string) bool {
 	found := false
 	flag.Visit(func(f *flag.Flag) {
