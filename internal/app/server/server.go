@@ -18,6 +18,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"golang.org/x/crypto/acme/autocert"
 )
 
 /*
@@ -94,10 +95,36 @@ func Start() {
 	os.Setenv("BASE_URL", initconfig.BaseURL)
 	os.Setenv("FILE_STORAGE_PATH", initconfig.FileDBpath)
 	os.Setenv("DATABASE_DSN", initconfig.PostgresDBURL)
-
 	onlyOnce.Do(storage.Initdb)
 
-	log.Fatal(http.ListenAndServe(initconfig.SrvAddress, r))
+	if initconfig.SrvRunHTTPS == "HTTPS_mode_enabled" {
+		log.Print("ENABLE_HTTPS: " + "HTTPS_mode_enabled")
+		os.Setenv("ENABLE_HTTPS", initconfig.SrvRunHTTPS)
+		// конструируем менеджер TLS-сертификатов
+		manager := &autocert.Manager{
+			// директория для хранения сертификатов
+			Cache: autocert.DirCache("cache-dir"),
+			// функция, принимающая Terms of Service издателя сертификатов
+			Prompt: autocert.AcceptTOS,
+			// перечень доменов, для которых будут поддерживаться сертификаты
+			HostPolicy: autocert.HostWhitelist("localhost", "127.0.0.1"),
+		}
+		// конструируем сервер с поддержкой TLS
+		server := &http.Server{
+			Addr:    ":443",
+			Handler: r,
+			// для TLS-конфигурации используем менеджер сертификатов
+			TLSConfig: manager.TLSConfig(),
+		}
+		log.Print("ENABLE_HTTPS: " + "HTTPS_mode_enabled")
+		log.Fatal(server.ListenAndServeTLS("", ""))
+	} else {
+		log.Print("ENABLE_HTTPS: " + "Loaded default: NO HTTPS")
+		//log.Fatal(http.ListenAndServe("localhost:8080", r))
+		log.Fatal(http.ListenAndServe(os.Getenv("SERVER_ADDRESS"), r))
+	}
+
+	//log.Fatal(http.ListenAndServe("localhost:8080", r))
 
 	//os.Setenv("SERVER_ADDRESS", "localhost:8080")
 	//log.Print("SERVER_ADDRESS: "+"Loaded default: " + os.Getenv("SERVER_ADDRESS"))
