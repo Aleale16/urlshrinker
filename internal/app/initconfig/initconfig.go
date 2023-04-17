@@ -14,10 +14,10 @@ import (
 // Variables using across the service.
 var (
 	// FileDBpath, BaseURL, SrvAddress - store database options. SrvRunHTTPS - store server HTTPS mode.
-	FileDBpath, BaseURL, SrvAddress, SrvRunHTTPS, SrvConfigFile string
+	FileDBpath, BaseURL, SrvAddress, SrvRunHTTPS, SrvConfigFile, TrustedSubnet string
 	// SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag, SrvRunHTTPSflag - store possible flags.
-	SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag, SrvConfigFileflag *string
-	SrvRunHTTPSflag                                                                   *bool
+	SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag, SrvConfigFileflag, TrustedSubnetflag *string
+	SrvRunHTTPSflag                                                                                      *bool
 )
 
 // PostgresDBURL - init database URL string.
@@ -38,6 +38,7 @@ func InitFlags() {
 	FileDBpathflag = flag.String("f", "../../internal/app/storage/database.txt", "FILE_STORAGE_PATH flag")
 	SrvRunHTTPSflag = flag.Bool("s", false, "ENABLE_HTTPS flag")
 	SrvConfigFileflag = flag.String("c", "", "CONFIG flag")
+	TrustedSubnetflag = flag.String("t", "", "TRUSTED_SUBNET flag")
 }
 
 // SetinitVars - init global vars according to ENV vars and flags passed.
@@ -51,6 +52,7 @@ func SetinitVars() {
 	fileDBpathENV, fileDBpathexists := os.LookupEnv("FILE_STORAGE_PATH")
 	postgresDBURLENV, postgresDBURLexists := os.LookupEnv("DATABASE_DSN")
 	srvRunHTTPSENV, srvRunHTTPSexists := os.LookupEnv("ENABLE_HTTPS")
+	trustedSubnetENV, trustedSubnetexists := os.LookupEnv("TRUSTED_SUBNET")
 
 	if !srvAddressexists {
 		SrvAddress = *SrvAddressflag
@@ -122,6 +124,17 @@ func SetinitVars() {
 	} else {
 		SrvRunHTTPS = srvRunHTTPSENV
 		fmt.Println("Set from ENV: SrvRunHTTPS:", SrvRunHTTPS)
+	}
+	if !trustedSubnetexists {
+		if isFlagPassed("t") {
+			TrustedSubnet = *TrustedSubnetflag
+			fmt.Print("Set from flag: TrustedSubnet:", *TrustedSubnetflag)
+		} else {
+			fmt.Print("TRUSTED_SUBNET: not set ")
+		}
+	} else {
+		TrustedSubnet = trustedSubnetENV
+		fmt.Println("Set from ENV: TrustedSubnet:", TrustedSubnet)
 	}
 
 	addInitVarsFromConfigFile()

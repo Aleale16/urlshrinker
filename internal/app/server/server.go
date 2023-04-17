@@ -47,6 +47,7 @@ func Start() {
 	r.Get("/{id}", handler.GetHandler)
 	r.Get("/api/user/urls", handler.GetUsrURLsHandler)
 	r.Get("/ping", handler.GetPingHandler)
+	r.Get("/api/internal/stats", handler.GetStatsHandler)
 
 	r.Post("/", handler.PostHandler)
 	r.Post("/api/shorten", handler.PostJSONHandler)

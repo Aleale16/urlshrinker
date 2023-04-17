@@ -14,6 +14,7 @@ type ConfigJSONrecord struct {
 	FileStoragePath string `json:"file_storage_path"`
 	DatabaseDSN     string `json:"database_dsn"`
 	EnableHTTPS     string `json:"enable_https"`
+	TrustedSubnet   string `json:"trusted_subnet"`
 }
 
 // config JSON input.
@@ -64,6 +65,9 @@ func addInitVarsFromConfigFile() {
 			}
 			if SrvRunHTTPS == "" {
 				SrvRunHTTPS = configJSON.EnableHTTPS
+			}
+			if TrustedSubnet == "" {
+				TrustedSubnet = configJSON.TrustedSubnet
 			}
 		}
 	}
