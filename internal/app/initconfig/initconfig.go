@@ -13,10 +13,11 @@ import (
 
 // Variables using across the service.
 var (
-	// FileDBpath, BaseURL, SrvAddress - store database options.
-	FileDBpath, BaseURL, SrvAddress string
-	// SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag - store possible flags.
-	SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag *string
+	// FileDBpath, BaseURL, SrvAddress - store database options. SrvRunHTTPS - store server HTTPS mode.
+	FileDBpath, BaseURL, SrvAddress, SrvRunHTTPS, SrvConfigFile, TrustedSubnet string
+	// SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag, SrvRunHTTPSflag - store possible flags.
+	SrvAddressflag, BaseURLflag, FileDBpathflag, PostgresDBURLflag, SrvConfigFileflag, TrustedSubnetflag *string
+	SrvRunHTTPSflag                                                                                      *bool
 )
 
 // PostgresDBURL - init database URL string.
@@ -35,6 +36,9 @@ func InitFlags() {
 	BaseURLflag = flag.String("b", "http://127.0.0.1:8080", "BASE_URL flag")
 	PostgresDBURLflag = flag.String("d", "postgres://postgres:1@localhost:5432/gotoschool", "DATABASE_DSN flag")
 	FileDBpathflag = flag.String("f", "../../internal/app/storage/database.txt", "FILE_STORAGE_PATH flag")
+	SrvRunHTTPSflag = flag.Bool("s", false, "ENABLE_HTTPS flag")
+	SrvConfigFileflag = flag.String("c", "", "CONFIG flag")
+	TrustedSubnetflag = flag.String("t", "", "TRUSTED_SUBNET flag")
 }
 
 // SetinitVars - init global vars according to ENV vars and flags passed.
@@ -47,6 +51,8 @@ func SetinitVars() {
 	srvAddressENV, srvAddressexists := os.LookupEnv("SERVER_ADDRESS")
 	fileDBpathENV, fileDBpathexists := os.LookupEnv("FILE_STORAGE_PATH")
 	postgresDBURLENV, postgresDBURLexists := os.LookupEnv("DATABASE_DSN")
+	srvRunHTTPSENV, srvRunHTTPSexists := os.LookupEnv("ENABLE_HTTPS")
+	trustedSubnetENV, trustedSubnetexists := os.LookupEnv("TRUSTED_SUBNET")
 
 	if !srvAddressexists {
 		SrvAddress = *SrvAddressflag
@@ -108,9 +114,34 @@ func SetinitVars() {
 		FileDBpath = fileDBpathENV
 		fmt.Println("Set from ENV: FileDBpath:", FileDBpath)
 	}
+	if !srvRunHTTPSexists {
+		if *SrvRunHTTPSflag {
+			SrvRunHTTPS = "HTTPS_mode_enabled"
+			fmt.Print("Set from flag: SrvRunHTTPS:", *SrvRunHTTPSflag)
+		} else {
+			fmt.Print("ENABLE_HTTPS: not set ")
+		}
+	} else {
+		SrvRunHTTPS = srvRunHTTPSENV
+		fmt.Println("Set from ENV: SrvRunHTTPS:", SrvRunHTTPS)
+	}
+	if !trustedSubnetexists {
+		if isFlagPassed("t") {
+			TrustedSubnet = *TrustedSubnetflag
+			fmt.Print("Set from flag: TrustedSubnet:", *TrustedSubnetflag)
+		} else {
+			fmt.Print("TRUSTED_SUBNET: not set ")
+		}
+	} else {
+		TrustedSubnet = trustedSubnetENV
+		fmt.Println("Set from ENV: TrustedSubnet:", TrustedSubnet)
+	}
+
+	addInitVarsFromConfigFile()
+
 }
 
-// isFlagPassed - checks if flaf is passed
+// isFlagPassed - checks if flag is passed
 func isFlagPassed(name string) bool {
 	found := false
 	flag.Visit(func(f *flag.Flag) {

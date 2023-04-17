@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/netip"
 	"path"
 	"strconv"
 	"sync"
@@ -256,6 +257,46 @@ func GetPingHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusInternalServerError)
 	}
 	fmt.Println("GetPingHandler: finished")
+}
+
+// структура выводимого JSON
+type resultStatsData struct {
+	//ID int `json:"ID"`
+	URLs int `json:"urls"`
+	Usrs int `json:"users"`
+}
+
+var resultStatsJSON resultStatsData
+
+// GetStatsHandler - returns Stats, num of users and URLs.
+func GetStatsHandler(w http.ResponseWriter, r *http.Request) {
+	// работаем с RAM
+	xRealIPHeader := r.Header.Get("X-Real-IP")
+	trustedNetwork, err := netip.ParsePrefix(initconfig.TrustedSubnet)
+	if err != nil {
+		panic(err)
+	}
+	ip, err := netip.ParseAddr(xRealIPHeader)
+	if err != nil {
+		panic(err)
+	}
+
+	if trustedNetwork.Contains(ip) {
+		w.WriteHeader(http.StatusOK)
+		totalURLs := len(storage.URL)
+		totalUsers := len(storage.Usr)
+		resultStatsJSON.URLs = totalURLs
+		resultStatsJSON.Usrs = totalUsers
+
+		resultStatsJSONBz, err := json.MarshalIndent(resultStatsJSON, "", "  ")
+		if err != nil {
+			panic(err)
+		}
+		//типа return:
+		w.Write(resultStatsJSONBz)
+	} else {
+		w.WriteHeader(http.StatusForbidden)
+	}
 }
 
 // ! POST /
