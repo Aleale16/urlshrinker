@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package grpcapp;
+
+option go_package = "urlshrinker/internal/app/grpcapp/proto";
+
+message GetrecordRequest {
+    string shortURL = 1;
+}
+message GetrecordResponse {
+    string fullURL = 1;
+    string status = 2;
+}
+
+message CheckPGdbConnRequest {
+}
+message CheckPGdbConnResponse {
+    bool connected = 1;
+}
+
+service Actions {
+  rpc Getrecord(GetrecordRequest) returns (GetrecordResponse);
+  rpc CheckPGdbConn(CheckPGdbConnRequest) returns (CheckPGdbConnResponse);
+} 
