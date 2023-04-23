@@ -78,7 +78,6 @@ func Start(ctx context.Context) error {
 	   		}
 	   	log.Println("USERNAME: " + UserName)
 	*/
-
 	onlyOnce.Do(storage.Initdb)
 
 	if initconfig.SrvRunHTTPS == "HTTPS_mode_enabled" {
