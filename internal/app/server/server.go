@@ -30,7 +30,7 @@ import (
 		User       string `env:"USERNAME"`
 	}
 */
-
+//shutdownTimeout set timeout for gracefull shutdown
 const shutdownTimeout = 5 * time.Second
 
 func Start(ctx context.Context) error {
@@ -108,7 +108,7 @@ func Start(ctx context.Context) error {
 			return fmt.Errorf("shutdown: %w", err)
 		}
 
-		//Если какая-то из операций по очистке ресурсов повисла
+		//longShutdown Если какая-то из операций по очистке ресурсов повисла
 		longShutdown := make(chan struct{}, 1)
 
 		go func() {
