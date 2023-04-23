@@ -30,7 +30,8 @@ import (
 		User       string `env:"USERNAME"`
 	}
 */
-//shutdownTimeout set timeout for gracefull shutdown
+
+// shutdownTimeout set timeout for gracefull shutdown
 const shutdownTimeout = 5 * time.Second
 
 func Start(ctx context.Context) error {
