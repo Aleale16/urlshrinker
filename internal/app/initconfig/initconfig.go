@@ -139,6 +139,29 @@ func SetinitVars() {
 
 	addInitVarsFromConfigFile()
 
+	if BaseURL == "" {
+		//нет ни переменной окружения ни флага
+		BaseURL = "http://localhost:8080"
+		log.Print("BASE_URL: " + "Loaded default: " + BaseURL)
+	}
+	log.Print("BASE_URL: " + BaseURL)
+
+	if FileDBpath == "" {
+		//нет ни переменной окружения ни флага
+		log.Print("FILE_STORAGE_PATH: not set")
+	}
+
+	if SrvAddress == "" {
+		//нет ни переменной окружения ни флага
+		SrvAddress = "localhost:8080"
+		log.Print("SERVER_ADDRESS: " + "Loaded default: " + SrvAddress)
+	}
+
+	os.Setenv("SERVER_ADDRESS", SrvAddress)
+	os.Setenv("BASE_URL", BaseURL)
+	os.Setenv("FILE_STORAGE_PATH", FileDBpath)
+	os.Setenv("DATABASE_DSN", PostgresDBURL)
+
 }
 
 // isFlagPassed - checks if flag is passed

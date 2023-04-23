@@ -68,12 +68,16 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
 	defer stop()
 
-	go server.Start()
+	//go server.Start()
 
-	<-ctx.Done()
-	if ctx.Err() != nil {
-		fmt.Printf("Ошибка:%v\n", ctx.Err())
+	if err := server.Start(ctx); err != nil {
+		log.Fatal(err)
 	}
+
+	//<-ctx.Done()
+	//if ctx.Err() != nil {
+	//	fmt.Printf("Ошибка:%v\n", ctx.Err())
+	//}
 	//os.Exit(10)
 
 }
