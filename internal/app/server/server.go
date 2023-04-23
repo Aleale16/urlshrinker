@@ -87,6 +87,7 @@ func Start(ctx context.Context) error {
 		log.Print("ENABLE_HTTPS: " + "Loaded default: NO HTTPS")
 		//log.Fatal(http.ListenAndServe("localhost:8080", r))
 		//log.Fatal(http.ListenAndServe(os.Getenv("SERVER_ADDRESS"), r))
+		//srv stores server params
 		var srv = &http.Server{
 			Addr:    os.Getenv("SERVER_ADDRESS"),
 			Handler: r,
