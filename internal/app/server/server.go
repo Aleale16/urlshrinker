@@ -34,6 +34,7 @@ import (
 // shutdownTimeout set timeout for gracefull shutdown
 const shutdownTimeout = 5 * time.Second
 
+// Start starts http or https server
 func Start(ctx context.Context) error {
 	var onlyOnce sync.Once
 	//var SrvConfig ServerConfig
@@ -110,7 +111,7 @@ func Start(ctx context.Context) error {
 			return fmt.Errorf("shutdown: %w", err)
 		}
 
-		//longShutdown Если какая-то из операций по очистке ресурсов повисла
+		// longShutdown Если какая-то из операций по очистке ресурсов повисла
 		longShutdown := make(chan struct{}, 1)
 
 		go func() {
