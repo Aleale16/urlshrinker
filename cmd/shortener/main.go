@@ -10,6 +10,7 @@ import (
 	"os/signal"
 	"syscall"
 
+	"urlshrinker/internal/app/grpcapp"
 	"urlshrinker/internal/app/initconfig"
 	"urlshrinker/internal/app/server"
 	//"github.com/Aleale16/urlshrinker/internal/app/initconfig"
@@ -74,10 +75,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//??Как его запустить?? параллельно же нельзя? или запускать по флагу?
-	//	if err := grpcapp.Grpcserverstart(); err != nil {
-	//		log.Fatal(err)
-	//	}
+	//??Как его запустить?? параллельно? или запускать по флагу?
+	if err := grpcapp.Grpcserverstart(); err != nil {
+		log.Fatal(err)
+	}
 
 	//<-ctx.Done()
 	//if ctx.Err() != nil {
