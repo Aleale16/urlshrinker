@@ -42,11 +42,11 @@ func (s *ActionsServer) Getuserrecords(ctx context.Context, in *pb.Getuserrecord
 }
 
 // PostShortURLtouser реализует интерфейс создания связки короткого айди урла с айди пользователя его создавшим.
-func (s *ActionsServer) PostShortURLtouser(ctx context.Context, in *pb.PostShortURLtouserRequest) error {
-
+func (s *ActionsServer) PostShortURLtouser(ctx context.Context, in *pb.PostShortURLtouserRequest) (*pb.PostShortURLtouserResponse, error) {
+	var response pb.PostShortURLtouserResponse
 	storage.AssignShortURLtouser(in.Userid, in.ShortURLid)
 
-	return nil
+	return &response, nil
 }
 
 // CheckPGdbConn реализует интерфейс проверки соединения с БД.
