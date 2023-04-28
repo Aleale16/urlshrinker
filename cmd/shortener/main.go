@@ -69,13 +69,12 @@ func main() {
 	defer stop()
 
 	//go server.Start()
-	go func() {
-		if err := server.Start(ctx); err != nil {
-			log.Fatal(err)
-		}
-	}()
 
-	//
+	if err := server.Start(ctx); err != nil {
+		log.Fatal(err)
+	}
+
+	//??Как его запустить параллельно??
 	//	if err := grpcapp.Grpcserverstart(); err != nil {
 	//		log.Fatal(err)
 	//	}
