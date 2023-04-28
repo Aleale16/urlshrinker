@@ -69,14 +69,16 @@ func main() {
 	defer stop()
 
 	//go server.Start()
+	go func() {
+		if err := server.Start(ctx); err != nil {
+			log.Fatal(err)
+		}
+	}()
 
-	if err := server.Start(ctx); err != nil {
-		log.Fatal(err)
-	}
-
-//	if err := grpcapp.Grpcserverstart(); err != nil {
-//		log.Fatal(err)
-//	}
+	//
+	//	if err := grpcapp.Grpcserverstart(); err != nil {
+	//		log.Fatal(err)
+	//	}
 
 	//<-ctx.Done()
 	//if ctx.Err() != nil {
