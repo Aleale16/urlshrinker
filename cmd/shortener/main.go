@@ -74,11 +74,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//??Как его запустить?? параллельно? или запускать по флагу?
-	//if errgRPC := grpcapp.Grpcserverstart(); errgRPC != nil {
-	//	log.Fatal(errgRPC)
-	//}
-
 	//<-ctx.Done()
 	//if ctx.Err() != nil {
 	//	fmt.Printf("Ошибка:%v\n", ctx.Err())
