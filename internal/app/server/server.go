@@ -12,6 +12,7 @@ import (
 	//"github.com/Aleale16/urlshrinker/internal/app/handler"
 	//"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 	//"github.com/Aleale16/urlshrinker/internal/app/storage"
+	"urlshrinker/internal/app/grpcapp"
 	"urlshrinker/internal/app/handler"
 	"urlshrinker/internal/app/initconfig"
 	"urlshrinker/internal/app/storage"
@@ -96,6 +97,11 @@ func Start(ctx context.Context) error {
 		go func() {
 			if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 				log.Fatalf("Listen and serve: %v", err)
+			}
+		}()
+		go func() {
+			if errgRPC := grpcapp.Grpcserverstart(); errgRPC != nil {
+				log.Fatal(errgRPC)
 			}
 		}()
 
