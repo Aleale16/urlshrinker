@@ -287,7 +287,7 @@ func copyFiletoRAM(dbPath string, URLs URLrecord) URLrecord {
 }
 
 // CheckPGdbConn - Check if Postgres DB is connected.
-func CheckPGdbConn() (connected bool) {
+func CheckPGdbConn() (PGdbconnected bool) {
 	//onlyOnce.Do(Initdb)
 	//defer PGdb.Close()
 	err := PGdb.Ping(context.Background())

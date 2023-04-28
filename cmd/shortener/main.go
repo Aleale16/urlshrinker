@@ -3,9 +3,12 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
+	"os/signal"
+	"syscall"
 
 	"urlshrinker/internal/app/initconfig"
 	"urlshrinker/internal/app/server"
@@ -62,8 +65,19 @@ func main() {
 
 	initconfig.SetinitVars()
 
-	server.Start()
+	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)
+	defer stop()
 
+	//go server.Start()
+
+	if err := server.Start(ctx); err != nil {
+		log.Fatal(err)
+	}
+
+	//<-ctx.Done()
+	//if ctx.Err() != nil {
+	//	fmt.Printf("Ошибка:%v\n", ctx.Err())
+	//}
 	//os.Exit(10)
 
 }

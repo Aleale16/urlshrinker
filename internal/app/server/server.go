@@ -1,15 +1,18 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
 	"sync"
+	"time"
 
 	//"github.com/Aleale16/urlshrinker/internal/app/handler"
 	//"github.com/Aleale16/urlshrinker/internal/app/initconfig"
 	//"github.com/Aleale16/urlshrinker/internal/app/storage"
+	"urlshrinker/internal/app/grpcapp"
 	"urlshrinker/internal/app/handler"
 	"urlshrinker/internal/app/initconfig"
 	"urlshrinker/internal/app/storage"
@@ -28,7 +31,12 @@ import (
 		User       string `env:"USERNAME"`
 	}
 */
-func Start() {
+
+// shutdownTimeout set timeout for gracefull shutdown
+const shutdownTimeout = 5 * time.Second
+
+// Start starts http or https server
+func Start(ctx context.Context) error {
 	var onlyOnce sync.Once
 	//var SrvConfig ServerConfig
 	//var UserName string
@@ -46,6 +54,7 @@ func Start() {
 	r.Get("/{id}", handler.GetHandler)
 	r.Get("/api/user/urls", handler.GetUsrURLsHandler)
 	r.Get("/ping", handler.GetPingHandler)
+	r.Get("/api/internal/stats", handler.GetStatsHandler)
 
 	r.Post("/", handler.PostHandler)
 	r.Post("/api/shorten", handler.PostJSONHandler)
@@ -72,32 +81,59 @@ func Start() {
 	   		}
 	   	log.Println("USERNAME: " + UserName)
 	*/
-	if initconfig.BaseURL == "" {
-		//нет ни переменной окружения ни флага
-		initconfig.BaseURL = "http://localhost:8080"
-		log.Print("BASE_URL: " + "Loaded default: " + initconfig.BaseURL)
-	}
-	log.Println("BASE_URL: " + initconfig.BaseURL)
-
-	if initconfig.FileDBpath == "" {
-		//нет ни переменной окружения ни флага
-		log.Print("FILE_STORAGE_PATH: not set")
-	}
-
-	if initconfig.SrvAddress == "" {
-		//нет ни переменной окружения ни флага
-		initconfig.SrvAddress = "localhost:8080"
-		log.Print("SERVER_ADDRESS: " + "Loaded default: " + initconfig.SrvAddress)
-	}
-
-	os.Setenv("SERVER_ADDRESS", initconfig.SrvAddress)
-	os.Setenv("BASE_URL", initconfig.BaseURL)
-	os.Setenv("FILE_STORAGE_PATH", initconfig.FileDBpath)
-	os.Setenv("DATABASE_DSN", initconfig.PostgresDBURL)
-
 	onlyOnce.Do(storage.Initdb)
 
-	log.Fatal(http.ListenAndServe(initconfig.SrvAddress, r))
+	if initconfig.SrvRunHTTPS == "HTTPS_mode_enabled" {
+		startHTTPS(r)
+	} else {
+		log.Print("ENABLE_HTTPS: " + "Loaded default: NO HTTPS")
+		//log.Fatal(http.ListenAndServe("localhost:8080", r))
+		//log.Fatal(http.ListenAndServe(os.Getenv("SERVER_ADDRESS"), r))
+		//srv stores server params
+		var srv = &http.Server{
+			Addr:    os.Getenv("SERVER_ADDRESS"),
+			Handler: r,
+		}
+		go func() {
+			if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+				log.Fatalf("Listen and serve: %v", err)
+			}
+		}()
+		go func() {
+			if errgRPC := grpcapp.Grpcserverstart(); errgRPC != nil {
+				log.Fatal(errgRPC)
+			}
+		}()
+
+		log.Printf("Listening on %s", srv.Addr)
+		<-ctx.Done()
+
+		log.Println("Shutting down server gracefully")
+
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), shutdownTimeout)
+		defer cancel()
+
+		if err := srv.Shutdown(shutdownCtx); err != nil {
+			return fmt.Errorf("shutdown: %w", err)
+		}
+
+		// longShutdown Если какая-то из операций по очистке ресурсов повисла
+		longShutdown := make(chan struct{}, 1)
+
+		go func() {
+			time.Sleep(3 * time.Second)
+			longShutdown <- struct{}{}
+		}()
+
+		select {
+		case <-shutdownCtx.Done():
+			return fmt.Errorf("server shutdown: %w", ctx.Err())
+		case <-longShutdown:
+			log.Println("Finished")
+		}
+	}
+	return nil
+	//log.Fatal(http.ListenAndServe("localhost:8080", r))
 
 	//os.Setenv("SERVER_ADDRESS", "localhost:8080")
 	//log.Print("SERVER_ADDRESS: "+"Loaded default: " + os.Getenv("SERVER_ADDRESS"))
