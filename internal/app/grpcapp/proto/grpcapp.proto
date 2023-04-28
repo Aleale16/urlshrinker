@@ -12,13 +12,41 @@ message GetrecordResponse {
     string status = 2;
 }
 
+message PostrecordRequest {
+    string fullURL = 1;
+}
+message PostrecordResponse {
+    string shortURL = 1;
+    string status = 2;
+}
+
+message GetuserrecordsRequest {
+    string userid = 1;
+}
+message GetuserrecordsResponse {
+    string fullURLs = 1;
+    bool noURLs = 2;
+    string arrayUserURLs = 3;
+}
+
+message PostShortURLtouserRequest {
+    string userid = 1;
+    string shortURLid = 2;
+}
+message PostShortURLtouserResponse {
+}
+
 message CheckPGdbConnRequest {
 }
 message CheckPGdbConnResponse {
-    bool connected = 1;
+    bool isconnected = 1;
 }
 
 service Actions {
   rpc Getrecord(GetrecordRequest) returns (GetrecordResponse);
+  rpc Postrecord(PostrecordRequest) returns (PostrecordResponse);
+  rpc Getuserrecords(GetuserrecordsRequest) returns (GetuserrecordsResponse);
+  rpc PostShortURLtouser(PostShortURLtouserRequest) returns (PostShortURLtouserResponse);
+
   rpc CheckPGdbConn(CheckPGdbConnRequest) returns (CheckPGdbConnResponse);
 } 

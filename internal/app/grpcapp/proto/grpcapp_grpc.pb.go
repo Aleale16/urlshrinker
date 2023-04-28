@@ -19,8 +19,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Actions_Getrecord_FullMethodName     = "/grpcapp.Actions/Getrecord"
-	Actions_CheckPGdbConn_FullMethodName = "/grpcapp.Actions/CheckPGdbConn"
+	Actions_Getrecord_FullMethodName          = "/grpcapp.Actions/Getrecord"
+	Actions_Postrecord_FullMethodName         = "/grpcapp.Actions/Postrecord"
+	Actions_Getuserrecords_FullMethodName     = "/grpcapp.Actions/Getuserrecords"
+	Actions_PostShortURLtouser_FullMethodName = "/grpcapp.Actions/PostShortURLtouser"
+	Actions_CheckPGdbConn_FullMethodName      = "/grpcapp.Actions/CheckPGdbConn"
 )
 
 // ActionsClient is the client API for Actions service.
@@ -28,6 +31,9 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ActionsClient interface {
 	Getrecord(ctx context.Context, in *GetrecordRequest, opts ...grpc.CallOption) (*GetrecordResponse, error)
+	Postrecord(ctx context.Context, in *PostrecordRequest, opts ...grpc.CallOption) (*PostrecordResponse, error)
+	Getuserrecords(ctx context.Context, in *GetuserrecordsRequest, opts ...grpc.CallOption) (*GetuserrecordsResponse, error)
+	PostShortURLtouser(ctx context.Context, in *PostShortURLtouserRequest, opts ...grpc.CallOption) (*PostShortURLtouserResponse, error)
 	CheckPGdbConn(ctx context.Context, in *CheckPGdbConnRequest, opts ...grpc.CallOption) (*CheckPGdbConnResponse, error)
 }
 
@@ -48,6 +54,33 @@ func (c *actionsClient) Getrecord(ctx context.Context, in *GetrecordRequest, opt
 	return out, nil
 }
 
+func (c *actionsClient) Postrecord(ctx context.Context, in *PostrecordRequest, opts ...grpc.CallOption) (*PostrecordResponse, error) {
+	out := new(PostrecordResponse)
+	err := c.cc.Invoke(ctx, Actions_Postrecord_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *actionsClient) Getuserrecords(ctx context.Context, in *GetuserrecordsRequest, opts ...grpc.CallOption) (*GetuserrecordsResponse, error) {
+	out := new(GetuserrecordsResponse)
+	err := c.cc.Invoke(ctx, Actions_Getuserrecords_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *actionsClient) PostShortURLtouser(ctx context.Context, in *PostShortURLtouserRequest, opts ...grpc.CallOption) (*PostShortURLtouserResponse, error) {
+	out := new(PostShortURLtouserResponse)
+	err := c.cc.Invoke(ctx, Actions_PostShortURLtouser_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *actionsClient) CheckPGdbConn(ctx context.Context, in *CheckPGdbConnRequest, opts ...grpc.CallOption) (*CheckPGdbConnResponse, error) {
 	out := new(CheckPGdbConnResponse)
 	err := c.cc.Invoke(ctx, Actions_CheckPGdbConn_FullMethodName, in, out, opts...)
@@ -62,6 +95,9 @@ func (c *actionsClient) CheckPGdbConn(ctx context.Context, in *CheckPGdbConnRequ
 // for forward compatibility
 type ActionsServer interface {
 	Getrecord(context.Context, *GetrecordRequest) (*GetrecordResponse, error)
+	Postrecord(context.Context, *PostrecordRequest) (*PostrecordResponse, error)
+	Getuserrecords(context.Context, *GetuserrecordsRequest) (*GetuserrecordsResponse, error)
+	PostShortURLtouser(context.Context, *PostShortURLtouserRequest) (*PostShortURLtouserResponse, error)
 	CheckPGdbConn(context.Context, *CheckPGdbConnRequest) (*CheckPGdbConnResponse, error)
 	mustEmbedUnimplementedActionsServer()
 }
@@ -72,6 +108,15 @@ type UnimplementedActionsServer struct {
 
 func (UnimplementedActionsServer) Getrecord(context.Context, *GetrecordRequest) (*GetrecordResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Getrecord not implemented")
+}
+func (UnimplementedActionsServer) Postrecord(context.Context, *PostrecordRequest) (*PostrecordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Postrecord not implemented")
+}
+func (UnimplementedActionsServer) Getuserrecords(context.Context, *GetuserrecordsRequest) (*GetuserrecordsResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Getuserrecords not implemented")
+}
+func (UnimplementedActionsServer) PostShortURLtouser(context.Context, *PostShortURLtouserRequest) (*PostShortURLtouserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PostShortURLtouser not implemented")
 }
 func (UnimplementedActionsServer) CheckPGdbConn(context.Context, *CheckPGdbConnRequest) (*CheckPGdbConnResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CheckPGdbConn not implemented")
@@ -107,6 +152,60 @@ func _Actions_Getrecord_Handler(srv interface{}, ctx context.Context, dec func(i
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Actions_Postrecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostrecordRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ActionsServer).Postrecord(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Actions_Postrecord_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ActionsServer).Postrecord(ctx, req.(*PostrecordRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Actions_Getuserrecords_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetuserrecordsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ActionsServer).Getuserrecords(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Actions_Getuserrecords_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ActionsServer).Getuserrecords(ctx, req.(*GetuserrecordsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _Actions_PostShortURLtouser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PostShortURLtouserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ActionsServer).PostShortURLtouser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Actions_PostShortURLtouser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ActionsServer).PostShortURLtouser(ctx, req.(*PostShortURLtouserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _Actions_CheckPGdbConn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CheckPGdbConnRequest)
 	if err := dec(in); err != nil {
@@ -135,6 +234,18 @@ var Actions_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Getrecord",
 			Handler:    _Actions_Getrecord_Handler,
+		},
+		{
+			MethodName: "Postrecord",
+			Handler:    _Actions_Postrecord_Handler,
+		},
+		{
+			MethodName: "Getuserrecords",
+			Handler:    _Actions_Getuserrecords_Handler,
+		},
+		{
+			MethodName: "PostShortURLtouser",
+			Handler:    _Actions_PostShortURLtouser_Handler,
 		},
 		{
 			MethodName: "CheckPGdbConn",
