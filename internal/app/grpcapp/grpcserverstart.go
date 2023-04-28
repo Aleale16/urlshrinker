@@ -31,7 +31,7 @@ func Grpcserverstart() error {
 	//	}
 
 	errChan := make(chan error)
-	stopChan := make(chan os.Signal,5)
+	stopChan := make(chan os.Signal,1)
 
 	// Ожидаем события от ОС
 	signal.Notify(stopChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)

@@ -50,7 +50,7 @@ func (s *ActionsServer) PostShortURLtouser(ctx context.Context, in *pb.PostShort
 }
 
 // CheckPGdbConn реализует интерфейс проверки соединения с БД.
-// Вызывает ошибку cannot use storage.CheckPGdbConn (value of type func() (PGdbconnected bool)) as type bool in assignment
+// ??Вызывает ошибку cannot use storage.CheckPGdbConn (value of type func() (PGdbconnected bool)) as type bool in assignment
 /*func (s *ActionsServer) CheckPGdbConn(ctx context.Context, in *pb.CheckPGdbConnRequest) (*pb.CheckPGdbConnResponse, error) {
 	var response pb.CheckPGdbConnResponse
 
