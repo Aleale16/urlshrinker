@@ -74,7 +74,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//??Как его запустить параллельно??
+	//??Как его запустить?? параллельно же нельзя? или запускать по флагу?
 	//	if err := grpcapp.Grpcserverstart(); err != nil {
 	//		log.Fatal(err)
 	//	}

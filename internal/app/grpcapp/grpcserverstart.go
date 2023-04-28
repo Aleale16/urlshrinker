@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+// Grpcserverstart starts gRPC server
 func Grpcserverstart() error {
 	// определяем порт для сервера
 	listen, err := net.Listen("tcp", ":3200")
