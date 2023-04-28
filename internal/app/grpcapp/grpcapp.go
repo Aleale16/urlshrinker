@@ -18,7 +18,7 @@ type ActionsServer struct {
 func (s *ActionsServer) GetRecord(ctx context.Context, in *pb.GetRecordRequest) (*pb.GetRecordResponse, error) {
 	var response pb.GetRecordResponse
 
-	response.fullURL, response.status = storage.Getrecord(in.shortURL)
+	response.FullURL, response.Status = storage.Getrecord(in.ShortURL)
 
 	return &response, nil
 }
@@ -27,7 +27,7 @@ func (s *ActionsServer) GetRecord(ctx context.Context, in *pb.GetRecordRequest) 
 func (s *ActionsServer) PostRecord(ctx context.Context, in *pb.PostRecordRequest) (*pb.PostRecordResponse, error) {
 	var response pb.PostRecordResponse
 
-	response.shortURL, response.status = storage.Storerecord(in.fullURL)
+	response.ShortURL, response.Status = storage.Storerecord(in.FullURL)
 
 	return &response, nil
 }
@@ -36,7 +36,7 @@ func (s *ActionsServer) PostRecord(ctx context.Context, in *pb.PostRecordRequest
 func (s *ActionsServer) Getuserrecords(ctx context.Context, in *pb.GetuserrecordsRequest) (*pb.GetuserrecordsResponse, error) {
 	var response pb.GetuserrecordsResponse
 
-	response.fullURLs, response.noURLs, response.arrayUserURLs = storage.GetuserURLS(in.userid)
+	response.FullURLs, response.NoURLs, response.ArrayUserURLs = storage.GetuserURLS(in.Userid)
 
 	return &response, nil
 }
@@ -44,7 +44,7 @@ func (s *ActionsServer) Getuserrecords(ctx context.Context, in *pb.Getuserrecord
 // PostShortURLtouser реализует интерфейс создания связки короткого айди урла с айди пользователя его создавшим.
 func (s *ActionsServer) PostShortURLtouser(ctx context.Context, in *pb.PostShortURLtouserRequest) error {
 
-	storage.AssignShortURLtouser(in.userid, in.shortURLid)
+	storage.AssignShortURLtouser(in.Userid, in.ShortURLid)
 
 	return nil
 }
@@ -53,7 +53,7 @@ func (s *ActionsServer) PostShortURLtouser(ctx context.Context, in *pb.PostShort
 func (s *ActionsServer) CheckPGdbConn(ctx context.Context, in *pb.CheckPGdbConnRequest) (*pb.CheckPGdbConnResponse, error) {
 	var response pb.CheckPGdbConnResponse
 
-	response.isconnected = storage.CheckPGdbConn
+	response.Isconnected = storage.CheckPGdbConn
 
 	return &response, nil
 }

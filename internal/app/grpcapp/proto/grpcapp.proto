@@ -5,33 +5,33 @@ package grpcapp;
 option go_package = "urlshrinker/internal/app/grpcapp/proto";
 
 message GetrecordRequest {
-    string shortURL = 1;
+    string ShortURL = 1;
 }
 message GetrecordResponse {
-    string fullURL = 1;
-    string status = 2;
+    string FullURL = 1;
+    string Status = 2;
 }
 
 message PostrecordRequest {
-    string fullURL = 1;
+    string FullURL = 1;
 }
 message PostrecordResponse {
-    string shortURL = 1;
-    string status = 2;
+    string ShortURL = 1;
+    string Status = 2;
 }
 
 message GetuserrecordsRequest {
     string userid = 1;
 }
 message GetuserrecordsResponse {
-    string fullURLs = 1;
-    bool noURLs = 2;
-    string arrayUserURLs = 3;
+    string FullURLs = 1;
+    bool NoURLs = 2;
+    repeated string ArrayUserURLs = 3;
 }
 
 message PostShortURLtouserRequest {
-    string userid = 1;
-    string shortURLid = 2;
+    string Userid = 1;
+    string ShortURLid = 2;
 }
 message PostShortURLtouserResponse {
 }
@@ -39,7 +39,7 @@ message PostShortURLtouserResponse {
 message CheckPGdbConnRequest {
 }
 message CheckPGdbConnResponse {
-    bool isconnected = 1;
+    bool Isconnected = 1;
 }
 
 service Actions {
