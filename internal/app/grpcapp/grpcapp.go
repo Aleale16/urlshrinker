@@ -3,7 +3,7 @@ package grpcapp
 import (
 	// импортируем пакет со сгенерированными protobuf-файлами
 	"context"
-	pb "urlshrinker/internal/app/grpcapp/proto"
+	pb "urlshrinker/internal/app/proto"
 	"urlshrinker/internal/app/storage"
 )
 
@@ -15,8 +15,8 @@ type ActionsServer struct {
 }
 
 // GetRecord реализует интерфейс получения полного урла по его короткому айди.
-func (s *ActionsServer) GetRecord(ctx context.Context, in *pb.GetRecordRequest) (*pb.GetRecordResponse, error) {
-	var response pb.GetRecordResponse
+func (s *ActionsServer) GetRecord(ctx context.Context, in *pb.GetrecordRequest) (*pb.GetrecordResponse, error) {
+	var response pb.GetrecordResponse
 
 	response.FullURL, response.Status = storage.Getrecord(in.ShortURL)
 
@@ -24,8 +24,8 @@ func (s *ActionsServer) GetRecord(ctx context.Context, in *pb.GetRecordRequest) 
 }
 
 // PostRecord реализует интерфейс сохранения полного урла в базу и получение его короткого айди.
-func (s *ActionsServer) PostRecord(ctx context.Context, in *pb.PostRecordRequest) (*pb.PostRecordResponse, error) {
-	var response pb.PostRecordResponse
+func (s *ActionsServer) PostRecord(ctx context.Context, in *pb.PostrecordRequest) (*pb.PostrecordResponse, error) {
+	var response pb.PostrecordResponse
 
 	response.ShortURL, response.Status = storage.Storerecord(in.FullURL)
 
@@ -50,10 +50,11 @@ func (s *ActionsServer) PostShortURLtouser(ctx context.Context, in *pb.PostShort
 }
 
 // CheckPGdbConn реализует интерфейс проверки соединения с БД.
-func (s *ActionsServer) CheckPGdbConn(ctx context.Context, in *pb.CheckPGdbConnRequest) (*pb.CheckPGdbConnResponse, error) {
+// Вызывает ошибку cannot use storage.CheckPGdbConn (value of type func() (PGdbconnected bool)) as type bool in assignment
+/*func (s *ActionsServer) CheckPGdbConn(ctx context.Context, in *pb.CheckPGdbConnRequest) (*pb.CheckPGdbConnResponse, error) {
 	var response pb.CheckPGdbConnResponse
 
 	response.Isconnected = storage.CheckPGdbConn
 
 	return &response, nil
-}
+}*/

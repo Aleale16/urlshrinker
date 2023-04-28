@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	pb "urlshrinker/internal/app/grpcapp/proto"
+	pb "urlshrinker/internal/app/proto"
 
 	"google.golang.org/grpc"
 )
@@ -31,7 +31,7 @@ func Grpcserverstart() error {
 	//	}
 
 	errChan := make(chan error)
-	stopChan := make(chan os.Signal)
+	stopChan := make(chan os.Signal,5)
 
 	// Ожидаем события от ОС
 	signal.Notify(stopChan, syscall.SIGTERM, syscall.SIGINT, syscall.SIGQUIT)

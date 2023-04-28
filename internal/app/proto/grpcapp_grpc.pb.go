@@ -19,11 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Actions_Getrecord_FullMethodName          = "/grpcapp.Actions/Getrecord"
-	Actions_Postrecord_FullMethodName         = "/grpcapp.Actions/Postrecord"
-	Actions_Getuserrecords_FullMethodName     = "/grpcapp.Actions/Getuserrecords"
-	Actions_PostShortURLtouser_FullMethodName = "/grpcapp.Actions/PostShortURLtouser"
-	Actions_CheckPGdbConn_FullMethodName      = "/grpcapp.Actions/CheckPGdbConn"
+	Actions_Getrecord_FullMethodName          = "/proto.Actions/Getrecord"
+	Actions_Postrecord_FullMethodName         = "/proto.Actions/Postrecord"
+	Actions_Getuserrecords_FullMethodName     = "/proto.Actions/Getuserrecords"
+	Actions_PostShortURLtouser_FullMethodName = "/proto.Actions/PostShortURLtouser"
 )
 
 // ActionsClient is the client API for Actions service.
@@ -34,7 +33,6 @@ type ActionsClient interface {
 	Postrecord(ctx context.Context, in *PostrecordRequest, opts ...grpc.CallOption) (*PostrecordResponse, error)
 	Getuserrecords(ctx context.Context, in *GetuserrecordsRequest, opts ...grpc.CallOption) (*GetuserrecordsResponse, error)
 	PostShortURLtouser(ctx context.Context, in *PostShortURLtouserRequest, opts ...grpc.CallOption) (*PostShortURLtouserResponse, error)
-	CheckPGdbConn(ctx context.Context, in *CheckPGdbConnRequest, opts ...grpc.CallOption) (*CheckPGdbConnResponse, error)
 }
 
 type actionsClient struct {
@@ -81,15 +79,6 @@ func (c *actionsClient) PostShortURLtouser(ctx context.Context, in *PostShortURL
 	return out, nil
 }
 
-func (c *actionsClient) CheckPGdbConn(ctx context.Context, in *CheckPGdbConnRequest, opts ...grpc.CallOption) (*CheckPGdbConnResponse, error) {
-	out := new(CheckPGdbConnResponse)
-	err := c.cc.Invoke(ctx, Actions_CheckPGdbConn_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // ActionsServer is the server API for Actions service.
 // All implementations must embed UnimplementedActionsServer
 // for forward compatibility
@@ -98,7 +87,6 @@ type ActionsServer interface {
 	Postrecord(context.Context, *PostrecordRequest) (*PostrecordResponse, error)
 	Getuserrecords(context.Context, *GetuserrecordsRequest) (*GetuserrecordsResponse, error)
 	PostShortURLtouser(context.Context, *PostShortURLtouserRequest) (*PostShortURLtouserResponse, error)
-	CheckPGdbConn(context.Context, *CheckPGdbConnRequest) (*CheckPGdbConnResponse, error)
 	mustEmbedUnimplementedActionsServer()
 }
 
@@ -117,9 +105,6 @@ func (UnimplementedActionsServer) Getuserrecords(context.Context, *Getuserrecord
 }
 func (UnimplementedActionsServer) PostShortURLtouser(context.Context, *PostShortURLtouserRequest) (*PostShortURLtouserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method PostShortURLtouser not implemented")
-}
-func (UnimplementedActionsServer) CheckPGdbConn(context.Context, *CheckPGdbConnRequest) (*CheckPGdbConnResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckPGdbConn not implemented")
 }
 func (UnimplementedActionsServer) mustEmbedUnimplementedActionsServer() {}
 
@@ -206,29 +191,11 @@ func _Actions_PostShortURLtouser_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Actions_CheckPGdbConn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CheckPGdbConnRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ActionsServer).CheckPGdbConn(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: Actions_CheckPGdbConn_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ActionsServer).CheckPGdbConn(ctx, req.(*CheckPGdbConnRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // Actions_ServiceDesc is the grpc.ServiceDesc for Actions service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Actions_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "grpcapp.Actions",
+	ServiceName: "proto.Actions",
 	HandlerType: (*ActionsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -246,10 +213,6 @@ var Actions_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "PostShortURLtouser",
 			Handler:    _Actions_PostShortURLtouser_Handler,
-		},
-		{
-			MethodName: "CheckPGdbConn",
-			Handler:    _Actions_CheckPGdbConn_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

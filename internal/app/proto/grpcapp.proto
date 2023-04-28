@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package grpcapp;
+package proto;
 
-option go_package = "urlshrinker/internal/app/grpcapp/proto";
+option go_package = "urlshrinker/internal/app/proto";
 
 message GetrecordRequest {
     string ShortURL = 1;
@@ -35,12 +35,12 @@ message PostShortURLtouserRequest {
 }
 message PostShortURLtouserResponse {
 }
-
+/*
 message CheckPGdbConnRequest {
 }
 message CheckPGdbConnResponse {
     bool Isconnected = 1;
-}
+}*/
 
 service Actions {
   rpc Getrecord(GetrecordRequest) returns (GetrecordResponse);
@@ -48,5 +48,5 @@ service Actions {
   rpc Getuserrecords(GetuserrecordsRequest) returns (GetuserrecordsResponse);
   rpc PostShortURLtouser(PostShortURLtouserRequest) returns (PostShortURLtouserResponse);
 
-  rpc CheckPGdbConn(CheckPGdbConnRequest) returns (CheckPGdbConnResponse);
+  //rpc CheckPGdbConn(CheckPGdbConnRequest) returns (CheckPGdbConnResponse);
 } 
